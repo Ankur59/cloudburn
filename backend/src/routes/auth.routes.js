@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router } from "express";
 import {
   register,
   verifyEmail,
@@ -6,24 +6,24 @@ import {
   refresh,
   logout,
   getMe,
-} from '../controllers/auth.controller.js';
+} from "../controllers/auth.controller.js";
 import {
   registerValidator,
   loginValidator,
   verifyEmailValidator,
-} from '../validators/auth.validator.js';
-import { protect } from '../middlewares/auth.middleware.js';
+} from "../validators/auth.validator.js";
+import { protect } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
 // Public routes
-router.post('/register',      registerValidator,    register);
-router.post('/verify-email',  verifyEmailValidator, verifyEmail);
-router.post('/login',         loginValidator,       login);
-router.post('/refresh',                             refresh);   // reads cookie
+router.post("/register", registerValidator, register);
+router.post("/verify-email", verifyEmailValidator, verifyEmail);
+router.post("/login", loginValidator, login);
+router.post("/refresh", refresh); // reads cookie
 
 // Protected routes (valid JWT required)
-router.post('/logout', protect(), logout);
-router.get('/me',      protect(), getMe);
+router.post("/logout", protect(), logout);
+router.get("/me", protect(), getMe);
 
 export default router;

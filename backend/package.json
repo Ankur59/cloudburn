@@ -15,6 +15,7 @@
     "nodemon": "^3.1.14"
   },
   "dependencies": {
+    "@aws-sdk/client-sts": "^3.1039.0",
     "@getbrevo/brevo": "^5.0.4",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",

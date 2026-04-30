@@ -1,12 +1,12 @@
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import crypto from 'crypto';
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
-import Organization from '../models/organization.model.js';
-import User from '../models/user.model.js';
-import AppError from '../utils/AppError.js';
-import { config } from '../config/config.js';
-import { sendVerificationEmail } from './email.service.js';
+import Organization from "../models/organization.model.js";
+import User from "../models/user.model.js";
+import AppError from "../utils/AppError.js";
+import { config } from "../config/config.js";
+import { sendVerificationEmail } from "./email.service.js";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -21,24 +21,24 @@ const generateRefreshToken = (userId) =>
   });
 
 // Crypto token (for email verification / invite links)
-const generateCryptoToken = () => crypto.randomBytes(32).toString('hex');
+const generateCryptoToken = () => crypto.randomBytes(32).toString("hex");
 
 // One-way hash stored in DB — original token goes to the user
 const hashToken = (token) =>
-  crypto.createHash('sha256').update(token).digest('hex');
+  crypto.createHash("sha256").update(token).digest("hex");
 
 export const setRefreshCookie = (res, rawRefreshToken) => {
-  res.cookie('refreshToken', rawRefreshToken, {
+  res.cookie("refreshToken", rawRefreshToken, {
     httpOnly: true,
-    secure: config.NODE_ENV === 'production',
-    sameSite: 'strict',
+    secure: config.NODE_ENV === "production",
+    sameSite: "strict",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    path: '/',
+    path: "/",
   });
 };
 
 export const clearRefreshCookie = (res) =>
-  res.clearCookie('refreshToken', { path: '/' });
+  res.clearCookie("refreshToken", { path: "/" });
 
 // ── Register Admin ────────────────────────────────────────────────────────────
 // Single call that:
@@ -51,7 +51,7 @@ export const registerAdmin = async ({ orgName, name, email, password }) => {
   // Email must be unique for users
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    throw new AppError('An account with this email already exists.', 409);
+    throw new AppError("An account with this email already exists.", 409);
   }
 
   // 1) Create the Organization (data store — no auth fields)
@@ -67,17 +67,23 @@ export const registerAdmin = async ({ orgName, name, email, password }) => {
     name,
     email,
     passwordHash,
-    role: 'Admin',
+    role: "Admin",
     inviteToken: null,
     inviteAccepted: true,
     isEmailVerified: false,
     emailVerificationToken: hashToken(rawToken),
-    emailVerificationExpiry: new Date(Date.now() + config.EMAIL_VERIFICATION_TTL_MS),
+    emailVerificationExpiry: new Date(
+      Date.now() + config.EMAIL_VERIFICATION_TTL_MS,
+    ),
   });
 
   // 4) Send verification email (fire-and-forget — don't block the response)
-  sendVerificationEmail({ to: email, name, emailVerificationToken: rawToken }).catch(
-    (err) => console.error('📧 Verification email failed:', err.message)
+  sendVerificationEmail({
+    to: email,
+    name,
+    emailVerificationToken: rawToken,
+  }).catch((err) =>
+    console.error("📧 Verification email failed:", err.message),
   );
 
   return { org, user };
@@ -93,7 +99,7 @@ export const verifyEmail = async (rawToken) => {
   });
 
   if (!user) {
-    throw new AppError('Token is invalid or has expired.', 400);
+    throw new AppError("Token is invalid or has expired.", 400);
   }
 
   user.isEmailVerified = true;
@@ -107,17 +113,19 @@ export const verifyEmail = async (rawToken) => {
 // ── Login ─────────────────────────────────────────────────────────────────────
 
 export const loginUser = async ({ email, password }, res) => {
-  const user = await User.findOne({ email }).select('+passwordHash +refreshToken');
+  const user = await User.findOne({ email }).select(
+    "+passwordHash +refreshToken",
+  );
 
   // Generic message to prevent email enumeration
   if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
-    throw new AppError('Invalid email or password.', 401);
+    throw new AppError("Invalid email or password.", 401);
   }
 
   if (!user.isEmailVerified) {
     throw new AppError(
-      'Your email is not verified. Please check your inbox for the verification link.',
-      403
+      "Your email is not verified. Please check your inbox for the verification link.",
+      403,
     );
   }
 
@@ -141,17 +149,20 @@ export const loginUser = async ({ email, password }, res) => {
 
 export const refreshAccessToken = async (rawRefreshToken, res) => {
   if (!rawRefreshToken) {
-    throw new AppError('No refresh token. Please log in.', 401);
+    throw new AppError("No refresh token. Please log in.", 401);
   }
 
   let decoded;
   try {
     decoded = jwt.verify(rawRefreshToken, config.JWT_REFRESH_SECRET);
   } catch {
-    throw new AppError('Invalid or expired refresh token. Please log in again.', 401);
+    throw new AppError(
+      "Invalid or expired refresh token. Please log in again.",
+      401,
+    );
   }
 
-  const user = await User.findById(decoded.id).select('+refreshToken');
+  const user = await User.findById(decoded.id).select("+refreshToken");
   if (!user || user.refreshToken !== hashToken(rawRefreshToken)) {
     // Possible token reuse — invalidate stored token
     if (user) {
@@ -159,7 +170,7 @@ export const refreshAccessToken = async (rawRefreshToken, res) => {
       await user.save({ validateBeforeSave: false });
     }
     clearRefreshCookie(res);
-    throw new AppError('Refresh token mismatch. Please log in again.', 401);
+    throw new AppError("Refresh token mismatch. Please log in again.", 401);
   }
 
   const newAccessToken = generateAccessToken({
