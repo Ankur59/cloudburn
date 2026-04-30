@@ -20,6 +20,11 @@ export const config = {
   // Client
   CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:3000',
 
+  // Brevo (email)
+  BREVO_API_KEY: process.env.BREVO_API_KEY,
+  EMAIL_FROM_NAME: process.env.EMAIL_FROM_NAME,
+  EMAIL_FROM: process.env.EMAIL_FROM,
+
   // Email verification token TTL (24 h in ms)
   EMAIL_VERIFICATION_TTL_MS: 24 * 60 * 60 * 1000,
 };

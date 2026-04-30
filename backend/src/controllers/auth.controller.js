@@ -1,6 +1,6 @@
 import asyncHandler from '../middlewares/async.middleware.js';
 import { sendSuccess } from '../utils/responseHelper.js';
-import * as authService from '../services/authService.js';
+import * as authService from '../services/auth.service.js';
 
 // ── POST /api/auth/register 
 export const register = asyncHandler(async (req, res) => {
@@ -11,12 +11,7 @@ export const register = asyncHandler(async (req, res) => {
 
   // TODO: in production, send emailVerificationToken via email service
   // and remove it from the response body.
-  return sendSuccess(res, 201, 'Registered successfully. Please verify your email to activate your account.', {
-    organization: { id: org._id, name: org.name, email: org.email },
-    user:         { id: user._id, name: user.name, email: user.email, role: user.role },
-    // Dev only ↓ — remove once email service is wired
-    emailVerificationToken,
-  });
+  return sendSuccess(res, 201, 'Registered successfully. Please verify your email to activate your account.');
 });
 
 // ── POST /api/auth/verify-email 

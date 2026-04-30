@@ -6,6 +6,7 @@ import Organization from '../models/organization.model.js';
 import User from '../models/user.model.js';
 import AppError from '../utils/AppError.js';
 import { config } from '../config/config.js';
+import { sendVerificationEmail } from './email.service.js';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -58,31 +59,36 @@ export const registerAdmin = async ({ orgName, name, email, password }) => {
 
   // 2) Hash password and generate email-verification token
   const passwordHash = await bcrypt.hash(password, 12);
-  const rawToken     = generateCryptoToken();
+  const rawToken = generateCryptoToken();
 
   // 3) Create the Admin User, linked to the org
   const user = await User.create({
-    orgId:                   org._id,
+    orgId: org._id,
     name,
     email,
     passwordHash,
-    role:                    'Admin',
-    inviteToken:             null,
-    inviteAccepted:          true,
-    isEmailVerified:         false,
-    emailVerificationToken:  hashToken(rawToken),
+    role: 'Admin',
+    inviteToken: null,
+    inviteAccepted: true,
+    isEmailVerified: false,
+    emailVerificationToken: hashToken(rawToken),
     emailVerificationExpiry: new Date(Date.now() + config.EMAIL_VERIFICATION_TTL_MS),
   });
 
-  return { org, user, emailVerificationToken: rawToken };
+  // 4) Send verification email (fire-and-forget — don't block the response)
+  sendVerificationEmail({ to: email, name, emailVerificationToken: rawToken }).catch(
+    (err) => console.error('📧 Verification email failed:', err.message)
+  );
+
+  return { org, user };
 };
 
 // ── Verify Email ──────────────────────────────────────────────────────────────
 
 export const verifyEmail = async (rawToken) => {
   const hashed = hashToken(rawToken);
-  const user   = await User.findOne({
-    emailVerificationToken:  hashed,
+  const user = await User.findOne({
+    emailVerificationToken: hashed,
     emailVerificationExpiry: { $gt: Date.now() },
   });
 
@@ -90,8 +96,8 @@ export const verifyEmail = async (rawToken) => {
     throw new AppError('Token is invalid or has expired.', 400);
   }
 
-  user.isEmailVerified        = true;
-  user.emailVerificationToken  = null;
+  user.isEmailVerified = true;
+  user.emailVerificationToken = null;
   user.emailVerificationExpiry = null;
   await user.save();
 
@@ -115,8 +121,8 @@ export const loginUser = async ({ email, password }, res) => {
     );
   }
 
-  const accessToken  = generateAccessToken(user._id);
-  const rawRefresh   = generateRefreshToken(user._id);
+  const accessToken = generateAccessToken(user._id);
+  const rawRefresh = generateRefreshToken(user._id);
 
   // Store hashed refresh token — prevents DB leak from being useful
   user.refreshToken = hashToken(rawRefresh);
@@ -155,8 +161,8 @@ export const refreshAccessToken = async (rawRefreshToken, res) => {
   const newAccessToken = generateAccessToken(user._id);
 
   // Rotate refresh token on every use (refresh token rotation)
-  const newRawRefresh  = generateRefreshToken(user._id);
-  user.refreshToken    = hashToken(newRawRefresh);
+  const newRawRefresh = generateRefreshToken(user._id);
+  user.refreshToken = hashToken(newRawRefresh);
   await user.save({ validateBeforeSave: false });
   setRefreshCookie(res, newRawRefresh);
 

@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import Organization from './organization.model.js';
 
 // Role hierarchy:
 //  Admin    → self-registers, owns the org, can invite TeamLeads
@@ -12,7 +13,7 @@ const userSchema = new mongoose.Schema(
     // then creates/links an Organization afterwards.
     orgId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Organization',
+      ref: Organization,
       default: null,
     },
     teamId: {
@@ -46,13 +47,13 @@ const userSchema = new mongoose.Schema(
 
     // ── Invite flow ──────────────────────────────────────────────────────────
     // null for Admin (self-registered). Set when Admin invites a TeamLead.
-    inviteToken:    { type: String,  default: null, select: false },
+    inviteToken: { type: String, default: null, select: false },
     inviteAccepted: { type: Boolean, default: false },
 
     // ── Email verification ───────────────────────────────────────────────────
-    isEmailVerified:         { type: Boolean, default: false },
-    emailVerificationToken:  { type: String,  default: null, select: false },
-    emailVerificationExpiry: { type: Date,    default: null },
+    isEmailVerified: { type: Boolean, default: false },
+    emailVerificationToken: { type: String, default: null, select: false },
+    emailVerificationExpiry: { type: Date, default: null },
 
     // ── Auth ─────────────────────────────────────────────────────────────────
     // Stored as SHA-256 hash — raw token lives in httpOnly cookie only
