@@ -10,8 +10,8 @@ import { sendVerificationEmail } from './email.service.js';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const generateAccessToken = (userId) =>
-  jwt.sign({ id: userId }, config.JWT_ACCESS_SECRET, {
+const generateAccessToken = ({ id, role, orgId }) =>
+  jwt.sign({ id, role, orgId }, config.JWT_ACCESS_SECRET, {
     expiresIn: config.JWT_ACCESS_EXPIRES_IN,
   });
 
@@ -121,7 +121,11 @@ export const loginUser = async ({ email, password }, res) => {
     );
   }
 
-  const accessToken = generateAccessToken(user._id);
+  const accessToken = generateAccessToken({
+    id: user._id,
+    role: user.role,
+    orgId: user.orgId,
+  });
   const rawRefresh = generateRefreshToken(user._id);
 
   // Store hashed refresh token — prevents DB leak from being useful
@@ -158,7 +162,11 @@ export const refreshAccessToken = async (rawRefreshToken, res) => {
     throw new AppError('Refresh token mismatch. Please log in again.', 401);
   }
 
-  const newAccessToken = generateAccessToken(user._id);
+  const newAccessToken = generateAccessToken({
+    id: user._id,
+    role: user.role,
+    orgId: user.orgId,
+  });
 
   // Rotate refresh token on every use (refresh token rotation)
   const newRawRefresh = generateRefreshToken(user._id);

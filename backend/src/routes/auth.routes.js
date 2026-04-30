@@ -23,7 +23,7 @@ router.post('/login',         loginValidator,       login);
 router.post('/refresh',                             refresh);   // reads cookie
 
 // Protected routes (valid JWT required)
-router.post('/logout', protect, logout);
-router.get('/me',      protect, getMe);
+router.post('/logout', protect(), logout);
+router.get('/me',      protect(), getMe);
 
 export default router;
