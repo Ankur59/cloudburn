@@ -1,5 +1,11 @@
 import express from 'express';
+
 import morgan from 'morgan';
+import { config } from './config/config.js';
+import { errorHandler } from './middlewares/error.middleware.js';
+import authRoutes from './routes/auth.routes.js';
+import teamRoutes from './routes/team.routes.js';
+
 
 import { config } from './config/config.js';
 import { applyMiddlewares } from './loaders/middleware.js';
@@ -14,11 +20,13 @@ applyMiddlewares(app, config)
 app.use(express.json());
 app.use(morgan('dev'));
 
+
 /**
  * all api routes here
  */
-app.use('/api/auth', authRoutes);
 app.use('/api/aws', awsConfigRoutes);
+app.use('/api/auth',  authRoutes);
+app.use('/api/teams', teamRoutes);
 
 
 app.get('/health', (_req, res) =>

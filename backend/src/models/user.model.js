@@ -42,13 +42,7 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       enum: USER_ROLES,
-      default: 'Member',
     },
-
-    // ── Invite flow ──────────────────────────────────────────────────────────
-    // null for Admin (self-registered). Set when Admin invites a TeamLead.
-    inviteToken: { type: String, default: null, select: false },
-    inviteAccepted: { type: Boolean, default: false },
 
     // ── Email verification ───────────────────────────────────────────────────
     isEmailVerified: { type: Boolean, default: false },
