@@ -1,8 +1,6 @@
 import express from 'express';
 
 import morgan from 'morgan';
-import { config } from './config/config.js';
-import { errorHandler } from './middlewares/error.middleware.js';
 import authRoutes from './routes/auth.routes.js';
 import teamRoutes from './routes/team.routes.js';
 
@@ -11,7 +9,6 @@ import { config } from './config/config.js';
 import { applyMiddlewares } from './loaders/middleware.js';
 import { errorHandler } from './middlewares/error.middleware.js';
 
-import authRoutes from './routes/auth.routes.js';
 import awsConfigRoutes from './routes/awsConfig.routes.js';
 
 const app = express();

@@ -1,4 +1,5 @@
 import { STSClient, GetCallerIdentityCommand } from "@aws-sdk/client-sts";
+import { CostExplorerClient, GetCostAndUsageCommand } from "@aws-sdk/client-cost-explorer";
 
 export const verifyAwsCredentials = async (accessKey, secretKey, region) => {
   try {
@@ -23,4 +24,31 @@ export const verifyAwsCredentials = async (accessKey, secretKey, region) => {
       error: error.message,
     };
   }
+};
+
+
+export const getAwsCost = async (accessKey, secretKey, region) => {
+  const client = new CostExplorerClient({
+    region,
+    credentials: {
+      accessKeyId: accessKey,
+      secretAccessKey: secretKey
+    }
+  });
+
+  const command = new GetCostAndUsageCommand({
+    TimePeriod: {
+      Start: "2026-04-01",
+      End: "2026-04-30"
+    },
+    Granularity: "DAILY",
+    Metrics: ["UnblendedCost"],
+    GroupBy: [
+      { Type: "DIMENSION", Key: "SERVICE" }
+    ]
+  });
+
+  const response = await client.send(command);
+
+  return response;
 };
