@@ -1,5 +1,6 @@
 import { config } from '../config/config.js';
 import { verificationEmailTemplate } from '../templates/verificationEmail.js';
+import { invitationEmailTemplate } from '../templates/invitationEmail.js';
 import AppError from '../utils/AppError.js';
 
 const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
@@ -67,5 +68,26 @@ export const sendVerificationEmail = ({ to, name, emailVerificationToken }) => {
     toName:  name,
     subject: '✅ Verify your CloudBurn email',
     html:    verificationEmailTemplate({ name, verificationUrl }),
+  });
+};
+
+/**
+ * Sends a Team Lead invitation link to the invitee.
+ *
+ * @param {object} options
+ * @param {string} options.to          - Invitee email
+ * @param {string} options.inviterName - Admin's name
+ * @param {string} options.teamName    - Team being joined
+ * @param {string} options.orgName     - Organization name
+ * @param {string} options.rawToken    - Raw (unhashed) invite token
+ */
+export const sendInvitationEmail = ({ to, inviterName, teamName, orgName, rawToken }) => {
+  const inviteUrl = `${config.CLIENT_URL}/accept-invite?token=${rawToken}`;
+
+  return sendEmail({
+    to,
+    toName:  to,
+    subject: `🎉 You're invited to join ${orgName} on CloudBurn`,
+    html:    invitationEmailTemplate({ inviterName, teamName, orgName, inviteUrl }),
   });
 };
