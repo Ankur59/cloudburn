@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from "react-router-dom";
-
-
-
+import { Link } from 'react-router-dom';
+import styles from './RegisterForm.module.css';
 
 const GoogleIcon = () => (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -13,8 +11,6 @@ const GoogleIcon = () => (
     <path d="M9 3.45586C10.4684 3.45586 11.764 4.0205 12.7108 4.94606L15.0168 2.64006C13.4277 1.1573 11.4292 0.272461 9 0.272461C5.73982 0.272461 2.83875 2.33856 1.32028 5.30133L4.14028 7.4713C4.71209 5.39142 6.675 3.81689 9 3.81689V3.45586Z" fill="#EA4335"/>
   </svg>
 );
-
-
 
 const RegisterForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,9 +31,6 @@ const RegisterForm = () => {
     },
   });
 
-
-
-
   const onSubmit = async (data) => {
     setSubmitStatus('');
     setIsSubmitting(true);
@@ -47,68 +40,49 @@ const RegisterForm = () => {
     console.log('Register data:', data);
   };
 
-
-
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-
-      <button
-        type="button"
-        className="cursor-pointer not-[]:group bg-zinc-800/80
-    border border-white/10
-    hover:bg-zinc-700/80
-    transition-all duration-400 shadow-[0_0_0_1px_rgba(255,255,255,0.05)]
-    text-zinc-100 mt-0 inline-flex w-full items-center justify-center gap-3 rounded-md   px-4 py-3 text-sm font-semibold  hover:brightness-95"
-       >
+    <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+      <button type="button" className={styles.googleButton}>
         <GoogleIcon />
         Continue with Google
       </button>
 
-      <div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.35em] text-[#A1A1A1]">
-        <span className="h-px flex-1 bg-[#222222]" />
+      <div className={styles.divider}>
+        <span className={styles.dividerLine} />
         <span>or continue with email</span>
-        <span className="h-px flex-1 bg-[#222222]" />
+        <span className={styles.dividerLine} />
       </div>
 
-      <div className="space-y-3">
-        <label className="text-sm mb-1 inline-block font-medium text-[#EDEDED]" htmlFor="organization">
+      <div className={styles.formGroup}>
+        <label className={styles.label} htmlFor="organization">
           Organization Name
         </label>
         <input
           id="organization"
           type="text"
           placeholder="Acme Corporation"
-          className={`w-full rounded-md border px-4 py-3 text-sm font-mono text-[#EDEDED] outline-none transition focus:border-white focus:ring-2 focus:ring-white/10 ${
-            errors.organization ? 'border-[#C94E4E] bg-[#1A1A1A]' : 'border-[#222222] bg-[#111111]'
-          }`}
+          className={`${styles.input} ${errors.organization ? styles.error : ''}`}
           {...register('organization', { required: 'Organization name is required.' })}
         />
-        {errors.organization && (
-          <p className="text-sm text-[#C94E4E]">{errors.organization.message}</p>
-        )}
+        {errors.organization && <p className={styles.errorMessage}>{errors.organization.message}</p>}
       </div>
 
-      <div className="space-y-3">
-        <label className="text-sm mb-1 inline-block font-medium text-[#EDEDED]" htmlFor="fullName">
+      <div className={styles.formGroup}>
+        <label className={styles.label} htmlFor="fullName">
           Full Name
         </label>
         <input
           id="fullName"
           type="text"
           placeholder="Alex Johnson"
-          className={`w-full rounded-md border px-4 py-3 text-sm font-mono text-[#EDEDED] outline-none transition focus:border-white focus:ring-2 focus:ring-white/10 ${
-            errors.fullName ? 'border-[#C94E4E] bg-[#1A1A1A]' : 'border-[#222222] bg-[#111111]'
-          }`}
+          className={`${styles.input} ${errors.fullName ? styles.error : ''}`}
           {...register('fullName', { required: 'Full name is required.' })}
         />
-        {errors.fullName && (
-          <p className="text-sm text-[#C94E4E]">{errors.fullName.message}</p>
-        )}
+        {errors.fullName && <p className={styles.errorMessage}>{errors.fullName.message}</p>}
       </div>
 
-      <div className="space-y-3">
-        <label className="text-sm mb-1 inline-block font-medium text-[#EDEDED]" htmlFor="email">
+      <div className={styles.formGroup}>
+        <label className={styles.label} htmlFor="email">
           Email
         </label>
         <input
@@ -116,9 +90,7 @@ const RegisterForm = () => {
           type="email"
           autoComplete="email"
           placeholder="you@company.com"
-          className={`w-full rounded-md border px-4 py-3 text-sm font-mono text-[#EDEDED] outline-none transition focus:border-white focus:ring-2 focus:ring-white/10 ${
-            errors.email ? 'border-[#C94E4E] bg-[#1A1A1A]' : 'border-[#222222] bg-[#111111]'
-          }`}
+          className={`${styles.input} ${errors.email ? styles.error : ''}`}
           {...register('email', {
             required: 'Email is required.',
             pattern: {
@@ -127,13 +99,11 @@ const RegisterForm = () => {
             },
           })}
         />
-        {errors.email && (
-          <p className="text-sm text-[#C94E4E]">{errors.email.message}</p>
-        )}
+        {errors.email && <p className={styles.errorMessage}>{errors.email.message}</p>}
       </div>
 
-      <div className="space-y-3">
-        <label className="text-sm mb-1 inline-block font-medium text-[#EDEDED]" htmlFor="password">
+      <div className={styles.formGroup}>
+        <label className={styles.label} htmlFor="password">
           Password
         </label>
         <input
@@ -141,9 +111,7 @@ const RegisterForm = () => {
           type="password"
           autoComplete="new-password"
           placeholder="Min. 8 characters"
-          className={`w-full rounded-md border px-4 py-3 text-sm font-mono text-[#EDEDED] outline-none transition focus:border-white focus:ring-2 focus:ring-white/10 ${
-            errors.password ? 'border-[#C94E4E] bg-[#1A1A1A]' : 'border-[#222222] bg-[#111111]'
-          }`}
+          className={`${styles.input} ${errors.password ? styles.error : ''}`}
           {...register('password', {
             required: 'Password is required.',
             minLength: {
@@ -152,20 +120,16 @@ const RegisterForm = () => {
             },
           })}
         />
-        {errors.password && (
-          <p className="text-sm text-[#C94E4E]">{errors.password.message}</p>
-        )}
+        {errors.password && <p className={styles.errorMessage}>{errors.password.message}</p>}
       </div>
 
-      <div className="space-y-3">
-        <label className="text-sm mb-1 inline-block font-medium text-[#EDEDED]" htmlFor="role">
+      <div className={styles.formGroup}>
+        <label className={styles.label} htmlFor="role">
           Role
         </label>
         <select
           id="role"
-          className={`w-full rounded-md border bg-[#111111] px-4 py-3 text-sm text-[#EDEDED] outline-none transition focus:border-white focus:ring-2 focus:ring-white/10 ${
-            errors.role ? 'border-[#C94E4E]' : 'border-[#222222]'
-          }`}
+          className={`${styles.select} ${errors.role ? styles.error : ''}`}
           defaultValue=""
           {...register('role', { required: 'Please select a role.' })}
         >
@@ -176,19 +140,13 @@ const RegisterForm = () => {
           <option value="team-lead">Team Lead</option>
           <option value="developer">Developer</option>
         </select>
-        {errors.role && (
-          <p className="text-sm text-[#C94E4E]">{errors.role.message}</p>
-        )}
+        {errors.role && <p className={styles.errorMessage}>{errors.role.message}</p>}
       </div>
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="cursor-pointer inline-flex w-full items-center justify-center rounded-md bg-white px-4 py-3 text-sm font-semibold text-black transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-70"
-      >
+      <button type="submit" disabled={isSubmitting} className={styles.submitButton}>
         {isSubmitting ? (
-          <span className="inline-flex items-center gap-2">
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-black border-t-transparent" />
+          <span className={styles.spinnerContainer}>
+            <span className={styles.spinner} />
             Creating account...
           </span>
         ) : (
@@ -196,20 +154,14 @@ const RegisterForm = () => {
         )}
       </button>
 
-
-      <div className="border-t border-[#222222] pt-4 text-center text-sm text-[#A1A1A1]">
+      <div className={styles.footerText}>
         Already have an account?{' '}
-        <Link to="/login" className="font-semibold text-[#EDEDED] transition hover:text-white cursor-pointer">
+        <Link to="/login" className={styles.footerLink}>
           Sign in
         </Link>
       </div>
 
-      {submitStatus && (
-        <div className="rounded-xl border border-[#4DB87A]/40 bg-[#1B2E1E] px-4 py-3 text-sm text-[#D9F1D9]">
-          {submitStatus}
-        </div>
-      )}
-
+      {submitStatus && <div className={styles.successMessage}>{submitStatus}</div>}
     </form>
   );
 };

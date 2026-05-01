@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from "react-router-dom";
-
+import { Link } from 'react-router-dom';
+import styles from './LoginForm.module.css';
 
 const GoogleIcon = () => (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -12,12 +12,9 @@ const GoogleIcon = () => (
   </svg>
 );
 
-
-
 const LoginForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState('');
-
 
   const {
     register,
@@ -28,8 +25,6 @@ const LoginForm = () => {
     defaultValues: { email: '', password: '' },
   });
 
-
-
   const onSubmit = async (data) => {
     setSubmitStatus('');
     setIsSubmitting(true);
@@ -39,35 +34,21 @@ const LoginForm = () => {
     console.log('Login data:', data);
   };
 
-
-
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-
-
-      <button
-        type="button"
-        className="group mt-0 inline-flex w-full items-center justify-center gap-3 rounded-md border border-white/10
-    hover:bg-zinc-700/80 bg-zinc-800/80 px-4 py-3 text-sm   text-zinc-100
-    font-medium transition hover:brightness-95 backdrop-blur-sm duration-400 cursor-pointer"
-      >
+    <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+      <button type="button" className={styles.googleButton}>
         <GoogleIcon />
         Continue with Google
       </button>
 
-
-
-      <div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.35em] text-[#A1A1A1]">
-        <span className="h-px flex-1 bg-[#222222]" />
+      <div className={styles.divider}>
+        <span className={styles.dividerLine} />
         <span>or continue with email</span>
-        <span className="h-px flex-1 bg-[#222222]" />
+        <span className={styles.dividerLine} />
       </div>
 
-
-
-      <div className="space-y-3">
-        <label className="text-sm font-medium text-[#EDEDED]" htmlFor="email">
+      <div className={styles.formGroup}>
+        <label className={styles.label} htmlFor="email">
           Email
         </label>
         <input
@@ -75,9 +56,7 @@ const LoginForm = () => {
           type="email"
           autoComplete="email"
           placeholder="you@company.com"
-          className={`w-full rounded-md border px-4 py-3 text-sm font-mono text-[#EDEDED] outline-none transition focus:border-white focus:ring-2 focus:ring-white/10 ${
-            errors.email ? 'border-[#C94E4E] bg-[#1A1A1A]' : 'border-[#222222] bg-[#111111]'
-          }`}
+          className={`${styles.input} ${errors.email ? styles.error : ''}`}
           {...register('email', {
             required: 'Email is required.',
             pattern: {
@@ -86,16 +65,11 @@ const LoginForm = () => {
             },
           })}
         />
-        {errors.email && (
-          <p className="text-sm text-[#C94E4E]">{errors.email.message}</p>
-        )}
+        {errors.email && <p className={styles.errorMessage}>{errors.email.message}</p>}
       </div>
 
-
-
-
-      <div className="space-y-3">
-        <label className="text-sm font-medium text-[#EDEDED]" htmlFor="password">
+      <div className={styles.formGroup}>
+        <label className={styles.label} htmlFor="password">
           Password
         </label>
         <input
@@ -103,9 +77,7 @@ const LoginForm = () => {
           type="password"
           autoComplete="current-password"
           placeholder="Enter your password"
-          className={`w-full rounded-md border px-4 py-3 text-sm font-mono text-[#EDEDED] outline-none transition focus:border-white focus:ring-2 focus:ring-white/10 ${
-            errors.password ? 'border-[#C94E4E] bg-[#1A1A1A]' : 'border-[#222222] bg-[#111111]'
-          }`}
+          className={`${styles.input} ${errors.password ? styles.error : ''}`}
           {...register('password', {
             required: 'Password is required.',
             minLength: {
@@ -114,23 +86,13 @@ const LoginForm = () => {
             },
           })}
         />
-        {errors.password && (
-          <p className="text-sm text-[#C94E4E]">{errors.password.message}</p>
-        )}
+        {errors.password && <p className={styles.errorMessage}>{errors.password.message}</p>}
       </div>
 
-
-
-
-
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="inline-flex w-full items-center justify-center rounded-md  bg-zinc-100 px-4 py-3 text-sm font-semibold text-black transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-70 cursor-pointer"
-      >
+      <button type="submit" disabled={isSubmitting} className={styles.submitButton}>
         {isSubmitting ? (
-          <span className="inline-flex items-center gap-2">
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-black border-t-transparent" />
+          <span className={styles.spinnerContainer}>
+            <span className={styles.spinner} />
             Signing in...
           </span>
         ) : (
@@ -138,33 +100,18 @@ const LoginForm = () => {
         )}
       </button>
 
+      <a href="#" className={styles.forgotLink}>
+        Forgot password?
+      </a>
 
-
-
-      <div className="text-center">
-        <a href="#" className="text-sm text-[#A1A1A1] transition hover:text-[#EDEDED]">
-          Forgot password?
-        </a>
-      </div>
-
-
-
-
-      <div className="border-t border-[#222222] pt-4 text-center text-sm text-[#A1A1A1]">
+      <div className={styles.footerText}>
         Don&apos;t have an account?{' '}
-        <Link to="/signup" className="font-semibold text-[#EDEDED] transition hover:text-white">
+        <Link to="/signup" className={styles.footerLink}>
           Create one
         </Link>
       </div>
 
-
-
-
-      {submitStatus && (
-        <div className="rounded-xl border border-[#4DB87A]/40 bg-[#1B2E1E] px-4 py-3 text-sm text-[#D9F1D9]">
-          {submitStatus}
-        </div>
-      )}
+      {submitStatus && <div className={styles.successMessage}>{submitStatus}</div>}
     </form>
   );
 };
