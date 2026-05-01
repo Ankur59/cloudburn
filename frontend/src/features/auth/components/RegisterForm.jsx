@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import { Link } from "react-router-dom";
 
 
+
+
 const GoogleIcon = () => (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M17.64 9.20441C17.64 8.5666 17.5791 7.95702 17.4668 7.375L9 7.875V10.875H13.8842C13.703 11.9581 13.1462 12.8735 12.2468 13.5246L14.9468 15.8246C16.6927 14.3279 17.64 11.9952 17.64 9.20441Z" fill="#4285F4"/>
@@ -14,10 +16,9 @@ const GoogleIcon = () => (
 
 
 
-const LoginForm = () => {
+const RegisterForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState('');
-
 
   const {
     register,
@@ -25,8 +26,15 @@ const LoginForm = () => {
     formState: { errors },
   } = useForm({
     mode: 'onTouched',
-    defaultValues: { email: '', password: '' },
+    defaultValues: {
+      organization: '',
+      fullName: '',
+      email: '',
+      password: '',
+      role: '',
+    },
   });
+
 
 
 
@@ -35,8 +43,8 @@ const LoginForm = () => {
     setIsSubmitting(true);
     await new Promise((resolve) => setTimeout(resolve, 800));
     setIsSubmitting(false);
-    setSubmitStatus('Signed in successfully.');
-    console.log('Login data:', data);
+    setSubmitStatus('Account created successfully.');
+    console.log('Register data:', data);
   };
 
 
@@ -45,18 +53,17 @@ const LoginForm = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
-
       <button
         type="button"
-        className="group mt-0 inline-flex w-full items-center justify-center gap-3 rounded-md border border-white/10
-    hover:bg-zinc-700/80 bg-zinc-800/80 px-4 py-3 text-sm   text-zinc-100
-    font-medium transition hover:brightness-95 backdrop-blur-sm duration-400 cursor-pointer"
-      >
+        className="cursor-pointer not-[]:group bg-zinc-800/80
+    border border-white/10
+    hover:bg-zinc-700/80
+    transition-all duration-400 shadow-[0_0_0_1px_rgba(255,255,255,0.05)]
+    text-zinc-100 mt-0 inline-flex w-full items-center justify-center gap-3 rounded-md   px-4 py-3 text-sm font-semibold  hover:brightness-95"
+       >
         <GoogleIcon />
         Continue with Google
       </button>
-
-
 
       <div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.35em] text-[#A1A1A1]">
         <span className="h-px flex-1 bg-[#222222]" />
@@ -64,10 +71,44 @@ const LoginForm = () => {
         <span className="h-px flex-1 bg-[#222222]" />
       </div>
 
-
+      <div className="space-y-3">
+        <label className="text-sm mb-1 inline-block font-medium text-[#EDEDED]" htmlFor="organization">
+          Organization Name
+        </label>
+        <input
+          id="organization"
+          type="text"
+          placeholder="Acme Corporation"
+          className={`w-full rounded-md border px-4 py-3 text-sm font-mono text-[#EDEDED] outline-none transition focus:border-white focus:ring-2 focus:ring-white/10 ${
+            errors.organization ? 'border-[#C94E4E] bg-[#1A1A1A]' : 'border-[#222222] bg-[#111111]'
+          }`}
+          {...register('organization', { required: 'Organization name is required.' })}
+        />
+        {errors.organization && (
+          <p className="text-sm text-[#C94E4E]">{errors.organization.message}</p>
+        )}
+      </div>
 
       <div className="space-y-3">
-        <label className="text-sm font-medium text-[#EDEDED]" htmlFor="email">
+        <label className="text-sm mb-1 inline-block font-medium text-[#EDEDED]" htmlFor="fullName">
+          Full Name
+        </label>
+        <input
+          id="fullName"
+          type="text"
+          placeholder="Alex Johnson"
+          className={`w-full rounded-md border px-4 py-3 text-sm font-mono text-[#EDEDED] outline-none transition focus:border-white focus:ring-2 focus:ring-white/10 ${
+            errors.fullName ? 'border-[#C94E4E] bg-[#1A1A1A]' : 'border-[#222222] bg-[#111111]'
+          }`}
+          {...register('fullName', { required: 'Full name is required.' })}
+        />
+        {errors.fullName && (
+          <p className="text-sm text-[#C94E4E]">{errors.fullName.message}</p>
+        )}
+      </div>
+
+      <div className="space-y-3">
+        <label className="text-sm mb-1 inline-block font-medium text-[#EDEDED]" htmlFor="email">
           Email
         </label>
         <input
@@ -91,26 +132,23 @@ const LoginForm = () => {
         )}
       </div>
 
-
-
-
       <div className="space-y-3">
-        <label className="text-sm font-medium text-[#EDEDED]" htmlFor="password">
+        <label className="text-sm mb-1 inline-block font-medium text-[#EDEDED]" htmlFor="password">
           Password
         </label>
         <input
           id="password"
           type="password"
-          autoComplete="current-password"
-          placeholder="Enter your password"
+          autoComplete="new-password"
+          placeholder="Min. 8 characters"
           className={`w-full rounded-md border px-4 py-3 text-sm font-mono text-[#EDEDED] outline-none transition focus:border-white focus:ring-2 focus:ring-white/10 ${
             errors.password ? 'border-[#C94E4E] bg-[#1A1A1A]' : 'border-[#222222] bg-[#111111]'
           }`}
           {...register('password', {
             required: 'Password is required.',
             minLength: {
-              value: 6,
-              message: 'Password must be at least 6 characters.',
+              value: 8,
+              message: 'Password must be at least 8 characters.',
             },
           })}
         />
@@ -119,54 +157,61 @@ const LoginForm = () => {
         )}
       </div>
 
-
-
-
+      <div className="space-y-3">
+        <label className="text-sm mb-1 inline-block font-medium text-[#EDEDED]" htmlFor="role">
+          Role
+        </label>
+        <select
+          id="role"
+          className={`w-full rounded-md border bg-[#111111] px-4 py-3 text-sm text-[#EDEDED] outline-none transition focus:border-white focus:ring-2 focus:ring-white/10 ${
+            errors.role ? 'border-[#C94E4E]' : 'border-[#222222]'
+          }`}
+          defaultValue=""
+          {...register('role', { required: 'Please select a role.' })}
+        >
+          <option value="" disabled>
+            Select your role
+          </option>
+          <option value="org-admin">Org Admin</option>
+          <option value="team-lead">Team Lead</option>
+          <option value="developer">Developer</option>
+        </select>
+        {errors.role && (
+          <p className="text-sm text-[#C94E4E]">{errors.role.message}</p>
+        )}
+      </div>
 
       <button
         type="submit"
         disabled={isSubmitting}
-        className="inline-flex w-full items-center justify-center rounded-md  bg-zinc-100 px-4 py-3 text-sm font-semibold text-black transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-70 cursor-pointer"
+        className="cursor-pointer inline-flex w-full items-center justify-center rounded-md bg-white px-4 py-3 text-sm font-semibold text-black transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-70"
       >
         {isSubmitting ? (
           <span className="inline-flex items-center gap-2">
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-black border-t-transparent" />
-            Signing in...
+            Creating account...
           </span>
         ) : (
-          'Sign in'
+          'Create account'
         )}
       </button>
 
 
-
-
-      <div className="text-center">
-        <a href="#" className="text-sm text-[#A1A1A1] transition hover:text-[#EDEDED]">
-          Forgot password?
-        </a>
-      </div>
-
-
-
-
       <div className="border-t border-[#222222] pt-4 text-center text-sm text-[#A1A1A1]">
-        Don&apos;t have an account?{' '}
-        <Link to="/signup" className="font-semibold text-[#EDEDED] transition hover:text-white">
-          Create one
+        Already have an account?{' '}
+        <Link to="/login" className="font-semibold text-[#EDEDED] transition hover:text-white cursor-pointer">
+          Sign in
         </Link>
       </div>
-
-
-
 
       {submitStatus && (
         <div className="rounded-xl border border-[#4DB87A]/40 bg-[#1B2E1E] px-4 py-3 text-sm text-[#D9F1D9]">
           {submitStatus}
         </div>
       )}
+
     </form>
   );
 };
 
-export default LoginForm;
+export default RegisterForm;
