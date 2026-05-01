@@ -6,7 +6,10 @@
  * @param {string} options.verificationUrl  - Full URL the user must visit
  * @returns {string} HTML string
  */
-export const verificationEmailTemplate = ({ name, verificationUrl }) => /* html */ `
+export const verificationEmailTemplate = ({
+  name,
+  verificationUrl,
+}) => /* html */ `
 <!DOCTYPE html>
 <html lang="en">
 <head>
