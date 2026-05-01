@@ -157,7 +157,9 @@ export const getFullBilling = asyncHandler(async (req, res) => {
 
   return sendSuccess(res, 200, "Full billing data fetched successfully", {
     summary: {
-      last30DaysTotal: summary.totalCost,
+      grossCost: summary.grossCost,
+      totalCost: summary.totalCost,
+      credits: summary.totalCredit,
       topService: summary.topService,
       currency: "USD",
       period: {

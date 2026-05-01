@@ -35,8 +35,46 @@ const monthsAgo = (n) => {
 
 const today = () => new Date();
 
-const ceQuery = (client, params) =>
-  client.send(new GetCostAndUsageCommand(params));
+const ceQuery = async (client, params) => {
+  let hasNext = true;
+  let nextToken = undefined;
+  let aggregatedResponse = null;
+
+  while (hasNext) {
+    const commandParams = { ...params, NextPageToken: nextToken };
+    const res = await client.send(new GetCostAndUsageCommand(commandParams));
+
+    if (!aggregatedResponse) {
+      aggregatedResponse = {
+        GroupDefinitions: res.GroupDefinitions,
+        DimensionValueAttributes: res.DimensionValueAttributes,
+        ResultsByTime: res.ResultsByTime || [],
+      };
+    } else if (res.ResultsByTime) {
+      res.ResultsByTime.forEach((period) => {
+        const existing = aggregatedResponse.ResultsByTime.find(
+          (p) =>
+            p.TimePeriod?.Start === period.TimePeriod?.Start &&
+            p.TimePeriod?.End === period.TimePeriod?.End,
+        );
+        if (existing) {
+          if (period.Groups) {
+            existing.Groups = (existing.Groups || []).concat(period.Groups);
+          }
+        } else {
+          aggregatedResponse.ResultsByTime.push(period);
+        }
+      });
+    }
+
+    if (res.NextPageToken) {
+      nextToken = res.NextPageToken;
+    } else {
+      hasNext = false;
+    }
+  }
+  return aggregatedResponse;
+};
 
 // AWS tag format is "tagKey$tagValue" — extract the value portion
 const parseTagValue = (raw) => {
@@ -144,20 +182,23 @@ export const getCostByUsageType = async (accessKey, secretKey) => {
   const response = await ceQuery(makeCEClient(accessKey, secretKey), {
     TimePeriod: { Start: fmt(daysAgo(30)), End: fmt(today()) },
     Granularity: "MONTHLY",
-    Metrics: ["AmortizedCost", "UsageQuantity"],
+    Metrics: ["UnblendedCost", "AmortizedCost", "UsageQuantity"],
     GroupBy: [{ Type: "DIMENSION", Key: "USAGE_TYPE" }],
   });
 
   const rows = [];
   response.ResultsByTime?.forEach((period) => {
     period.Groups?.forEach((g) => {
-      const cost = parseFloat(g.Metrics?.AmortizedCost?.Amount || 0);
+      const usageType = g.Keys?.[0] || "unknown";
+      const cost = parseFloat(g.Metrics?.UnblendedCost?.Amount || 0);
+      const amortized = parseFloat(g.Metrics?.AmortizedCost?.Amount || 0);
       const usageQuantity = parseFloat(g.Metrics?.UsageQuantity?.Amount || 0);
       const unit = g.Metrics?.UsageQuantity?.Unit || "";
-      if (cost > 0)
+      if (usageQuantity > 0 || cost !== 0)
         rows.push({
-          usageType: g.Keys?.[0] || "unknown",
-          cost: +cost.toFixed(6),
+          usageType,
+          cost: +Math.abs(cost).toFixed(6),
+          amortized: +amortized.toFixed(6),
           usageQuantity: +usageQuantity.toFixed(4),
           unit,
         });
@@ -416,10 +457,17 @@ export const getTotalCost = (data) => {
 export const aggregateByDate = (data) => {
   const map = {};
   data.forEach(({ date, cost }) => {
-    if (cost > 0) map[date] = (map[date] || 0) + cost;
+    if (!map[date]) map[date] = { gross: 0, credits: 0 };
+    if (cost > 0) map[date].gross += cost;
+    else map[date].credits += cost; // negative rakhna
   });
   return Object.entries(map)
-    .map(([date, cost]) => ({ date, cost: +cost.toFixed(6) }))
+    .map(([date, { gross, credits }]) => ({
+      date,
+      grossCost: +gross.toFixed(6),
+      credits: +credits.toFixed(6),
+      netCost: +(gross + credits).toFixed(6),
+    }))
     .sort((a, b) => new Date(a.date) - new Date(b.date));
 };
 
