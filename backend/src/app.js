@@ -3,6 +3,7 @@ import express from 'express';
 import morgan from 'morgan';
 import authRoutes from './routes/auth.routes.js';
 import teamRoutes from './routes/team.routes.js';
+import invitationRoutes from './routes/invitation.routes.js';
 
 
 import { config } from './config/config.js';
@@ -18,13 +19,9 @@ app.use(express.json());
 app.use(morgan('dev'));
 
 
-/**
- * all api routes here
- */
-app.use('/api/aws', awsConfigRoutes);
-app.use('/api/auth',  authRoutes);
-app.use('/api/teams', teamRoutes);
-
+app.use('/api/auth',        authRoutes);
+app.use('/api/teams',       teamRoutes);
+app.use('/api/invitations', invitationRoutes);
 
 app.get('/health', (_req, res) =>
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() })
