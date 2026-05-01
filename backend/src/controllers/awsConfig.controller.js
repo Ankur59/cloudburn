@@ -46,9 +46,9 @@ export const getCost = async (req, res) => {
     const accessKey = decrypt(org.awsAccessKey);
     const secretKey = decrypt(org.awsSecretKey);
 
+    
 
     const data = await getAwsCost(accessKey, secretKey, org.awsRegion);
-
     res.json(data);
 
   } catch (error) {

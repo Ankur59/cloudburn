@@ -36,16 +36,25 @@ export const getAwsCost = async (accessKey, secretKey, region) => {
     }
   });
 
+  // Dynamic window: last 30 days, dates zero-padded to YYYY-MM-DD
+  const today  = new Date();
+  const start  = new Date(today);
+  start.setDate(today.getDate() - 30);
+
+  const fmt = (d) => d.toISOString().split('T')[0]; // "YYYY-MM-DD"
+
   const command = new GetCostAndUsageCommand({
     TimePeriod: {
-      Start: "2026-04-01",
-      End: "2026-04-30"
+      Start: fmt(start),
+      End:   fmt(today),
     },
     Granularity: "DAILY",
     Metrics: ["UnblendedCost"],
     GroupBy: [
-      { Type: "DIMENSION", Key: "SERVICE" }
-    ]
+      { Type: "DIMENSION", Key: "SERVICE" },
+      // { Type: "DIMENSION", Key: "REGION" },
+      { Type: "TAG",Key: "team" },
+    ],
   });
 
   const response = await client.send(command);

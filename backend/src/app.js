@@ -19,10 +19,10 @@ app.use(express.json());
 app.use(morgan('dev'));
 
 
-app.use('/api/auth',        authRoutes);
-app.use('/api/teams',       teamRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/teams', teamRoutes);
 app.use('/api/invitations', invitationRoutes);
-
+app.use('/api/aws', awsConfigRoutes)
 app.get('/health', (_req, res) =>
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() })
 );
