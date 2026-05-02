@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx nodemon index.js"
+    "dev": "npx nodemon index.js",
+    "sync": "node scripts/syncCosts.js",
+    "sync:org": "node scripts/syncCosts.js --orgId"
   },
   "keywords": [],
   "author": "",
