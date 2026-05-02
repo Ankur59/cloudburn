@@ -24,6 +24,7 @@ import { buildDashboardData } from "../services/dashboard.service.js";
 import { saveDailyCosts } from "../services/cost.service.js";
 import BillingSnapshot from "../models/billingSnapshot.model.js";
 import { refreshRAGForOrg } from "../loaders/rag.loader.js";
+import { refreshInsightsForOrg } from "../services/insights.service.js";
 
 const getOrgCreds = async (orgId) => {
   const org = await Organization.findById(orgId).select(
@@ -236,6 +237,12 @@ export const getFullBilling = asyncHandler(async (req, res) => {
   // ── Step 8: Trigger RAG re-index in background (non-blocking) ───────────────
   refreshRAGForOrg(req.user.orgId).catch((err) =>
     console.error("⚠️  refreshRAGForOrg failed (getFullBilling):", err.message),
+  );
+
+  // ── Step 8b: Refresh AI insights cache in background (non-blocking) ─────────
+  // Runs AFTER BillingSnapshot is already saved above (Step 7), so Groq gets fresh data.
+  refreshInsightsForOrg(req.user.orgId).catch((err) =>
+    console.error("⚠️  refreshInsightsForOrg failed (getFullBilling):", err.message),
   );
 
   // ── Step 9: Return full response ─────────────────────────────────────────────

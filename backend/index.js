@@ -7,6 +7,7 @@ import { initRAG } from './src/loaders/rag.loader.js';
 import { initSpikeJob } from './src/jobs/spike.job.js';
 import { initCronJobs } from './src/jobs/costSync.job.js';
 import { initResourceSyncJob } from './src/jobs/resourceSync.job.js';
+import { initInsightRefreshJob } from './src/jobs/insightRefresh.job.js';
 
 // ── HTTP server (wraps express — required for socket.io) ──────────────────────
 const httpServer = createServer(app);
@@ -41,8 +42,9 @@ const startServer = async () => {
 
   // 3) Start cron jobs (needs io for WebSocket events)
   initSpikeJob(io);
-  initCronJobs();          // daily cost sync  (00:01 UTC)
-  initResourceSyncJob();   // resource monitor (every 5 min)
+  initCronJobs();               // daily cost sync  (00:01 UTC)
+  initResourceSyncJob();        // resource monitor (every 5 min)
+  initInsightRefreshJob();      // AI insights refresh (daily at midnight)
   
   // 4) Begin accepting HTTP + WebSocket connections
   httpServer.listen(config.PORT, () => {
