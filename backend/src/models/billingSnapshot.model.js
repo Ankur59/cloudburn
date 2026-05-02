@@ -32,6 +32,9 @@ const billingSnapshotSchema = new mongoose.Schema(
     // Daily breakdown (last 30 days): [{ date, grossCost, credits, netCost }]
     dailyBreakdown: { type: mongoose.Schema.Types.Mixed, default: [] },
 
+    // Daily trend (last 90 days): [{ date, cost }]
+    dailyTrend90: { type: mongoose.Schema.Types.Mixed, default: [] },
+
     // Monthly trend: [{ month, cost }] last 12 months
     monthlyTrend: { type: mongoose.Schema.Types.Mixed, default: [] },
 

@@ -1,9 +1,10 @@
 import { Router } from "express";
 import {
   connectAWS,
-  getCost,
-  getFullBilling,
+  
+  
 } from "../controllers/awsConfig.controller.js";
+import { getCost, getFullBilling } from "../controllers/awsBilling.controller.js";
 import { protect } from "../middlewares/auth.middleware.js";
 
 const router = Router();

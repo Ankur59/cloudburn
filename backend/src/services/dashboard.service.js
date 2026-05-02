@@ -18,38 +18,35 @@ import DailyCost from "../models/dailyCost.model.js";
 //                      [{ team, cost, services[], instances[] }]
 
 export const buildDashboardData = (billingData) => {
-  const { summary, monthComparison, serviceBreakdown, dailyBreakdown, byTeam } =
-    billingData;
+  const {
+    summary,
+    monthComparison,
+    serviceBreakdown,
+    dailyBreakdown,
+    dailyTrend90,
+    byTeam,
+    byRegion,
+    monthlyTrend,
+    monthlyCostByService,
+    byOperation,
+    byRecordType,
+  } = billingData;
 
   // ── 1. KPI Cards ─────────────────────────────────────────────────────────────
-  // All cost figures = AmortizedCost (grossCost). Credits shown as savings only.
-
-  // Month-to-date spend: sum of AmortizedCost for the current calendar month
   const mtdCost = +(monthComparison?.thisMonthTotal || 0).toFixed(2);
-
-  // Month-over-month trend string, e.g. "+12.5%" or "-3.2%"
+  const lastMonthCost = +(monthComparison?.lastMonthTotal || 0).toFixed(2);
   const changePercent = monthComparison?.changePercent ?? 0;
   const mtdTrendStr = (changePercent > 0 ? "+" : "") + changePercent + "%";
   const mtdTrendDir = changePercent >= 0 ? "up" : "down";
-
-  // Credits / refunds — read from summary.savings which is populated from byRecordType
-  // (NOT from totalCredit, which is now ~0 since cost queries filter out credit rows)
-  const savings = +Math.abs(
-    summary?.savings ?? summary?.totalCredit ?? 0,
-  ).toFixed(2);
-
-  // Projected month-end cost = average daily spend × 30
+  const savings = +Math.abs(summary?.savings ?? summary?.totalCredit ?? 0).toFixed(2);
   const daysElapsed = new Date().getDate() || 1;
   const avgDaily = mtdCost / daysElapsed;
   const projected = +(avgDaily * 30).toFixed(2);
-
-  // Top service this month
   const topSvc = summary?.topService?.name || "N/A";
   const topSvcCost = +(summary?.topService?.cost || 0).toFixed(2);
 
   const kpis = [
     {
-      // Primary KPI: total AmortizedCost spend month-to-date
       label: "Total Spend (MTD)",
       value: `$${mtdCost.toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
       rawValue: mtdCost,
@@ -61,7 +58,6 @@ export const buildDashboardData = (billingData) => {
       note: "AmortizedCost — credits not deducted",
     },
     {
-      // Savings KPI: show credits / refunds as positive "savings" figure
       label: "Savings This Month",
       value: `$${savings.toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
       rawValue: savings,
@@ -71,7 +67,6 @@ export const buildDashboardData = (billingData) => {
       note: "Shown separately — NOT deducted from Total Spend",
     },
     {
-      // Projection KPI
       label: "Projected Month-End",
       value: `$${projected.toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
       rawValue: projected,
@@ -81,7 +76,6 @@ export const buildDashboardData = (billingData) => {
       icon: "projection",
     },
     {
-      // Top-spending service
       label: "Top Service",
       value: topSvc,
       rawValue: topSvcCost,
@@ -91,67 +85,49 @@ export const buildDashboardData = (billingData) => {
     },
   ];
 
-  log;
+  // ── 2. Daily Cost Trend ───────────────────────────────────────────────────────
+  // Prefer dailyTrend90 (clean 90-day data). Fall back to dailyBreakdown (30d).
+  const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
-  // ── 2. Daily Cost Trend (last 30 days) ────────────────────────────────────────
-  // cost field = grossCost (AmortizedCost). Credits shown as separate field.
-  const MONTH_NAMES = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
+  const trendSource = (dailyTrend90 && dailyTrend90.length > 0) ? dailyTrend90 : (dailyBreakdown || []);
+  const isFromTrend90 = (dailyTrend90 && dailyTrend90.length > 0);
 
-  const dailyCostTrend = (dailyBreakdown || []).map((d) => {
+  const dailyCostTrend = trendSource.map((d) => {
     const dateObj = new Date(d.date);
+    const cost = isFromTrend90
+      ? +d.cost.toFixed(4)
+      : +(d.grossCost || 0).toFixed(4);
     return {
       date: `${MONTH_NAMES[dateObj.getMonth()]} ${dateObj.getDate()}`,
-      fullDate: d.date, // "YYYY-MM-DD" — useful for tooltip labels
+      fullDate: d.date,
       aws: {
-        cost: +d.grossCost.toFixed(4), // AmortizedCost — PRIMARY display value
-        credits: +d.credits.toFixed(4), // credits this day (negative value)
-        netCost: +d.netCost.toFixed(4), // after-credit cost — internal only
+        cost,
+        credits: isFromTrend90 ? 0 : +(d.credits || 0).toFixed(4),
+        netCost: isFromTrend90 ? cost : +(d.netCost || cost).toFixed(4),
       },
-      gcp: 0, // placeholder for future multi-cloud support
+      gcp: 0,
       azure: 0,
     };
   });
 
-  // ── 3. Cost By Service (top 8 services) ───────────────────────────────────────
-  // Relative bar width = cost / maxCost × 100 (visual only, not % of total)
-  const maxServiceCost = Math.max(
-    ...(serviceBreakdown || []).map((s) => s.cost),
-    1,
-  );
-  const services = (serviceBreakdown || []).slice(0, 8).map((s) => ({
+  // ── 3. Cost By Service (top 10) ───────────────────────────────────────────────
+  const maxServiceCost = Math.max(...(serviceBreakdown || []).map((s) => s.cost), 1);
+  const services = (serviceBreakdown || []).slice(0, 10).map((s) => ({
     name: s.service,
     cost: +s.cost.toFixed(4),
-    percentOfTotal: s.percentOfTotal ?? 0, // % of org's total gross spend
-    barWidth: Math.round((s.cost / maxServiceCost) * 100), // relative bar width
+    percentOfTotal: s.percentOfTotal ?? 0,
+    barWidth: Math.round((s.cost / maxServiceCost) * 100),
   }));
 
   // ── 4. Top Spending Teams ─────────────────────────────────────────────────────
-  // Each team card shows: spent, estimated budget, services breakdown,
-  // and EC2 instance types running in that team.
   const teams = (byTeam || []).slice(0, 5).map((t) => {
     const spent = +t.cost.toFixed(2);
-    // Estimated budget heuristic: 20 % headroom above current spend (min $50)
     const budget = Math.round(spent * 1.2 + 50);
     const remaining = +(budget - spent).toFixed(2);
-
     let status = "on-track";
     if (remaining < budget * 0.1) status = "at-risk";
     if (remaining < 0) status = "over-budget";
 
-    // Top 5 services for this team, sorted by cost
     const teamServices = (t.services || []).slice(0, 5).map((s) => ({
       service: s.service,
       cost: +s.cost.toFixed(4),
@@ -159,7 +135,6 @@ export const buildDashboardData = (billingData) => {
       unit: s.unit || "",
     }));
 
-    // EC2 instances running in this team (from getCostByTeamInstances)
     const teamInstances = (t.instances || []).slice(0, 5).map((i) => ({
       resourceId: i.resourceId,
       instanceName: i.instanceName,
@@ -176,12 +151,58 @@ export const buildDashboardData = (billingData) => {
       spent,
       remaining,
       status,
-      services: teamServices, // which AWS services this team is spending on
-      instances: teamInstances, // which EC2 instance types this team is running
+      services: teamServices,
+      instances: teamInstances,
     };
   });
 
-  // ── 5. Recent Alerts (static — replace with real anomaly detection later) ─────
+  // ── 5. Monthly Trend (last 12 months) ────────────────────────────────────────
+  const monthlyTrendFormatted = (monthlyTrend || []).map((m) => ({
+    month: m.month, // "YYYY-MM"
+    label: (() => {
+      const [year, mon] = m.month.split("-");
+      return `${MONTH_NAMES[parseInt(mon, 10) - 1]} '${year.slice(2)}`;
+    })(),
+    cost: +m.cost.toFixed(2),
+  }));
+
+  // ── 6. Month Comparison (this vs last) ───────────────────────────────────────
+  const monthComparisonFormatted = {
+    lastMonthTotal: lastMonthCost,
+    thisMonthTotal: mtdCost,
+    delta: +(mtdCost - lastMonthCost).toFixed(2),
+    changePercent,
+    trend: mtdTrendDir,
+    byService: (monthComparison?.byService || []).slice(0, 8).map((s) => ({
+      service: s.service,
+      lastMonthCost: +s.lastMonthCost.toFixed(2),
+      thisMonthCost: +s.thisMonthCost.toFixed(2),
+      delta: +s.delta.toFixed(2),
+      changePercent: s.changePercent,
+      trend: s.trend,
+    })),
+  };
+
+  // ── 7. Region Breakdown ───────────────────────────────────────────────────────
+  const regionBreakdown = (byRegion || []).slice(0, 8).map((r) => ({
+    region: r.region || "global",
+    cost: +r.cost.toFixed(4),
+  }));
+
+  // ── 8. Top Operations ─────────────────────────────────────────────────────────
+  const topOperations = (byOperation || []).slice(0, 8).map((op) => ({
+    service: op.service,
+    operation: op.operation,
+    cost: +op.cost.toFixed(4),
+  }));
+
+  // ── 9. Record Type Breakdown ──────────────────────────────────────────────────
+  const recordTypeBreakdown = (byRecordType || []).map((r) => ({
+    recordType: r.recordType,
+    cost: +r.cost.toFixed(4),
+  }));
+
+  // ── 10. Recent Alerts (static — replace with real anomaly detection later) ────
   const recentAlerts = [
     {
       id: 1,
@@ -208,9 +229,17 @@ export const buildDashboardData = (billingData) => {
     dailyCostTrend,
     services,
     teams,
+    monthlyTrend: monthlyTrendFormatted,
+    monthComparison: monthComparisonFormatted,
+    regionBreakdown,
+    topOperations,
+    recordTypeBreakdown,
     recentAlerts,
   };
 };
+
+
+
 
 export const buildReportsData = async (orgId, page = 1, limit = 50) => {
   const skip = (page - 1) * limit;

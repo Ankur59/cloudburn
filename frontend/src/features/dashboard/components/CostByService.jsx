@@ -5,7 +5,10 @@ export default function CostByService({ services = [] }) {
 
   return (
     <div className={styles.costCard}>
-      <h3 className={styles.title}>Cost by Service</h3>
+      <div className={styles.cardHeader}>
+        <h3 className={styles.title}>Cost by Service</h3>
+        <span className={styles.badge}>{services.length} services</span>
+      </div>
       {services.length === 0 ? (
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', padding: '1rem 0' }}>
           No service data available.
@@ -17,13 +20,21 @@ export default function CostByService({ services = [] }) {
             return (
               <div key={index} className={styles.serviceItem}>
                 <div className={styles.serviceHeader}>
-                  <span className={styles.serviceName}>{service.name}</span>
-                  <span className={styles.serviceCost}>${service.cost.toFixed(6)}</span>
+                  <div className={styles.serviceLeft}>
+                    <span className={styles.serviceRank}>#{index + 1}</span>
+                    <span className={styles.serviceName}>{service.name}</span>
+                  </div>
+                  <div className={styles.serviceRight}>
+                    <span className={styles.serviceCost}>${service.cost.toFixed(2)}</span>
+                    {service.percentOfTotal > 0 && (
+                      <span className={styles.servicePct}>{service.percentOfTotal}%</span>
+                    )}
+                  </div>
                 </div>
                 <div className={styles.progressBar}>
                   <div
                     className={styles.progressFill}
-                    style={{ width: `${pct}%` }}
+                    style={{ width: `${pct}%`, opacity: 1 - index * 0.07 }}
                   />
                 </div>
               </div>

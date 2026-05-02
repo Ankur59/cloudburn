@@ -2,10 +2,12 @@ import asyncHandler from "../middlewares/async.middleware.js";
 import BillingSnapshot from "../models/billingSnapshot.model.js";
 import AppError from "../utils/AppError.js";
 import { sendSuccess } from "../utils/responseHelper.js";
-import { buildReportsData } from "../services/dashboard.service.js";
+import { buildReportsData, buildDashboardData } from "../services/dashboard.service.js";
 
 // ── GET /api/dashboard ────────────────────────────────────────────────────────
 // Fetches the pre-formatted dashboard data from the latest BillingSnapshot.
+// Always rebuilds from raw snapshot fields so new dashboard sections are included
+// even if the snapshot was saved before those sections were added.
 export const getDashboardData = asyncHandler(async (req, res) => {
   const snapshot = await BillingSnapshot.findOne({ orgId: req.user.orgId });
 
@@ -16,7 +18,27 @@ export const getDashboardData = asyncHandler(async (req, res) => {
     );
   }
 
-  const dashboardData = snapshot.dashboardData || {};
+  // Rebuild dashboard from raw snapshot fields every time — this ensures new
+  // sections (monthlyTrend, regionBreakdown, topOperations, etc.) are always
+  // returned even if the snapshot was persisted before those sections existed.
+  const dashboardData = buildDashboardData({
+    summary: {
+      grossCost: snapshot.grossCost,
+      totalCost: snapshot.totalCost,
+      savings: Math.abs(snapshot.credits || 0),
+      totalCredit: snapshot.credits || 0,
+      topService: { name: snapshot.topService, cost: snapshot.topServiceCost },
+    },
+    monthComparison: snapshot.monthComparison,
+    serviceBreakdown: snapshot.serviceBreakdown,
+    dailyBreakdown: snapshot.dailyBreakdown,
+    dailyTrend90: snapshot.dailyTrend90,
+    byTeam: snapshot.byTeam,
+    byRegion: snapshot.byRegion,
+    monthlyTrend: snapshot.monthlyTrend,
+    byOperation: snapshot.byOperation,
+    byRecordType: snapshot.byRecordType,
+  });
 
   return sendSuccess(res, 200, "Dashboard data fetched successfully", dashboardData);
 });

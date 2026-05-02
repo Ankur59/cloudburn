@@ -7,6 +7,8 @@ import AIInsights from '../components/AIInsights'
 import CostByService from '../components/CostByService'
 import RecentAlerts from '../components/RecentAlerts'
 import TopSpendingTeams from '../components/TopSpendingTeams'
+import MonthlyTrend from '../components/MonthlyTrend'
+import RegionBreakdown from '../components/RegionBreakdown'
 import useDashboard from '../hooks/useDashboard'
 import { StatCardSkeleton, ChartSkeleton } from '../../shared/SkeletonLoader'
 import styles from './Dashboard.module.css'
@@ -50,7 +52,7 @@ export default function Dashboard() {
 
           {/* KPI Cards */}
           {loading && !data ? (
-            <div className={styles.kpiGrid ?? 'kpi-grid'} style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
               {[0,1,2,3].map(i => <StatCardSkeleton key={i} />)}
             </div>
           ) : (
@@ -64,6 +66,16 @@ export default function Dashboard() {
             <DailyCostTrend data={data?.dailyCostTrend ?? []} />
           )}
 
+          {/* Monthly Trend + Month Comparison */}
+          {!loading && (
+            <div className={styles.fullRow}>
+              <MonthlyTrend
+                data={data?.monthlyTrend ?? []}
+                monthComparison={data?.monthComparison ?? {}}
+              />
+            </div>
+          )}
+
           <AIInsights />
 
           <div className={styles.bottomSection}>
@@ -72,6 +84,10 @@ export default function Dashboard() {
               <TopSpendingTeams teams={data?.teams ?? []} />
             </div>
             <div className={styles.rightColumn}>
+              <RegionBreakdown
+                regions={data?.regionBreakdown ?? []}
+                topOperations={data?.topOperations ?? []}
+              />
               <RecentAlerts recentAlerts={data?.recentAlerts ?? []} />
             </div>
           </div>
