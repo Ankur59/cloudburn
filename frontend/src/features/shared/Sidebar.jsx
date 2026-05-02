@@ -9,7 +9,7 @@ const navItems = [
   { icon: 'alerts',    label: 'Alerts',         href: '/alerts' },
   { icon: 'cloud',     label: 'Cloud Accounts',  href: '/connect' },
   { icon: 'teams',     label: 'Teams',           href: '/teams' },
-  { icon: 'budget',    label: 'Budget',          href: '#' },
+  { icon: 'budget',    label: 'Budget',          href: '/budget' },
   { icon: 'reports',   label: 'Reports',         href: '/reports' },
   { icon: 'settings',  label: 'Settings',        href: '#' },
   { icon: 'admin',     label: 'Admin',           href: '#' },
