@@ -112,73 +112,70 @@ export const getFullBilling = asyncHandler(async (req, res) => {
   // Fire all 9 Cost Explorer queries in parallel
   const [
     dailyRaw,
-    monthlyCostByService,
-    byRegion,
-    byUsageType,
-    byOperation,
-    byRecordType,
-    dailyTrend90,
-    byTeam,
-    monthComparison,
+    // monthlyCostByService,
+    // byRegion,
+    // byUsageType,
+    // byOperation,
+    // byRecordType,
+    // dailyTrend90,
+    // byTeam,
+    // monthComparison,
   ] = await Promise.all([
     getAwsCost(accessKey, secretKey),
-    getMonthlyCostByService(accessKey, secretKey),
-    getCostByRegion(accessKey, secretKey),
-    getCostByUsageType(accessKey, secretKey),
-    getCostByOperation(accessKey, secretKey),
-    getCostByRecordType(accessKey, secretKey),
-    getDailySpendTrend(accessKey, secretKey),
-    getCostByTeam(accessKey, secretKey),
-    getMonthComparison(accessKey, secretKey),
+    
+    // getMonthlyCostByService(accessKey, secretKey),
+    // getCostByRegion(accessKey, secretKey),
+    // getCostByUsageType(accessKey, secretKey),
+    // getCostByOperation(accessKey, secretKey),
+    // getCostByRecordType(accessKey, secretKey),
+    // getDailySpendTrend(accessKey, secretKey),
+    // getCostByTeam(accessKey, secretKey),
+    // getMonthComparison(accessKey, secretKey),
   ]);
 
   const records = transformAwsCost(dailyRaw);
-  const summary = getTotalCost(records);
-  const serviceBreakdown = aggregateByService(records);
-  const dailyBreakdown = aggregateByDate(records);
+  // const summary = getTotalCost(records);
+  // const serviceBreakdown = aggregateByService(records);
+  // const dailyBreakdown = aggregateByDate(records);
 
   // Percent of gross spend per service (gross = before credits, always positive)
-  const serviceWithPercent = serviceBreakdown.map((s) => ({
-    ...s,
-    percent:
-      summary.grossCost > 0
-        ? +((s.cost / summary.grossCost) * 100).toFixed(2)
-        : 0,
-  }));
+  // const serviceWithPercent = serviceBreakdown.map((s) => ({
+  //   ...s,
+  //   percent:
+  //     summary.grossCost > 0
+  //       ? +((s.cost / summary.grossCost) * 100).toFixed(2)
+  //       : 0,
+  // }));
 
   // Build monthly total trend from per-service monthly rows
   const monthlyTotalsMap = {};
-  monthlyCostByService.forEach(({ month, cost }) => {
-    monthlyTotalsMap[month] = (monthlyTotalsMap[month] || 0) + cost;
-  });
-  const monthlyTrend = Object.entries(monthlyTotalsMap)
-    .map(([month, cost]) => ({ month, cost: +cost.toFixed(6) }))
-    .sort((a, b) => a.month.localeCompare(b.month));
+  // monthlyCostByService.forEach(({ month, cost }) => {
+  //   monthlyTotalsMap[month] = (monthlyTotalsMap[month] || 0) + cost;
+  // });
+  // const monthlyTrend = Object.entries(monthlyTotalsMap)
+  //   .map(([month, cost]) => ({ month, cost: +cost.toFixed(6) }))
+  //   .sort((a, b) => a.month.localeCompare(b.month));
 
   return sendSuccess(res, 200, "Full billing data fetched successfully", {
-    summary: {
-      last30DaysTotal: summary.totalCost,
-      topService: summary.topService,
-      currency: "USD",
-      period: {
-        daily: "last_30_days",
-        trend: "last_90_days",
-        monthly: "last_12_months",
-      },
-    },
-    monthComparison,
-    serviceBreakdown: serviceWithPercent,
-    dailyBreakdown,
-    dailyTrend90,
-    monthly: {
-      totalTrend: monthlyTrend,
-      byService: monthlyCostByService,
-    },
-    byRegion,
-    byUsageType,
-    byOperation,
-    byRecordType,
-    byTeam,
+    // summary: {
+    //   // last30DaysTotal: summary.totalCost,
+    //   // topService: summary.topService,
+    //   currency: "USD",
+    //   period: {
+    //     daily: "last_30_days",
+    //     trend: "last_90_days",
+    //     monthly: "last_12_months",
+    //   },
+    // },
+    // monthly: {
+    //   // totalTrend: monthlyTrend,
+    //   // byService: monthlyCostByService,
+    // },
+    // byRegion,
+    // byUsageType,
+    // byOperation,
+    // byRecordType,
+    // byTeam,
     rawDailyRecords: records,
   });
 });

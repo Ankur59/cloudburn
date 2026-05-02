@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx nodemon index.js"
+    "dev": "npx nodemon index.js",
+    "sync": "node scripts/syncCosts.js",
+    "sync:org": "node scripts/syncCosts.js --orgId"
   },
   "keywords": [],
   "author": "",
@@ -31,6 +33,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.6.0",
     "morgan": "^1.10.1",
+    "node-cron": "^4.2.1",
     "xss-clean": "^0.1.4"
   }
 }

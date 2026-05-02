@@ -85,8 +85,7 @@ export const getAwsCost = (accessKey, secretKey) =>
     ],
     GroupBy: [
       { Type: "DIMENSION", Key: "SERVICE" },
-      { Type: "TAG",Key: "team" },
-
+      { Type: "TAG", Key: "Name" },
     ],
   });
 
@@ -331,9 +330,9 @@ export const getMonthComparison = async (accessKey, secretKey) => {
     changePercent:
       lastMonth.total > 0
         ? +(
-            ((thisMonth.total - lastMonth.total) / lastMonth.total) *
-            100
-          ).toFixed(1)
+          ((thisMonth.total - lastMonth.total) / lastMonth.total) *
+          100
+        ).toFixed(1)
         : null,
     byService: byService.sort((a, b) => b.thisMonthCost - a.thisMonthCost),
   };
@@ -347,30 +346,38 @@ export const getMonthComparison = async (accessKey, secretKey) => {
 export const transformAwsCost = (data) => {
   const results = [];
   data.ResultsByTime?.forEach((day) => {
+
     const date = day.TimePeriod.Start;
+
     day.Groups?.forEach((group) => {
+
       const service = group.Keys?.[0] || "unknown";
+
       const team = parseTagValue(group.Keys?.[1]);
       // AmortizedCost = true allocated cost (includes RI/SP amortization)
+
       const amortizedCost = parseFloat(
         group.Metrics?.AmortizedCost?.Amount || 0,
       );
+
       // NetAmortizedCost = amortizedCost minus discounts/credits
       const netAmortizedCost = parseFloat(
         group.Metrics?.NetAmortizedCost?.Amount || 0,
       );
+
       // UnblendedCost = on-demand price (0 for RI-covered resources)
       const unblendedCost = parseFloat(
         group.Metrics?.UnblendedCost?.Amount || 0,
       );
+
       const usageQty = parseFloat(group.Metrics?.UsageQuantity?.Amount || 0);
       const unit = group.Metrics?.AmortizedCost?.Unit || "USD";
       // cost = primary field used by all aggregation helpers
       results.push({
         service,
         team,
-        cost: amortizedCost, // primary — matches AWS Console
-        netCost: netAmortizedCost, // after credits/discounts
+        amortizedCost: amortizedCost, // primary — matches AWS Console
+        netAmortizedCost: netAmortizedCost, // after credits/discounts
         unblendedCost, // on-demand only (0 for RI resources)
         usageQty,
         unit,
