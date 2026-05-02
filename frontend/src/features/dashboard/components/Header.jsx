@@ -1,10 +1,12 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import useAuth from '../../auth/hook/useAuth'
 import styles from './Header.module.css'
 
-
-export default function Header({ currentOrg, organizations, onOrgChange }) {
+export default function Header() {
   const [orgDropdownOpen, setOrgDropdownOpen] = useState(false)
   const [notifDropdownOpen, setNotifDropdownOpen] = useState(false)
   const [userDropdownOpen, setUserDropdownOpen] = useState(false)
@@ -12,6 +14,10 @@ export default function Header({ currentOrg, organizations, onOrgChange }) {
   const orgRef = useRef(null)
   const notifRef = useRef(null)
   const userRef = useRef(null)
+
+  const { user } = useSelector((state) => state.auth)
+  const { handleLogout } = useAuth()
+  const navigate = useNavigate()
   
   useEffect(() => {
     function handleClickOutside(event) {
@@ -42,6 +48,26 @@ export default function Header({ currentOrg, organizations, onOrgChange }) {
     },
   ]
 
+  const onLogoutClick = async () => {
+    setUserDropdownOpen(false)
+    const res = await handleLogout()
+    if (res.success) {
+      navigate('/login')
+    }
+  }
+
+  const currentOrg = user?.orgName || 'Select Organization'
+  const userName = user?.name || 'User'
+  const userEmail = user?.email || ''
+  const userRole = user?.role || 'Member'
+  
+  const initials = userName
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .substring(0, 2)
+    .toUpperCase()
+
   return (
     <header className={styles.header}>
       <div className={styles.leftSection}>
@@ -63,27 +89,21 @@ export default function Header({ currentOrg, organizations, onOrgChange }) {
           {orgDropdownOpen && (
             <div className={styles.dropdown}>
               <div className={styles.dropdownHeader}>Organizations</div>
-              {organizations.map((org) => (
-                <button 
-                  key={org}
-                  className={`${styles.dropdownItem} ${org === currentOrg ? styles.active : ''}`}
-                  onClick={() => {
-                    onOrgChange(org)
-                    setOrgDropdownOpen(false)
-                  }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                    <path d="M3 9h18M9 21V9" />
-                  </svg>
-                  {org}
-                </button>
-              ))}
+              <button 
+                className={`${styles.dropdownItem} ${styles.active}`}
+                onClick={() => setOrgDropdownOpen(false)}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <path d="M3 9h18M9 21V9" />
+                </svg>
+                {currentOrg}
+              </button>
             </div>
           )}
         </div>
         
-        <span className={styles.badge}>Org Admin</span>
+        <span className={styles.badge}>{userRole}</span>
       </div>
       
       <div className={styles.rightSection}>
@@ -96,7 +116,7 @@ export default function Header({ currentOrg, organizations, onOrgChange }) {
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
               <path d="M13.73 21a2 2 0 0 1-3.46 0" />
             </svg>
-            <span className={styles.notifBadge}>3</span>
+            <span className={styles.notifBadge}>2</span>
           </button>
           
           {notifDropdownOpen && (
@@ -121,7 +141,7 @@ export default function Header({ currentOrg, organizations, onOrgChange }) {
             className={styles.userButton}
             onClick={() => setUserDropdownOpen(!userDropdownOpen)}
           >
-            <div className={styles.userAvatar}>AJ</div>
+            <div className={styles.userAvatar}>{initials}</div>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="6,9 12,15 18,9" />
             </svg>
@@ -130,8 +150,8 @@ export default function Header({ currentOrg, organizations, onOrgChange }) {
           {userDropdownOpen && (
             <div className={`${styles.dropdown} ${styles.userDropdown}`}>
               <div className={styles.userInfo}>
-                <span className={styles.userName}>Alex Johnson</span>
-                <span className={styles.userEmail}>alex@company.com</span>
+                <span className={styles.userName}>{userName}</span>
+                <span className={styles.userEmail}>{userEmail}</span>
               </div>
               <div className={styles.dropdownDivider} />
               <button className={styles.dropdownItem}>
@@ -149,7 +169,7 @@ export default function Header({ currentOrg, organizations, onOrgChange }) {
                 Settings
               </button>
               <div className={styles.dropdownDivider} />
-              <button className={`${styles.dropdownItem} ${styles.logout}`}>
+              <button className={`${styles.dropdownItem} ${styles.logout}`} onClick={onLogoutClick}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                   <polyline points="16,17 21,12 16,7" />

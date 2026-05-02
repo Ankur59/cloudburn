@@ -11,23 +11,112 @@ import Budget from "../features/budget/pages/Budget.jsx";
 import AiInsights from "../features/ai-insights/pages/Aiinsights.jsx";
 import ZombieDetector from "../features/zombie-detector/pages/ZombieDetector.jsx";
 import CloudAccounts from "../features/cloud-accounts/pages/CloudAccounts.jsx";
+import ProtectedRoute from "../features/auth/components/Protected.jsx";
+import PublicRoute from "../features/auth/components/PublicRoute.jsx";
 
 const AppRouter = () => {
   return (
     <Routes>
-      <Route path="/" element={<Dashboard />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Register />} />
+      {/* Public Routes - Only accessible if NOT logged in */}
+      <Route
+        path="/login"
+        element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/signup"
+        element={
+          <PublicRoute>
+            <Register />
+          </PublicRoute>
+        }
+      />
       <Route path="/verify-email" element={<VerifyEmail />} />
-      <Route path="/connect" element={<Connect />} />
-      <Route path="/reports" element={<Reports />} />
-      <Route path="/alerts" element={<Alerts />} />
-      <Route path="/teams" element={<Team />} />
-      <Route path="/budget" element={<Budget />} />
-      <Route path="/ai-insights" element={<AiInsights />} />
-      <Route path="/zombie-detector" element={<ZombieDetector />} />
-      <Route path="/cloud-accounts" element={<CloudAccounts />} />
+
+      {/* Protected Routes */}
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/connect"
+        element={
+          <ProtectedRoute>
+            <Connect />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/reports"
+        element={
+          <ProtectedRoute>
+            <Reports />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/alerts"
+        element={
+          <ProtectedRoute>
+            <Alerts />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teams"
+        element={
+          <ProtectedRoute>
+            <Team />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/budget"
+        element={
+          <ProtectedRoute>
+            <Budget />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/ai-insights"
+        element={
+          <ProtectedRoute>
+            <AiInsights />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/zombie-detector"
+        element={
+          <ProtectedRoute>
+            <ZombieDetector />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/cloud-accounts"
+        element={
+          <ProtectedRoute>
+            <CloudAccounts />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 };

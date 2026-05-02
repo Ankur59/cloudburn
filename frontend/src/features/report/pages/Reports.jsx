@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { useReport } from '../hooks/useReport';
 import Sidebar from '../../shared/Sidebar';
 import Header from '../../dashboard/components/Header';
 import FilterBar from '../components/FilterBar';
@@ -8,15 +10,26 @@ import styles from './Reports.module.css';
 
 export default function Reports() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [currentOrg, setCurrentOrg] = useState('Acme Corporation');
-  const [loading, setLoading] = useState(false);
+  
+  // Real data state from Redux
+  const { data, pagination, loading } = useSelector((state) => state.report);
+  const { user } = useSelector((state) => state.auth);
+  const { handleGetReports } = useReport();
 
-  const organizations = ['Acme Corporation', 'TechStart Inc.', 'Global Dynamics'];
+  const currentOrg = user?.orgName || 'Acme Corporation';
+  const organizations = [currentOrg];
 
-  // Simulate report generation
+  useEffect(() => {
+    handleGetReports(1, 50);
+  }, [handleGetReports]);
+
+  // Simulate report generation (you can adapt this to filters later)
   const handleGenerate = (filters) => {
-    setLoading(true);
-    setTimeout(() => setLoading(false), 1500);
+    handleGetReports(1, 50);
+  };
+
+  const handlePageChange = (newPage) => {
+    handleGetReports(newPage, pagination.limit);
   };
 
   return (
@@ -30,7 +43,7 @@ export default function Reports() {
         <Header
           currentOrg={currentOrg}
           organizations={organizations}
-          onOrgChange={setCurrentOrg}
+          onOrgChange={() => {}}
         />
 
         <div className={styles.content}>
@@ -45,8 +58,12 @@ export default function Reports() {
           {/* Filter bar */}
           <FilterBar onGenerate={handleGenerate} loading={loading} />
 
-          {/* Report table */}
-          <ReportTable loading={loading} />
+          <ReportTable 
+            loading={loading} 
+            data={data} 
+            pagination={pagination} 
+            onPageChange={handlePageChange} 
+          />
 
           {/* Export section */}
           <ExportBar />

@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import {
   registerApi,
@@ -19,41 +20,47 @@ import {
 const useAuth = () => {
   const dispatch = useDispatch();
 
-  const handleRegister = async (data) => {
-    try {
-      dispatch(setLoading(true));
-      dispatch(setError(null));
-      await registerApi(data);
-      return { success: true };
-    } catch (error) {
-      const message = error?.response?.data?.message || "Registration failed";
-      dispatch(setError(message));
-      return { success: false, message };
-    } finally {
-      dispatch(setLoading(false));
-    }
-  };
+  const handleRegister = useCallback(
+    async (data) => {
+      try {
+        dispatch(setLoading(true));
+        dispatch(setError(null));
+        await registerApi(data);
+        return { success: true };
+      } catch (error) {
+        const message = error?.response?.data?.message || "Registration failed";
+        dispatch(setError(message));
+        return { success: false, message };
+      } finally {
+        dispatch(setLoading(false));
+      }
+    },
+    [dispatch],
+  );
 
-  const handleLogin = async (data) => {
-    try {
-      dispatch(setLoading(true));
-      dispatch(setError(null));
-      const response = await loginApi(data);
-      // Backend returns: { success, message, data: { accessToken, user } }
-      const { accessToken, user } = response.data?.data ?? {};
-      if (accessToken) dispatch(setToken(accessToken));
-      if (user) dispatch(setUser(user));
-      return { success: true };
-    } catch (error) {
-      const message = error?.response?.data?.message || "Login failed";
-      dispatch(setError(message));
-      return { success: false, message };
-    } finally {
-      dispatch(setLoading(false));
-    }
-  };
+  const handleLogin = useCallback(
+    async (data) => {
+      try {
+        dispatch(setLoading(true));
+        dispatch(setError(null));
+        const response = await loginApi(data);
+        // Backend returns: { success, message, data: { accessToken, user } }
+        const { accessToken, user } = response.data?.data ?? {};
+        if (accessToken) dispatch(setToken(accessToken));
+        if (user) dispatch(setUser(user));
+        return { success: true };
+      } catch (error) {
+        const message = error?.response?.data?.message || "Login failed";
+        dispatch(setError(message));
+        return { success: false, message };
+      } finally {
+        dispatch(setLoading(false));
+      }
+    },
+    [dispatch],
+  );
 
-  const handleGetme = async () => {
+  const handleGetme = useCallback(async () => {
     try {
       dispatch(setLoading(true));
       const response = await getMeApi();
@@ -66,25 +73,28 @@ const useAuth = () => {
       dispatch(setAuthChecked(true));
       dispatch(setLoading(false));
     }
-  };
+  }, [dispatch]);
 
-  const handleVerifyEmail = async (token) => {
-    try {
-      dispatch(setLoading(true));
-      dispatch(setError(null));
-      const response = await verifyEmailApi(token);
-      dispatch(setUser(response.data?.data?.user || null));
-      return { success: true };
-    } catch (error) {
-      const message = error?.response?.data?.message || "Verification failed";
-      dispatch(setError(message));
-      return { success: false, message };
-    } finally {
-      dispatch(setLoading(false));
-    }
-  };
+  const handleVerifyEmail = useCallback(
+    async (token) => {
+      try {
+        dispatch(setLoading(true));
+        dispatch(setError(null));
+        const response = await verifyEmailApi(token);
+        dispatch(setUser(response.data?.data?.user || null));
+        return { success: true };
+      } catch (error) {
+        const message = error?.response?.data?.message || "Verification failed";
+        dispatch(setError(message));
+        return { success: false, message };
+      } finally {
+        dispatch(setLoading(false));
+      }
+    },
+    [dispatch],
+  );
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
       dispatch(setLoading(true));
       await logoutApi();
@@ -97,29 +107,33 @@ const useAuth = () => {
     } finally {
       dispatch(setLoading(false));
     }
-  };
+  }, [dispatch]);
 
-  const handleUpdateProfile = async (file) => {
-    try {
-      dispatch(setLoading(true));
-      dispatch(setError(null));
+  const handleUpdateProfile = useCallback(
+    async (file) => {
+      try {
+        dispatch(setLoading(true));
+        dispatch(setError(null));
 
-      const formData = new FormData();
-      formData.append("avatar", file);
+        const formData = new FormData();
+        formData.append("avatar", file);
 
-      const response = await updateProfileApi(formData);
+        const response = await updateProfileApi(formData);
 
-      dispatch(setUser(response.data));
+        dispatch(setUser(response.data));
 
-      return { success: true };
-    } catch (error) {
-      const message = error?.response?.data?.message || "Profile update failed";
-      dispatch(setError(message));
-      return { success: false, message };
-    } finally {
-      dispatch(setLoading(false));
-    }
-  };
+        return { success: true };
+      } catch (error) {
+        const message =
+          error?.response?.data?.message || "Profile update failed";
+        dispatch(setError(message));
+        return { success: false, message };
+      } finally {
+        dispatch(setLoading(false));
+      }
+    },
+    [dispatch],
+  );
 
   return {
     handleRegister,
