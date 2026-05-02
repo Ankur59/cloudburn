@@ -7,7 +7,14 @@ import {
   updateProfileApi,
   verifyEmailApi,
 } from "../service/auth.api";
-import { setUser, setLoading, setError, setAuthChecked } from "../auth.slice";
+import {
+  setUser,
+  setToken,
+  setLoading,
+  setError,
+  setAuthChecked,
+  clearAuth,
+} from "../auth.slice";
 
 const useAuth = () => {
   const dispatch = useDispatch();
@@ -32,7 +39,10 @@ const useAuth = () => {
       dispatch(setLoading(true));
       dispatch(setError(null));
       const response = await loginApi(data);
-      dispatch(setUser(response.data));
+      // Backend returns: { success, message, data: { accessToken, user } }
+      const { accessToken, user } = response.data?.data ?? {};
+      if (accessToken) dispatch(setToken(accessToken));
+      if (user) dispatch(setUser(user));
       return { success: true };
     } catch (error) {
       const message = error?.response?.data?.message || "Login failed";
@@ -47,7 +57,9 @@ const useAuth = () => {
     try {
       dispatch(setLoading(true));
       const response = await getMeApi();
-      dispatch(setUser(response.data));
+      // Backend returns: { success, message, data: { user } }
+      const user = response.data?.data?.user ?? response.data?.data ?? null;
+      dispatch(setUser(user));
     } catch (error) {
       dispatch(setUser(null));
     } finally {
@@ -75,11 +87,12 @@ const useAuth = () => {
   const handleLogout = async () => {
     try {
       dispatch(setLoading(true));
-      const response = await logoutApi();
-      dispatch(setUser(null));
-      return { success: true, data: response };
+      await logoutApi();
+      dispatch(clearAuth()); // clears user + token + localStorage
+      return { success: true };
     } catch (error) {
-      dispatch(setError("Logout failed"));
+      // Even if API fails, clear local state so user can't stay logged in
+      dispatch(clearAuth());
       return { success: false, message: "Logout failed" };
     } finally {
       dispatch(setLoading(false));

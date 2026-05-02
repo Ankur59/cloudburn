@@ -4,6 +4,8 @@ const authSlice = createSlice({
   name: "auth",
   initialState: {
     user: null,
+    // Hydrate from localStorage so token survives page refresh
+    accessToken: localStorage.getItem("accessToken") || null,
     loading: false,
     error: null,
     isAuthChecked: false,
@@ -12,6 +14,15 @@ const authSlice = createSlice({
   reducers: {
     setUser: (state, action) => {
       state.user = action.payload;
+    },
+
+    setToken: (state, action) => {
+      state.accessToken = action.payload;
+      if (action.payload) {
+        localStorage.setItem("accessToken", action.payload);
+      } else {
+        localStorage.removeItem("accessToken");
+      }
     },
 
     setLoading: (state, action) => {
@@ -29,10 +40,24 @@ const authSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+
+    // Wipes everything on logout
+    clearAuth: (state) => {
+      state.user = null;
+      state.accessToken = null;
+      localStorage.removeItem("accessToken");
+    },
   },
 });
 
-export const { setUser, setLoading, setError, setAuthChecked, clearError } =
-  authSlice.actions;
+export const {
+  setUser,
+  setToken,
+  setLoading,
+  setError,
+  setAuthChecked,
+  clearError,
+  clearAuth,
+} = authSlice.actions;
 
 export default authSlice.reducer;

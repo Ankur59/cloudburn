@@ -1,5 +1,3 @@
-'use client'
-
 import { 
   LineChart, 
   Line, 
@@ -7,35 +5,8 @@ import {
   YAxis, 
   Tooltip, 
   ResponsiveContainer,
-  Legend
 } from 'recharts'
 import styles from './DailyCostTrend.module.css'
-
-// Generate 30 days of data
-function generateData() {
-  const data = []
-  const startDate = new Date(2024, 3, 1) // April 1
-  
-  for (let i = 0; i < 30; i++) {
-    const date = new Date(startDate)
-    date.setDate(date.getDate() + i)
-    
-    // Generate realistic looking cost data with some variation
-    const awsBase = 1600 + Math.sin(i * 0.3) * 200
-    const gcpBase = 900 + Math.cos(i * 0.25) * 150
-    const azureBase = 500 + Math.sin(i * 0.4) * 100
-    
-    data.push({
-      date: `Apr ${i + 1}`,
-      aws: Math.round(awsBase + Math.random() * 300),
-      gcp: Math.round(gcpBase + Math.random() * 200),
-      azure: Math.round(azureBase + Math.random() * 150),
-    })
-  }
-  return data
-}
-
-const data = generateData()
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -45,7 +16,7 @@ const CustomTooltip = ({ active, payload, label }) => {
         {payload.map((entry, index) => (
           <p key={index} className={styles.tooltipItem} style={{ color: entry.color }}>
             <span className={styles.tooltipName}>{entry.name}:</span>
-            <span className={styles.tooltipValue}>${entry.value.toLocaleString()}</span>
+            <span className={styles.tooltipValue}>${Number(entry.value).toFixed(6)}</span>
           </p>
         ))}
       </div>
@@ -73,7 +44,15 @@ const CustomLegend = () => {
   )
 }
 
-export default function DailyCostTrend() {
+export default function DailyCostTrend({ data = [] }) {
+  // Normalize: API sends aws as { cost, credits, grossCost }; chart uses flat numbers
+  const chartData = data.map((d) => ({
+    date: d.date,
+    aws: typeof d.aws === 'object' ? (d.aws.grossCost ?? 0) : (d.aws ?? 0),
+    gcp: d.gcp ?? 0,
+    azure: d.azure ?? 0,
+  }))
+
   return (
     <div className={styles.chartCard}>
       <div className={styles.chartHeader}>
@@ -82,7 +61,7 @@ export default function DailyCostTrend() {
       </div>
       <div className={styles.chartContainer}>
         <ResponsiveContainer width="100%" height={280}>
-          <LineChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+          <LineChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
             <XAxis 
               dataKey="date" 
               axisLine={false}
@@ -95,8 +74,8 @@ export default function DailyCostTrend() {
               axisLine={false}
               tickLine={false}
               tick={{ fill: '#555555', fontSize: 12 }}
-              tickFormatter={(value) => `$${(value / 1000).toFixed(1)}k`}
-              width={50}
+              tickFormatter={(value) => `$${value.toFixed(4)}`}
+              width={65}
             />
             <Tooltip content={<CustomTooltip />} />
             <Line 
