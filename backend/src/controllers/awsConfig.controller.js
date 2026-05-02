@@ -20,6 +20,9 @@ import {
   aggregateByService,
   aggregateByTeam,
 } from "../services/aws.service.js";
+import { saveDailyCosts } from "../services/cost.service.js";
+import BillingSnapshot from "../models/billingSnapshot.model.js";
+import { refreshRAGForOrg } from "../loaders/rag.loader.js";
 
 // ── Helper: load and decrypt org AWS credentials ──────────────────────────────
 const getOrgCreds = async (orgId) => {
@@ -72,6 +75,15 @@ export const getCost = asyncHandler(async (req, res) => {
 
   const raw = await getAwsCost(accessKey, secretKey);
   const records = transformAwsCost(raw);
+
+  // 1) Save per-day per-service records (await so RAG gets fresh data)
+  await saveDailyCosts(records, req.user.orgId);
+
+  // 2) Trigger RAG re-index in background — does NOT block API response
+  refreshRAGForOrg(req.user.orgId).catch((err) =>
+    console.error('⚠️  refreshRAGForOrg failed (getCost):', err.message),
+  );
+
   const summary = getTotalCost(records);
   const serviceBreakdown = aggregateByService(records);
   const dailyBreakdown = aggregateByDate(records);
@@ -92,6 +104,7 @@ export const getCost = asyncHandler(async (req, res) => {
     dailyBreakdown,
     teamBreakdown,
     rawRecords: records,
+    
   });
 });
 
@@ -133,6 +146,7 @@ export const getFullBilling = asyncHandler(async (req, res) => {
     // getMonthComparison(accessKey, secretKey),
   ]);
 
+  // 1) Save per-day per-service records
   const records = transformAwsCost(dailyRaw);
   // const summary = getTotalCost(records);
   // const serviceBreakdown = aggregateByService(records);
@@ -147,7 +161,6 @@ export const getFullBilling = asyncHandler(async (req, res) => {
   //       : 0,
   // }));
 
-  // Build monthly total trend from per-service monthly rows
   const monthlyTotalsMap = {};
   // monthlyCostByService.forEach(({ month, cost }) => {
   //   monthlyTotalsMap[month] = (monthlyTotalsMap[month] || 0) + cost;
@@ -155,6 +168,36 @@ export const getFullBilling = asyncHandler(async (req, res) => {
   // const monthlyTrend = Object.entries(monthlyTotalsMap)
   //   .map(([month, cost]) => ({ month, cost: +cost.toFixed(6) }))
   //   .sort((a, b) => a.month.localeCompare(b.month));
+
+  // Upsert BillingSnapshot (one per org, replace on every fetch)
+  await BillingSnapshot.findOneAndUpdate(
+    { orgId: req.user.orgId },
+    {
+      $set: {
+        fetchedAt:        new Date(),
+        grossCost:        summary.grossCost,
+        totalCost:        summary.totalCost,
+        credits:          summary.totalCredit,
+        topService:       summary.topService?.name || '',
+        topServiceCost:   summary.topService?.cost || 0,
+        serviceBreakdown: serviceWithPercent,
+        dailyBreakdown,
+        monthlyTrend,
+        monthlyByService: monthlyCostByService,
+        byOperation,
+        monthComparison,
+      },
+      $setOnInsert: { orgId: req.user.orgId },
+    },
+    { upsert: true, returnDocument: 'after' },
+  );
+
+  console.log(`💾 BillingSnapshot saved for [${req.user.orgId}]`);
+
+  // 3) Trigger RAG re-index in background — does NOT block API response
+  refreshRAGForOrg(req.user.orgId).catch((err) =>
+    console.error('⚠️  refreshRAGForOrg failed (getFullBilling):', err.message),
+  );
 
   return sendSuccess(res, 200, "Full billing data fetched successfully", {
     // summary: {
