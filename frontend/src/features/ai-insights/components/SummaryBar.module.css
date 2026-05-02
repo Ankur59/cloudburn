@@ -1,0 +1,63 @@
+/* SummaryBar.module.css */
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+/* Each stat cell */
+.stat {
+  flex: 1;
+  min-width: 160px;
+  padding: 18px 24px;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat:last-child {
+  border-right: none;
+}
+
+.statLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+}
+
+.statValue {
+  font-size: 22px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+
+.statValue.savings {
+  color: var(--success);
+}
+
+.statSub {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+@media (max-width: 768px) {
+  .stat {
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .stat:last-child {
+    border-bottom: none;
+  }
+}

@@ -1,0 +1,247 @@
+/* InsightCard.module.css */
+
+/* Card wrapper */
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.card:hover {
+  border-color: #333;
+  background-color: var(--elevated-bg);
+}
+
+/* "New" insight gets a subtle animated pulse border */
+.card.isNew {
+  border-color: rgba(91, 127, 212, 0.4);
+  animation: pulseBorder 2.5s ease-in-out infinite;
+}
+
+@keyframes pulseBorder {
+  0%, 100% { border-color: rgba(91, 127, 212, 0.4); }
+  50%       { border-color: rgba(91, 127, 212, 0.15); }
+}
+
+/* Expanded state */
+.card.expanded {
+  background-color: var(--elevated-bg);
+  border-color: #333;
+}
+
+/* ── Card Header ── */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 16px 12px;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+/* "New" badge */
+.newBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background-color: rgba(91, 127, 212, 0.15);
+  color: var(--info);
+  border: 1px solid rgba(91, 127, 212, 0.25);
+  font-family: var(--font-sans);
+  flex-shrink: 0;
+}
+
+/* Service tag */
+.serviceTag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  background-color: var(--elevated-bg);
+  border: 1px solid var(--border-color);
+  font-family: var(--font-mono);
+  align-self: flex-start;
+}
+
+.chevron {
+  color: var(--text-tertiary);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.chevron.open {
+  transform: rotate(180deg);
+}
+
+/* ── Metrics Row (always visible) ── */
+.metricsRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 16px 14px;
+  flex-wrap: wrap;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.metricLabel {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+}
+
+.metricValue {
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+
+.metricValue.savings {
+  color: var(--success);
+}
+
+.metricDivider {
+  width: 1px;
+  height: 28px;
+  background-color: var(--border-color);
+}
+
+/* Priority badge */
+.priorityBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+}
+
+.priorityBadge.critical {
+  background-color: rgba(201, 78, 78, 0.1);
+  color: var(--danger);
+  border: 1px solid rgba(201, 78, 78, 0.2);
+}
+
+.priorityBadge.high {
+  background-color: rgba(201, 136, 42, 0.1);
+  color: var(--warning);
+  border: 1px solid rgba(201, 136, 42, 0.2);
+}
+
+.priorityBadge.low {
+  background-color: rgba(161, 161, 161, 0.08);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+/* ── Expanded Body ── */
+.body {
+  padding: 16px;
+  padding-top: 0;
+  border-top: 1px solid var(--border-color);
+  animation: slideDown 0.18s ease;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.explanation {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  padding-top: 14px;
+  padding-bottom: 16px;
+}
+
+/* Action buttons */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid var(--border-color);
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+}
+
+.actionBtn:hover {
+  border-color: #555;
+  background-color: #222;
+}
+
+/* Primary action (Apply / Review) */
+.actionBtn.primary {
+  background-color: #ffffff;
+  border-color: #ffffff;
+  color: #000000;
+}
+
+.actionBtn.primary:hover {
+  opacity: 0.88;
+}
+
+/* Dismiss button */
+.actionBtn.dismiss {
+  color: var(--text-tertiary);
+}
+
+.actionBtn.dismiss:hover {
+  color: var(--danger);
+  border-color: rgba(201, 78, 78, 0.3);
+  background-color: rgba(201, 78, 78, 0.06);
+}
