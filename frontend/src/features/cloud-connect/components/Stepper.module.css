@@ -1,0 +1,75 @@
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+  width: 100%;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  color: #666666;
+  font-size: 0.75rem;
+  font-weight: 500;
+  position: relative;
+  transition: color 0.3s ease;
+  width: 100px; /* fixed width for alignment */
+}
+
+
+
+
+.step.active {
+  color: #999999;
+}
+
+.step.completed {
+  color: var(--success);
+}
+
+.stepIcon {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background-color: var(--elevated-bg);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.step.active .stepIcon {
+  background-color: var(--text-primary);
+  border-color: var(--text-primary);
+  color: var(--page-base);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
+}
+
+.step.completed .stepIcon {
+  background-color: var(--success);
+  border-color: var(--success);
+  color: var(--page-base);
+}
+
+.stepLine {
+  flex: 1;
+  max-width: 4rem;
+  height: 2px;
+  background-color: var(--border-color);
+  margin-top: -1.5rem; /* align with circles */
+  border-radius: 1px;
+  transition: background-color 0.3s ease;
+}
+
+.stepLine.activeLine {
+  background-color: var(--success);
+}

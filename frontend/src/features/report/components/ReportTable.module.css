@@ -1,0 +1,206 @@
+.tableWrapper {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.rowCount {
+  padding: 12px 20px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.rowCount span {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.scrollArea {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+  display: table-cell;
+}
+
+/* Override display for th since it's a table cell */
+th.th {
+  display: table-cell;
+}
+
+table thead tr th {
+  display: table-cell;
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+
+table thead tr th:hover,
+table thead tr th.thActive {
+  color: var(--text-primary);
+}
+
+table thead tr th svg {
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.row {
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.1s ease;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.row:hover {
+  background-color: var(--elevated-bg);
+}
+
+.td {
+  padding: 12px 16px;
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.teamBadge {
+  padding: 3px 8px;
+  background-color: rgba(91, 127, 212, 0.12);
+  color: var(--info);
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.cloudBadge {
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cloudBadge.aws {
+  background-color: rgba(249, 153, 29, 0.12);
+  color: #F8991D;
+}
+
+.cloudBadge.gcp {
+  background-color: rgba(66, 133, 244, 0.12);
+  color: #4285F4;
+}
+
+.cloudBadge.azure {
+  background-color: rgba(0, 120, 212, 0.12);
+  color: #0078D4;
+}
+
+.delta {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.delta.up {
+  color: var(--danger);
+}
+
+.delta.down {
+  color: var(--success);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.pageBtn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background-color: var(--elevated-bg);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pageBtn:hover:not(:disabled) {
+  color: var(--text-primary);
+  border-color: var(--text-tertiary);
+}
+
+.pageBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.pageInfo {
+  font-size: 13px;
+  color: var(--text-secondary);
+  min-width: 100px;
+  text-align: center;
+}
+
+/* Skeleton */
+.skeletonHeader {
+  height: 44px;
+  background: linear-gradient(90deg, var(--elevated-bg) 25%, var(--border-color) 50%, var(--elevated-bg) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+.skeletonRow {
+  height: 48px;
+  border-bottom: 1px solid var(--border-color);
+  background: linear-gradient(90deg, var(--card-bg) 25%, var(--elevated-bg) 50%, var(--card-bg) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (max-width: 768px) {
+  .td, thead tr th {
+    padding: 10px 12px;
+  }
+}

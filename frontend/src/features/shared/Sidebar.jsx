@@ -1,16 +1,18 @@
 'use client'
 
 import styles from './Sidebar.module.css'
+import {Link} from "react-router-dom"
+
 
 const navItems = [
-  { icon: 'dashboard', label: 'Dashboard', active: true },
-  { icon: 'alerts', label: 'Alerts' },
-  { icon: 'cloud', label: 'Cloud Accounts' },
-  { icon: 'teams', label: 'Teams' },
-  { icon: 'budget', label: 'Budget' },
-  { icon: 'reports', label: 'Reports' },
-  { icon: 'settings', label: 'Settings' },
-  { icon: 'admin', label: 'Admin' },
+  { icon: 'dashboard', label: 'Dashboard', href: '/dashboard' },
+  { icon: 'alerts',    label: 'Alerts',         href: '#' },
+  { icon: 'cloud',     label: 'Cloud Accounts',  href: '/connect' },
+  { icon: 'teams',     label: 'Teams',           href: '#' },
+  { icon: 'budget',    label: 'Budget',          href: '#' },
+  { icon: 'reports',   label: 'Reports',         href: '/reports' },
+  { icon: 'settings',  label: 'Settings',        href: '#' },
+  { icon: 'admin',     label: 'Admin',           href: '#' },
 ]
 
 function NavIcon({ type }) {
@@ -74,6 +76,8 @@ function NavIcon({ type }) {
 }
 
 export default function Sidebar({ collapsed, onToggle }) {
+  const currentPath = window.location.pathname
+
   return (
     <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ''}`}>
       <div className={styles.logo}>
@@ -87,14 +91,14 @@ export default function Sidebar({ collapsed, onToggle }) {
       
       <nav className={styles.nav}>
         {navItems.map((item) => (
-          <a 
+          <Link 
             key={item.label} 
-            href="#" 
-            className={`${styles.navItem} ${item.active ? styles.active : ''}`}
+            to={item.href} 
+            className={`${styles.navItem} ${currentPath === item.href ? styles.active : ''}`}
           >
             <NavIcon type={item.icon} />
             {!collapsed && <span>{item.label}</span>}
-          </a>
+          </Link>
         ))}
       </nav>
       
@@ -132,5 +136,3 @@ export default function Sidebar({ collapsed, onToggle }) {
     </aside>
   )
 }
-
-
