@@ -1,4 +1,4 @@
-import DailyCost from '../models/dailyCost.model.js';
+import DailyCost from "../models/dailyCost.model.js";
 
 // ── saveDailyCosts ─────────────────────────────────────────────────────────────
 // Accepts the output of transformAwsCost() + the orgId of the calling user.
@@ -9,7 +9,7 @@ import DailyCost from '../models/dailyCost.model.js';
 export const saveDailyCosts = async (records, orgId) => {
   if (!records || records.length === 0) return;
   if (!orgId) {
-    console.error('⚠️  saveDailyCosts: orgId is missing — data not saved');
+    console.error("⚠️  saveDailyCosts: orgId is missing — data not saved");
     return;
   }
 
@@ -33,15 +33,15 @@ export const saveDailyCosts = async (records, orgId) => {
   const ops = Array.from(map.values()).map(
     ({ date, service, grossCost, netCost, credits }) => ({
       updateOne: {
-        filter: { orgId, date, service },          // ← orgId in filter
+        filter: { orgId, date, service }, // ← orgId in filter
         update: {
           $set: {
             grossCost: +grossCost.toFixed(8),
-            netCost:   +netCost.toFixed(8),
-            credits:   +credits.toFixed(8),
+            netCost: +netCost.toFixed(8),
+            credits: +credits.toFixed(8),
             fetchedAt: new Date(),
           },
-          $setOnInsert: { orgId },                 // ← orgId set on insert
+          $setOnInsert: { orgId }, // ← orgId set on insert
         },
         upsert: true,
       },
@@ -64,7 +64,7 @@ export const getRecentCosts = async (orgId, days = 30) => {
 
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - days);
-  const cutoffStr = cutoff.toISOString().split('T')[0]; // "YYYY-MM-DD"
+  const cutoffStr = cutoff.toISOString().split("T")[0]; // "YYYY-MM-DD"
 
   return DailyCost.find({ orgId, date: { $gte: cutoffStr } })
     .sort({ date: -1, service: 1 })

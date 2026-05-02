@@ -82,7 +82,7 @@ export const getCost = asyncHandler(async (req, res) => {
 
   // 2) Trigger RAG re-index in background — does NOT block API response
   refreshRAGForOrg(req.user.orgId).catch((err) =>
-    console.error('⚠️  refreshRAGForOrg failed (getCost):', err.message),
+    console.error("⚠️  refreshRAGForOrg failed (getCost):", err.message),
   );
 
   const summary = getTotalCost(records);
@@ -105,7 +105,6 @@ export const getCost = asyncHandler(async (req, res) => {
     dailyBreakdown,
     teamBreakdown,
     rawRecords: records,
-    
   });
 });
 
@@ -152,9 +151,9 @@ export const getFullBilling = asyncHandler(async (req, res) => {
 
   // 2) Save full billing snapshot — replaces previous snapshot for this org
   //    This gives RAG rich context: service totals, monthly, operations, etc.
-  const summary   = getTotalCost(records);
+  const summary = getTotalCost(records);
   const serviceBreakdown = aggregateByService(records);
-  const dailyBreakdown   = aggregateByDate(records);
+  const dailyBreakdown = aggregateByDate(records);
 
   const serviceWithPercent = serviceBreakdown.map((s) => ({
     ...s,
@@ -177,7 +176,7 @@ export const getFullBilling = asyncHandler(async (req, res) => {
     monthComparison,
     serviceBreakdown: serviceWithPercent,
     dailyBreakdown,
-    byTeam
+    byTeam,
   });
 
   // Upsert BillingSnapshot (one per org, replace on every fetch)
@@ -185,12 +184,12 @@ export const getFullBilling = asyncHandler(async (req, res) => {
     { orgId: req.user.orgId },
     {
       $set: {
-        fetchedAt:        new Date(),
-        grossCost:        summary.grossCost,
-        totalCost:        summary.totalCost,
-        credits:          summary.totalCredit,
-        topService:       summary.topService?.name || '',
-        topServiceCost:   summary.topService?.cost || 0,
+        fetchedAt: new Date(),
+        grossCost: summary.grossCost,
+        totalCost: summary.totalCost,
+        credits: summary.totalCredit,
+        topService: summary.topService?.name || "",
+        topServiceCost: summary.topService?.cost || 0,
         serviceBreakdown: serviceWithPercent,
         dailyBreakdown,
         monthlyTrend,
@@ -201,14 +200,14 @@ export const getFullBilling = asyncHandler(async (req, res) => {
       },
       $setOnInsert: { orgId: req.user.orgId },
     },
-    { upsert: true, returnDocument: 'after' },
+    { upsert: true, returnDocument: "after" },
   );
 
   console.log(`💾 BillingSnapshot saved for [${req.user.orgId}]`);
 
   // 3) Trigger RAG re-index in background — does NOT block API response
   refreshRAGForOrg(req.user.orgId).catch((err) =>
-    console.error('⚠️  refreshRAGForOrg failed (getFullBilling):', err.message),
+    console.error("⚠️  refreshRAGForOrg failed (getFullBilling):", err.message),
   );
 
   return sendSuccess(res, 200, "Full billing data fetched successfully", {

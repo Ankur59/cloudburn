@@ -1,3 +1,5 @@
+import DailyCost from '../models/dailyCost.model.js';
+
 export const buildDashboardData = (billingData) => {
   const { summary, monthComparison, serviceBreakdown, dailyBreakdown, byTeam } =
     billingData;
@@ -140,5 +142,82 @@ export const buildDashboardData = (billingData) => {
     services,
     teams,
     recentAlerts,
+  };
+};
+
+export const buildReportsData = async (orgId, page = 1, limit = 50) => {
+  const skip = (page - 1) * limit;
+
+  // Filter query: only include data where cost is greater than 0
+  const query = { orgId, netCost: { $gt: 0 } };
+
+  // 1. Get total count for pagination metadata
+  const totalRows = await DailyCost.countDocuments(query);
+  const totalPages = Math.ceil(totalRows / limit);
+
+  // 2. Fetch the current page of records
+  const records = await DailyCost.find(query)
+    .sort({ date: -1, service: 1 })
+    .skip(skip)
+    .limit(limit)
+    .lean();
+
+  if (!records || records.length === 0) {
+    return {
+      reports: [],
+      pagination: { totalRows, totalPages, currentPage: page, pageSize: limit }
+    };
+  }
+
+  // 3. For each record, find the "previous" day's cost to calculate delta
+  const reports = await Promise.all(
+    records.map(async (r) => {
+      // Find the most recent record for this service before this record's date
+      const prevRecord = await DailyCost.findOne({
+        orgId,
+        service: r.service,
+        date: { $lt: r.date }
+      })
+        .sort({ date: -1 })
+        .lean();
+
+      const prevCost = prevRecord ? prevRecord.netCost : 0;
+      const cost = r.netCost;
+      let delta = 0;
+      console.log(r);
+      
+      if (prevCost > 0) {
+        delta = +(((cost - prevCost) / prevCost) * 100).toFixed(1);
+      }
+
+      // Format date as "Mar 1, 2024"
+      const dateObj = new Date(r.date);
+      const dateFormatted = dateObj.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+
+      return {
+        id: r._id,
+        date: dateFormatted,
+        service: r.service,
+        team: "Unassigned", // DailyCost doesn't have team tags currently
+        cloud: "AWS",
+        cost: +cost.toFixed(2),
+        prev: +prevCost.toFixed(2),
+        delta: delta,
+      };
+    })
+  );
+
+  return {
+    reports,
+    pagination: {
+      totalRows,
+      totalPages,
+      currentPage: page,
+      pageSize: limit,
+    },
   };
 };
