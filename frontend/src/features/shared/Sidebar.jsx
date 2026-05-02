@@ -8,7 +8,8 @@ const navItems = [
   { icon: 'dashboard', label: 'Dashboard', href: '/dashboard' },
   { icon: 'alerts',    label: 'Alerts',         href: '/alerts' },
   { icon: 'ai-insights',    label: 'AI Insights',    href: '/ai-insights' },
-  { icon: 'cloud',     label: 'Cloud Accounts',  href: '/connect' },
+  { icon: 'zombie-detector',    label: 'Zombie Detector',    href: '/zombie-detector' },
+  { icon: 'cloud',     label: 'Cloud Accounts',  href: '/cloud-accounts' },
   { icon: 'teams',     label: 'Teams',           href: '/teams' },
   { icon: 'budget',    label: 'Budget',          href: '/budget' },
   { icon: 'reports',   label: 'Reports',         href: '/reports' },
@@ -31,6 +32,31 @@ function NavIcon({ type }) {
   <path d="M12 2v4M12 18v4M2 12h4M18 12h4M5.64 5.64l2.83 2.83M15.54 15.54l2.83 2.83M5.64 18.36l2.83-2.83M15.54 8.46l2.83-2.83" strokeLinecap="round"/>
 </svg>
     ),  
+
+
+    "zombie-detector":(
+       
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  {/* Head */}
+  <rect x="7" y="2" width="10" height="9" rx="2" />
+  {/* Eyes */}
+  <circle cx="10" cy="6" r="1" fill="currentColor" stroke="none" />
+  <circle cx="14" cy="6" r="1" fill="currentColor" stroke="none" />
+  {/* Mouth - jagged zombie */}
+  <path d="M9 9.5h6" />
+  {/* Neck */}
+  <path d="M10 11v2M14 11v2" />
+  {/* Body */}
+  <path d="M6 13h12v5H6z" rx="1" />
+  {/* Arms outstretched - zombie pose */}
+  <path d="M6 14.5L2 13M18 14.5L22 13" />
+  {/* Legs */}
+  <path d="M9 18v3M15 18v3" />
+</svg>
+
+    ),
+
+
     alerts: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
