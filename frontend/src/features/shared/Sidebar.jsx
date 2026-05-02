@@ -6,9 +6,9 @@ import {Link} from "react-router-dom"
 
 const navItems = [
   { icon: 'dashboard', label: 'Dashboard', href: '/dashboard' },
-  { icon: 'alerts',    label: 'Alerts',         href: '#' },
+  { icon: 'alerts',    label: 'Alerts',         href: '/alerts' },
   { icon: 'cloud',     label: 'Cloud Accounts',  href: '/connect' },
-  { icon: 'teams',     label: 'Teams',           href: '#' },
+  { icon: 'teams',     label: 'Teams',           href: '/teams' },
   { icon: 'budget',    label: 'Budget',          href: '#' },
   { icon: 'reports',   label: 'Reports',         href: '/reports' },
   { icon: 'settings',  label: 'Settings',        href: '#' },

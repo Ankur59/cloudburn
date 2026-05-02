@@ -4,6 +4,8 @@ import Register from '../features/auth/pages/Register.jsx';
 import Dashboard from '../features/dashboard/pages/DashboardPage.jsx';
 import Connect from '../features/cloud-connect/pages/Connect.jsx';
 import Reports from '../features/report/pages/Reports.jsx';
+import Alerts from '../features/alerts/pages/Alerts.jsx';
+import Team from '../features/Team/pages/Team.jsx';
 
 const AppRouter = () => {
   return (
@@ -14,6 +16,8 @@ const AppRouter = () => {
       <Route path='/signup' element={<Register />} />
       <Route path='/connect' element={<Connect />} />
       <Route path='/reports' element={<Reports />} />
+      <Route path='/alerts' element={<Alerts />} />
+      <Route path='/teams' element={<Team />} />
     </Routes>
   );
 };
