@@ -1,0 +1,103 @@
+.aiInsights {
+  margin-top: 24px;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.sectionTitle svg {
+  color: var(--warning);
+}
+
+.insightsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.insightCard {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cardContent {
+  flex: 1;
+}
+
+.insightTitle {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.savingsRow,
+.confidenceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.savingsLabel,
+.confidenceLabel {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.savingsValue {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--success);
+}
+
+.period {
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.confidenceValue {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.reviewBtn {
+  padding: 8px 16px;
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-sans);
+  white-space: nowrap;
+}
+
+.reviewBtn:hover {
+  background-color: var(--elevated-bg);
+  border-color: var(--text-tertiary);
+}
+
+@media (max-width: 900px) {
+  .insightsGrid {
+    grid-template-columns: 1fr;
+  }
+}

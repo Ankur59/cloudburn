@@ -1,0 +1,76 @@
+.teamsCard {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+
+.tableContainer {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 12px 16px;
+  text-align: left;
+}
+
+.table th {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table td {
+  font-size: 14px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.teamName {
+  font-weight: 500;
+}
+
+.money {
+  font-family: var(--font-mono);
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.statusBadge.on-track {
+  background-color: rgba(77, 184, 122, 0.15);
+  color: var(--success);
+}
+
+.statusBadge.at-risk {
+  background-color: rgba(201, 136, 42, 0.15);
+  color: var(--warning);
+}
+
+.statusBadge.over-budget {
+  background-color: rgba(201, 78, 78, 0.15);
+  color: var(--danger);
+}

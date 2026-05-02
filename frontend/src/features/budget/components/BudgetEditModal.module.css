@@ -1,0 +1,221 @@
+/* BudgetEditModal.module.css */
+
+/* Overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Modal box */
+.modal {
+  background-color: var(--elevated-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  width: 100%;
+  max-width: 420px;
+  animation: slideUp 0.18s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Modal header */
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modalTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color 0.2s;
+}
+
+.closeBtn:hover {
+  color: var(--text-primary);
+}
+
+/* Modal body */
+.modalBody {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.teamLabel {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.teamName {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Field */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* Budget input with $ prefix */
+.inputWrapper {
+  position: relative;
+}
+
+.prefix {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
+  pointer-events: none;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 12px 10px 24px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 15px;
+  font-family: var(--font-mono);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  border-color: #555;
+}
+
+/* Threshold slider */
+.sliderSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.thresholdOptions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Each threshold option is a clickable pill */
+.thresholdPill {
+  flex: 1;
+  padding: 8px 4px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: none;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+}
+
+.thresholdPill:hover {
+  border-color: #444;
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+}
+
+.thresholdPill.selected {
+  border-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.thresholdHint {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+/* Action buttons */
+.actions {
+  display: flex;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.saveBtn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  background-color: #ffffff;
+  color: #000000;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.saveBtn:hover {
+  opacity: 0.9;
+}
+
+.cancelBtn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: none;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancelBtn:hover {
+  border-color: #444;
+  color: var(--text-primary);
+  background-color: var(--card-bg);
+}

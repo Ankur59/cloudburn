@@ -1,0 +1,24 @@
+/* AlertList.module.css */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.listHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.listCount {
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.listCount span {
+  color: var(--text-secondary);
+  font-weight: 500;
+}

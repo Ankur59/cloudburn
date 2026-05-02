@@ -1,0 +1,222 @@
+/* ZombieDrawer.module.css */
+
+/* Backdrop overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0,0,0,0.4);
+  z-index: 200;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Drawer panel — slides in from right */
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 420px;
+  background-color: var(--card-bg);
+  border-left: 1px solid var(--border-color);
+  z-index: 201;
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.22s ease;
+  overflow-y: auto;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+/* Header */
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.drawerTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  transition: color 0.2s;
+}
+
+.closeBtn:hover { color: var(--text-primary); }
+
+/* Body */
+.drawerBody {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Section */
+.section { display: flex; flex-direction: column; gap: 10px; }
+
+.sectionTitle {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Metadata key-value grid */
+.metaGrid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 16px;
+}
+
+.metaKey {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.metaValue {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  word-break: break-all;
+}
+
+/* Usage graph — flat line visualisation */
+.graphBox {
+  background-color: var(--elevated-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 16px;
+  height: 80px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.graphLabel {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+}
+
+.flatLine {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--danger) 0%, rgba(201,78,78,0.3) 100%);
+  border-radius: 1px;
+  position: relative;
+}
+
+.flatLine::after {
+  content: 'No activity';
+  position: absolute;
+  right: 0;
+  top: -18px;
+  font-size: 10px;
+  color: var(--danger);
+  font-family: var(--font-mono);
+}
+
+/* AI Summary box */
+.aiBox {
+  background-color: var(--elevated-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 14px;
+}
+
+.aiLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--info);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.aiText {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+/* Action buttons */
+.drawerActions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
+  padding: 16px 20px;
+}
+
+.actBtn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid var(--border-color);
+  background: none;
+  color: var(--text-secondary);
+}
+
+.actBtn:hover {
+  border-color: #555;
+  background-color: var(--elevated-bg);
+  color: var(--text-primary);
+}
+
+.actBtn.terminate {
+  border-color: rgba(201,78,78,0.3);
+  color: var(--danger);
+  background-color: rgba(201,78,78,0.06);
+}
+
+.actBtn.terminate:hover {
+  background-color: rgba(201,78,78,0.15);
+  border-color: rgba(201,78,78,0.5);
+}
+
+@media (max-width: 768px) {
+  .drawer { width: 100%; }
+}

@@ -1,0 +1,121 @@
+/* TeamList.module.css — Left panel showing all teams */
+
+.panel {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Panel header row */
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.panelTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Create team button */
+.createBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: none;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.createBtn:hover {
+  background-color: var(--elevated-bg);
+  border-color: #444;
+}
+
+/* Individual team row */
+.teamRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.teamRow:last-child {
+  border-bottom: none;
+}
+
+.teamRow:hover {
+  background-color: var(--elevated-bg);
+}
+
+.teamRow.active {
+  background-color: var(--elevated-bg);
+  box-shadow: inset 3px 0 0 #ffffff;
+}
+
+.teamName {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.teamMeta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.teamStat {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.providerBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+}
+
+.providerBadge.aws {
+  background-color: rgba(201, 136, 42, 0.12);
+  color: var(--warning);
+}
+
+.providerBadge.gcp {
+  background-color: rgba(91, 127, 212, 0.12);
+  color: var(--info);
+}
+
+.providerBadge.azure {
+  background-color: rgba(91, 127, 212, 0.12);
+  color: var(--info);
+}
+
+.teamSpend {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}

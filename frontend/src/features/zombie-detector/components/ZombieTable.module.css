@@ -1,0 +1,192 @@
+/* ZombieTable.module.css */
+
+.wrapper {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Sortable column header */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tableHead {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tableHead th {
+  padding: 11px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Sortable header cell — clickable */
+.sortable {
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.sortable:hover { color: var(--text-secondary); }
+
+.sortIcon {
+  display: inline-block;
+  margin-left: 4px;
+  font-style: normal;
+  font-size: 10px;
+}
+
+/* Checkbox column */
+.checkboxCell {
+  width: 40px;
+  padding-left: 16px !important;
+}
+
+/* Table rows */
+.tableBody tr {
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.15s;
+  position: relative;
+}
+
+.tableBody tr:last-child { border-bottom: none; }
+
+.tableBody tr:hover { background-color: var(--elevated-bg); }
+
+.tableBody tr.selected { background-color: rgba(91,127,212,0.06); }
+
+.tableBody td {
+  padding: 14px 16px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  vertical-align: middle;
+}
+
+/* Resource type icon + name */
+.resourceCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.resourceIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background-color: var(--elevated-bg);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--text-tertiary);
+}
+
+.resourceName {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* Resource ID — mono */
+.resourceId {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Cloud provider badge */
+.cloudBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+}
+
+.cloudBadge.aws   { background-color: rgba(201,136,42,0.12); color: var(--warning); border: 1px solid rgba(201,136,42,0.2); }
+.cloudBadge.gcp   { background-color: rgba(91,127,212,0.12); color: var(--info);    border: 1px solid rgba(91,127,212,0.2);  }
+.cloudBadge.azure { background-color: rgba(91,127,212,0.12); color: var(--info);    border: 1px solid rgba(91,127,212,0.2);  }
+
+/* Idle duration — coloured by age */
+.idleAmber { color: var(--warning); font-family: var(--font-mono); font-size: 12px; }
+.idleRed   { color: var(--danger);  font-family: var(--font-mono); font-size: 12px; }
+.idleGray  { color: var(--text-secondary); font-family: var(--font-mono); font-size: 12px; }
+
+/* Cost cell */
+.costCell {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* Status badges */
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+}
+
+.statusBadge.zombie  { background-color: rgba(201,78,78,0.1);   color: var(--danger);  border: 1px solid rgba(201,78,78,0.2);   }
+.statusBadge.marked  { background-color: rgba(201,136,42,0.1);  color: var(--warning); border: 1px solid rgba(201,136,42,0.2);  }
+.statusBadge.cleaned { background-color: rgba(77,184,122,0.1);  color: var(--success); border: 1px solid rgba(77,184,122,0.2);  }
+
+/* Row action buttons (visible on hover) */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.tableBody tr:hover .actions { opacity: 1; }
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  background: none;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.actionBtn:hover {
+  border-color: #444;
+  background-color: var(--elevated-bg);
+  color: var(--text-primary);
+}
+
+.markBtn:hover {
+  border-color: rgba(201,136,42,0.4);
+  background-color: rgba(201,136,42,0.08);
+  color: var(--warning);
+}
+
+/* Table scroll on mobile */
+@media (max-width: 768px) {
+  .wrapper { overflow-x: auto; }
+}
