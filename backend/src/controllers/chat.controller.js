@@ -1,16 +1,14 @@
-import crypto from 'crypto';
 import asyncHandler from '../middlewares/async.middleware.js';
 import AppError from '../utils/AppError.js';
 import { sendSuccess } from '../utils/responseHelper.js';
-import { sendMessage, getHistory, getAllSessions } from '../services/chat.service.js';
+import { processMessage, getUserChats, getChatMessages, removeChat } from '../services/chat.service.js';
 
 // ── POST /api/chat/message ────────────────────────────────────────────────────
-// Body: { sessionId?: string, message: string }
-// orgId is extracted from the JWT (req.user.orgId) — never trusted from body.
-
-export const postMessage = asyncHandler(async (req, res) => {
-  const { sessionId, message } = req.body;
-  const orgId = req.user?.orgId;
+// Body: { chatId?: string, message: string }
+export const sendMessage = asyncHandler(async (req, res) => {
+  const { chatId, message } = req.body;
+  const user = req.user;
+  const orgId = user?.orgId;
 
   if (!orgId) {
     throw new AppError('Organisation not identified. Please log in again.', 401);
@@ -20,52 +18,38 @@ export const postMessage = asyncHandler(async (req, res) => {
     throw new AppError('message is required and must be a non-empty string.', 400);
   }
 
-  // Auto-generate session ID if client didn't provide one
-  const sid = sessionId || crypto.randomUUID();
-
-  const { answer } = await sendMessage({
-    sessionId: sid,
+  const { chatId: resolvedChatId, answer } = await processMessage({
+    chatId,
     message: message.trim(),
-    orgId,                          // ← org context from JWT
+    userId: user._id,
+    orgId
   });
 
-  return sendSuccess(res, 200, 'Chat response generated.', {
+  return sendSuccess(res, 200, 'Message sent successfully', {
+    chatId: resolvedChatId,
     answer,
-    sessionId: sid,
   });
 });
 
-// ── GET /api/chat/history/:sessionId ─────────────────────────────────────────
-// Returns message history for the session — filtered by orgId for security.
-
-export const getChatHistory = asyncHandler(async (req, res) => {
-  const { sessionId } = req.params;
-  const orgId = req.user?.orgId;
-
-  if (!orgId) {
-    throw new AppError('Organisation not identified. Please log in again.', 401);
-  }
-
-  if (!sessionId) {
-    throw new AppError('sessionId param is required.', 400);
-  }
-
-  const messages = await getHistory(sessionId, orgId);
-
-  return sendSuccess(res, 200, 'Chat history retrieved.', { messages });
+// ── GET /api/chat/ ────────────────────────────────────────────────────────────
+// Returns a list of all chat sessions for the user
+export const getChats = asyncHandler(async (req, res) => {
+  const chats = await getUserChats(req.user._id);
+  return sendSuccess(res, 200, 'Chats retrieved.', { chats });
 });
 
-// ── GET /api/chat/sessions ────────────────────────────────────────────────────
-// Returns a list of all chat sessions for the org (for a sidebar)
+// ── GET /api/chat/:chatId/messages ─────────────────────────────────────────────
+// Returns message history for the chat
+export const getMessages = asyncHandler(async (req, res) => {
+  const { chatId } = req.params;
+  const messages = await getChatMessages(chatId, req.user._id);
+  return sendSuccess(res, 200, 'Messages retrieved.', { messages });
+});
 
-export const getChatSessions = asyncHandler(async (req, res) => {
-  const orgId = req.user?.orgId;
-
-  if (!orgId) {
-    throw new AppError('Organisation not identified. Please log in again.', 401);
-  }
-
-  const sessions = await getAllSessions(orgId);
-
-  return sendSuccess(res, 200, 'Chat sessions retrieved.', { sessions });
+// ── DELETE /api/chat/delete/:chatId ────────────────────────────────────────────
+// Deletes a chat session and all its messages
+export const deleteChat = asyncHandler(async (req, res) => {
+  const { chatId } = req.params;
+  await removeChat(chatId, req.user._id);
+  return sendSuccess(res, 200, 'Chat deleted successfully.', null);
 });

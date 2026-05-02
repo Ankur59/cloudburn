@@ -1,5 +1,8 @@
+import Chat from '../models/chat.model.js';
+import Message from '../models/message.model.js';
+import AppError from '../utils/AppError.js';
+import { askGroq, generateChatTitle } from './ai.service.js';
 import { getVectorStore, refreshRAGForOrg } from '../loaders/rag.loader.js';
-import { askGroq } from './ai.service.js';
 
 // ── System prompt factory ─────────────────────────────────────────────────────
 const buildSystemPrompt = (ragContext, orgId) =>
@@ -18,17 +21,41 @@ Instructions:
 - Recommend actionable cost optimizations based on the actual services shown.
 - Be concise but thorough. Do not make up numbers that are not in the context.`;
 
-// ── sendMessage ───────────────────────────────────────────────────────────────
-export const sendMessage = async ({ sessionId, message, orgId }) => {
-  if (!orgId) throw new Error('orgId is required for chat');
+export const processMessage = async ({ chatId, message, userId, orgId }) => {
+  // 1. Resolve or create Chat
+  let chat;
+  if (chatId) {
+    chat = await Chat.findOne({ _id: chatId, user: userId });
+    if (!chat) {
+      throw new AppError('Chat session not found.', 404);
+    }
+  } else {
+    // Generate a contextual title using AI
+    const title = await generateChatTitle(message);
+    chat = await Chat.create({ user: userId, title });
+  }
 
-  // RAG similarity search — ONLY this org's vector store
+  // 2. Save User Message
+  await Message.create({
+    chat: chat._id,
+    content: message,
+    role: 'user',
+  });
+
+  // 3. Fetch past messages for AI context
+  const pastMessages = await Message.find({ chat: chat._id })
+    .sort({ createdAt: 1 })
+    .lean();
+
+  const formattedHistory = pastMessages.map(m => ({
+    role: m.role,
+    content: m.content
+  }));
+
+  // 4. RAG Context
   let ragContext = '';
   try {
     let vectorStore = getVectorStore(orgId);
-
-    // Auto-refresh: if org has no store yet (e.g. first chat after billing fetch),
-    // trigger a rebuild so the user immediately benefits from their data.
     if (!vectorStore) {
       console.log(`🔄 RAG auto-refresh triggered for [${orgId}]`);
       await refreshRAGForOrg(orgId);
@@ -43,28 +70,41 @@ export const sendMessage = async ({ sessionId, message, orgId }) => {
     console.warn('⚠️  RAG lookup skipped:', err.message);
   }
 
-  // Stateless messages payload — just system prompt and the current user message
-  const messages = [
+  // 5. Construct payload for Groq
+  const aiPayload = [
     { role: 'system', content: buildSystemPrompt(ragContext, orgId) },
-    { role: 'user', content: message },
+    ...formattedHistory // Includes the current user message
   ];
 
-  // Call Groq
-  const answer = await askGroq(messages);
+  // 6. Call Groq
+  const answer = await askGroq(aiPayload);
 
-  return { answer, sessionId };
+  // 7. Save AI Response
+  const aiMessage = await Message.create({
+    chat: chat._id,
+    content: answer,
+    role: 'ai',
+  });
+
+  return { chatId: chat._id, answer: aiMessage.content };
 };
 
-// ── getHistory ────────────────────────────────────────────────────────────────
-// Since data saving is disabled, always return an empty array.
-
-export const getHistory = async (sessionId, orgId) => {
-  return [];
+export const getUserChats = async (userId) => {
+  return await Chat.find({ user: userId }).sort({ updatedAt: -1 });
 };
 
-// ── getAllSessions ────────────────────────────────────────────────────────────
-// Since data saving is disabled, always return an empty array.
+export const getChatMessages = async (chatId, userId) => {
+  const chat = await Chat.findOne({ _id: chatId, user: userId });
+  if (!chat) {
+    throw new AppError('Chat not found.', 404);
+  }
+  return await Message.find({ chat: chatId }).sort({ createdAt: 1 });
+};
 
-export const getAllSessions = async (orgId) => {
-  return [];
+export const removeChat = async (chatId, userId) => {
+  const chat = await Chat.findOneAndDelete({ _id: chatId, user: userId });
+  if (!chat) {
+    throw new AppError('Chat not found.', 404);
+  }
+  await Message.deleteMany({ chat: chatId });
 };

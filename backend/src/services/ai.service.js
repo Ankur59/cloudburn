@@ -48,3 +48,23 @@ export const askGroq = async (messages) => {
   const response = await groq.invoke(messages);
   return response.content?.trim() || '';
 };
+
+// ── generateChatTitle ─────────────────────────────────────────────────────────
+// Generates a short, descriptive title (max 5 words) for a new chat session based
+// on the user's first message.
+
+export const generateChatTitle = async (firstMessage) => {
+  const prompt = `You are a helpful assistant that generates short, concise titles for chat sessions.
+Based on the following user message, generate a chat title that is at most 5 words long.
+Do not use quotes or punctuation. Just output the title.
+
+Message: "${firstMessage}"`;
+
+  try {
+    const response = await groq.invoke([{ role: 'user', content: prompt }]);
+    return response.content?.trim() || 'New Chat';
+  } catch (err) {
+    console.error('⚠️  Groq title generation failed:', err.message);
+    return 'New Chat';
+  }
+};
