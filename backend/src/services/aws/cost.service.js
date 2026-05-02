@@ -237,12 +237,15 @@ export const getCostByTeam = async (accessKey, secretKey) => {
 };
 
 export const getMonthComparison = async (accessKey, secretKey) => {
-  const thisMonthStart = new Date();
-  thisMonthStart.setDate(1);
-  thisMonthStart.setHours(0, 0, 0, 0);
+  const now = new Date();
 
-  const lastMonthStart = new Date(thisMonthStart);
-  lastMonthStart.setMonth(lastMonthStart.getMonth() - 1);
+  // This month's first day (UTC midnight)
+  const thisMonthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+
+  // Last month's first day
+  const lastMonthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1));
+
+  const thisMonthStartStr = fmt(thisMonthStart); // "YYYY-MM-01"
 
   const response = await ceQuery(makeCEClient(accessKey, secretKey), {
     TimePeriod: { Start: fmt(lastMonthStart), End: fmt(today()) },
@@ -258,8 +261,12 @@ export const getMonthComparison = async (accessKey, secretKey) => {
   const lastMonth = { services: {}, total: 0 };
   const thisMonth = { services: {}, total: 0 };
 
-  periods.forEach((p, idx) => {
-    const target = idx === 0 ? lastMonth : thisMonth;
+  periods.forEach((p) => {
+    // Identify period by its start date — NOT by array index
+    const periodStart = p.TimePeriod?.Start || "";
+    // If period starts on or after the 1st of the current month → this month
+    const target = periodStart >= thisMonthStartStr ? thisMonth : lastMonth;
+
     p.Groups?.forEach((g) => {
       const svc = g.Keys?.[0] || "unknown";
       const cost = parseFloat(g.Metrics?.AmortizedCost?.Amount || 0);
@@ -296,11 +303,11 @@ export const getMonthComparison = async (accessKey, secretKey) => {
     delta: +(thisMonth.total - lastMonth.total).toFixed(6),
     changePercent:
       lastMonth.total > 0
-        ? +(
-            ((thisMonth.total - lastMonth.total) / lastMonth.total) *
-            100
-          ).toFixed(1)
+        ? +(((thisMonth.total - lastMonth.total) / lastMonth.total) * 100).toFixed(1)
         : null,
     byService: byService.sort((a, b) => b.thisMonthCost - a.thisMonthCost),
   };
 };
+
+
+

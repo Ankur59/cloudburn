@@ -33,15 +33,28 @@ export const buildDashboardData = (billingData) => {
   } = billingData;
 
   // ── 1. KPI Cards ─────────────────────────────────────────────────────────────
-  const mtdCost = +(monthComparison?.thisMonthTotal || 0).toFixed(2);
+  const trendSource = (dailyTrend90 && dailyTrend90.length > 0) ? dailyTrend90 : (dailyBreakdown || []);
+  const isFromTrend90 = (dailyTrend90 && dailyTrend90.length > 0);
+
+  const now = new Date();
+  const currentMonthStr = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
+
+  let computedMtdCost = 0;
+  trendSource.forEach((d) => {
+    if (d.date && d.date.startsWith(currentMonthStr)) {
+      computedMtdCost += isFromTrend90 ? (d.cost || 0) : (d.grossCost || 0);
+    }
+  });
+
+  const mtdCost = +computedMtdCost.toFixed(2);
   const lastMonthCost = +(monthComparison?.lastMonthTotal || 0).toFixed(2);
   const changePercent = monthComparison?.changePercent ?? 0;
   const mtdTrendStr = (changePercent > 0 ? "+" : "") + changePercent + "%";
   const mtdTrendDir = changePercent >= 0 ? "up" : "down";
   const savings = +Math.abs(summary?.savings ?? summary?.totalCredit ?? 0).toFixed(2);
-  const daysElapsed = new Date().getDate() || 1;
+  const daysElapsed = now.getUTCDate() || 1;
   const avgDaily = mtdCost / daysElapsed;
-  const projected = +(avgDaily * 30).toFixed(2);
+  const projected = +(avgDaily * new Date(now.getUTCFullYear(), now.getUTCMonth() + 1, 0).getDate()).toFixed(2);
   const topSvc = summary?.topService?.name || "N/A";
   const topSvcCost = +(summary?.topService?.cost || 0).toFixed(2);
 
@@ -88,9 +101,6 @@ export const buildDashboardData = (billingData) => {
   // ── 2. Daily Cost Trend ───────────────────────────────────────────────────────
   // Prefer dailyTrend90 (clean 90-day data). Fall back to dailyBreakdown (30d).
   const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-
-  const trendSource = (dailyTrend90 && dailyTrend90.length > 0) ? dailyTrend90 : (dailyBreakdown || []);
-  const isFromTrend90 = (dailyTrend90 && dailyTrend90.length > 0);
 
   const dailyCostTrend = trendSource.map((d) => {
     const dateObj = new Date(d.date);

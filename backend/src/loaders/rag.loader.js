@@ -119,18 +119,60 @@ const buildTextChunks = async (orgId) => {
       );
     }
 
-    // Dashboard Data (Frontend Context)
-    if (snap.dashboardData) {
-      if (snap.dashboardData.kpis) {
-        const kpiStr = snap.dashboardData.kpis.map(k => `${k.label}: ${k.value} (${k.trend || ''} ${k.subtitle || ''})`).join('\n');
-        texts.push(`Dashboard KPIs:\n${kpiStr}`);
-      }
-      if (snap.dashboardData.teams) {
-        const teamStr = snap.dashboardData.teams.map(t => `${t.name}: Spent $${t.spent} (Budget $${t.budget}, Status: ${t.status})`).join('\n');
-        texts.push(`Dashboard Top Spending Teams:\n${teamStr}`);
-      }
+    // Team and EC2 Instance spending breakdown
+    if (snap.byTeam?.length > 0) {
+      const lines = [];
+      snap.byTeam.forEach(t => {
+        const teamName = t.team === "unassigned" ? "Unallocated" : t.team;
+        lines.push(`Team: ${teamName} | Total Cost: $${(t.cost || 0).toFixed(6)}`);
+        if (t.instances && t.instances.length > 0) {
+          lines.push(`  EC2 Instances for ${teamName}:`);
+          t.instances.forEach(i => {
+            lines.push(`  - Instance: ${i.instanceName || i.resourceId} (${i.instanceType}) | State: ${i.state} | AZ: ${i.az} | Cost: $${(i.cost || 0).toFixed(6)} | Usage Hours: ${i.usageHours}`);
+          });
+        }
+      });
+      texts.push(`Team and EC2 Instance Spending:\n${lines.join('\n')}`);
     }
-  }
+
+    // Daily Trend (Last 90 Days)
+    if (snap.dailyTrend90?.length > 0) {
+      const lines = snap.dailyTrend90.map(
+        (d) => `${d.date}: $${(d.cost || 0).toFixed(4)}`
+      );
+      texts.push(`Daily cost trend (last 90 days):\n${lines.join('\n')}`);
+    } else if (snap.dailyBreakdown?.length > 0) {
+      // Fallback to 30 days
+      const lines = snap.dailyBreakdown.map(
+        (d) => `${d.date}: $${(d.grossCost || 0).toFixed(4)}`
+      );
+      texts.push(`Daily cost trend (last 30 days):\n${lines.join('\n')}`);
+    }
+
+    // By AWS Region
+    if (snap.byRegion?.length > 0) {
+      const lines = snap.byRegion.map(
+        (r) => `${r.region}: $${(r.cost || 0).toFixed(6)}`
+      );
+      texts.push(`Cost breakdown by AWS Region:\n${lines.join('\n')}`);
+    }
+
+    // By Usage Type
+    if (snap.byUsageType?.length > 0) {
+      const lines = snap.byUsageType.map(
+        (u) => `${u.usageType}: $${(u.cost || 0).toFixed(6)} (${u.usageQuantity} ${u.unit})`
+      );
+      texts.push(`Cost breakdown by Usage Type:\n${lines.join('\n')}`);
+    }
+
+    // By Record Type (Usage vs Tax vs Credits)
+    if (snap.byRecordType?.length > 0) {
+      const lines = snap.byRecordType.map(
+        (r) => `${r.recordType}: $${(r.cost || 0).toFixed(6)}`
+      );
+      texts.push(`Cost breakdown by Record Type (Usage/Tax/Credits):\n${lines.join('\n')}`);
+    }
+  } // <-- Added missing closing brace for if (snap) {
 
   return texts;
 };
