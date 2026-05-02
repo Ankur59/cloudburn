@@ -1,0 +1,265 @@
+/* AccountCard.module.css */
+
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s;
+}
+
+.card:hover { border-color: #333; }
+
+/* Red border for error/expired accounts */
+.card.error   { border-color: rgba(201, 78, 78, 0.4); }
+.card.syncing { border-color: rgba(91, 127, 212, 0.3); }
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  gap: 12px;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Provider icon circle */
+.providerIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.providerIcon.aws   { background-color: rgba(201, 136, 42, 0.15); color: var(--warning); border: 1px solid rgba(201, 136, 42, 0.25); }
+.providerIcon.gcp   { background-color: rgba(91, 127, 212, 0.15); color: var(--info);    border: 1px solid rgba(91, 127, 212, 0.25); }
+.providerIcon.azure { background-color: rgba(91, 127, 212, 0.15); color: var(--info);    border: 1px solid rgba(91, 127, 212, 0.25); }
+
+.accountName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Status badges */
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  flex-shrink: 0;
+}
+
+.statusBadge.active   { background-color: rgba(77, 184, 122, 0.1);  color: var(--success); border: 1px solid rgba(77, 184, 122, 0.2);  }
+.statusBadge.syncing  { background-color: rgba(91, 127, 212, 0.1);  color: var(--info);    border: 1px solid rgba(91, 127, 212, 0.2);  }
+.statusBadge.error    { background-color: rgba(201, 78, 78, 0.1);   color: var(--danger);  border: 1px solid rgba(201, 78, 78, 0.2);   }
+.statusBadge.expiring { background-color: rgba(201, 136, 42, 0.1);  color: var(--warning); border: 1px solid rgba(201, 136, 42, 0.2);  }
+
+/* Animated pulse dot for syncing */
+.syncDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--info);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.statusDot.active   { background-color: var(--success); }
+.statusDot.error    { background-color: var(--danger);  }
+.statusDot.expiring { background-color: var(--warning); }
+
+/* ── Body ── */
+.body {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+/* Key-value row */
+.metaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.metaKey {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.metaValue {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  text-align: right;
+  word-break: break-all;
+}
+
+/* Copyable ID row */
+.copyRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.copyBtn {
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+}
+
+.copyBtn:hover { color: var(--text-primary); }
+
+/* Spend — big number */
+.spendRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.spendLabel { font-size: 12px; color: var(--text-tertiary); }
+
+.spendValue {
+  font-size: 20px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+
+/* Credentials health bar */
+.credBar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.credLabel {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.credText { font-size: 11px; }
+.credText.healthy  { color: var(--success); }
+.credText.expiring { color: var(--warning); }
+.credText.expired  { color: var(--danger);  }
+
+.credTrack {
+  height: 4px;
+  background-color: var(--elevated-bg);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.credFill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+.credFill.healthy  { background-color: var(--success); }
+.credFill.expiring { background-color: var(--warning); }
+.credFill.expired  { background-color: var(--danger);  }
+
+/* ── Footer ── */
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border-color);
+  flex-wrap: wrap;
+}
+
+.footerBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: none;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.footerBtn:hover {
+  border-color: #444;
+  color: var(--text-primary);
+  background-color: var(--elevated-bg);
+}
+
+.footerBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.removeBtn:hover {
+  border-color: rgba(201, 78, 78, 0.35);
+  background-color: rgba(201, 78, 78, 0.07);
+  color: var(--danger);
+}
+
+.reconnectBtn {
+  border-color: rgba(201, 78, 78, 0.3);
+  color: var(--danger);
+  background-color: rgba(201, 78, 78, 0.06);
+}
+
+.reconnectBtn:hover {
+  background-color: rgba(201, 78, 78, 0.14);
+  border-color: rgba(201, 78, 78, 0.5);
+}
+
+.lastSync {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+}

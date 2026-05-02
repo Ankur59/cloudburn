@@ -9,6 +9,7 @@ import Team from '../features/Team/pages/Team.jsx';
 import Budget from '../features/budget/pages/Budget.jsx';
 import AiInsights from '../features/ai-insights/pages/Aiinsights.jsx';
 import ZombieDetector from '../features/zombie-detector/pages/ZombieDetector.jsx';
+import CloudAccounts from '../features/cloud-accounts/pages/CloudAccounts.jsx';
 
 const AppRouter = () => {
   return (
@@ -24,6 +25,7 @@ const AppRouter = () => {
       <Route path='/budget' element={<Budget />} />
       <Route path='/ai-insights' element={<AiInsights />} />
       <Route path='/zombie-detector' element={<ZombieDetector />} />
+      <Route path='/cloud-accounts' element={<CloudAccounts />} />
     </Routes>
   );
 };
