@@ -57,3 +57,5 @@ export const deleteTeam = async ({ teamId, orgId }) => {
   const team = await Team.findOneAndDelete({ _id: teamId, orgId });
   if (!team) throw new AppError('Team not found.', 404);
 };
+
+

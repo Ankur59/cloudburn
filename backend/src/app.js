@@ -10,6 +10,7 @@ import { applyMiddlewares } from "./loaders/middleware.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 
 import awsConfigRoutes from "./routes/awsConfig.routes.js";
+import chatRoutes from "./routes/chat.routes.js";
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/teams", teamRoutes);
 app.use("/api/invitations", invitationRoutes);
 app.use("/api/aws", awsConfigRoutes);
+app.use("/api/chat", chatRoutes);
 
 app.get("/health", (_req, res) =>
   res.status(200).json({ status: "ok", timestamp: new Date().toISOString() }),
