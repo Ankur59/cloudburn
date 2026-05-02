@@ -1,7 +1,7 @@
-import SpikeAlert from '../models/spikeAlert.model.js';
-import DailyCost from '../models/dailyCost.model.js';
-import { getRecentCosts } from './cost.service.js';
-import { generateSpikeExplanation } from './ai.service.js';
+import SpikeAlert from "../models/spikeAlert.model.js";
+import DailyCost from "../models/dailyCost.model.js";
+import { getRecentCosts } from "./cost.service.js";
+import { generateSpikeExplanation } from "./ai.service.js";
 
 // ── detectSpikesForOrg ────────────────────────────────────────────────────────
 // Detects spikes for a SINGLE org.
@@ -23,12 +23,14 @@ const detectSpikesForOrg = async (orgId) => {
 
   const [todayStr, yesterdayStr] = dates;
 
-  const todayCosts     = {};
+  const todayCosts = {};
   const yesterdayCosts = {};
 
   records.forEach(({ date, service, grossCost }) => {
-    if (date === todayStr)     todayCosts[service]     = (todayCosts[service]     || 0) + grossCost;
-    if (date === yesterdayStr) yesterdayCosts[service] = (yesterdayCosts[service] || 0) + grossCost;
+    if (date === todayStr)
+      todayCosts[service] = (todayCosts[service] || 0) + grossCost;
+    if (date === yesterdayStr)
+      yesterdayCosts[service] = (yesterdayCosts[service] || 0) + grossCost;
   });
 
   const spikes = [];
@@ -46,7 +48,11 @@ const detectSpikesForOrg = async (orgId) => {
       );
 
       const aiExplanation = await generateSpikeExplanation({
-        service, previousCost, currentCost, multiplier, date: todayStr,
+        service,
+        previousCost,
+        currentCost,
+        multiplier,
+        date: todayStr,
       });
 
       // Upsert SpikeAlert scoped to this org
@@ -55,26 +61,26 @@ const detectSpikesForOrg = async (orgId) => {
         {
           $set: {
             previousCost: +previousCost.toFixed(8),
-            currentCost:  +currentCost.toFixed(8),
-            multiplier:   +multiplier.toFixed(4),
+            currentCost: +currentCost.toFixed(8),
+            multiplier: +multiplier.toFixed(4),
             aiExplanation,
           },
           $setOnInsert: { orgId, isRead: false },
         },
-        { upsert: true, returnDocument: 'after' },
+        { upsert: true, returnDocument: "after" },
       );
 
       spikes.push({
         orgId,
-        id:           alert._id,
-        date:         todayStr,
+        id: alert._id,
+        date: todayStr,
         service,
         previousCost: +previousCost.toFixed(6),
-        currentCost:  +currentCost.toFixed(6),
-        multiplier:   +multiplier.toFixed(2),
+        currentCost: +currentCost.toFixed(6),
+        multiplier: +multiplier.toFixed(2),
         aiExplanation,
-        isRead:       alert.isRead,
-        createdAt:    alert.createdAt,
+        isRead: alert.isRead,
+        createdAt: alert.createdAt,
       });
     }
   }
@@ -88,18 +94,24 @@ const detectSpikesForOrg = async (orgId) => {
 // for each one independently. Returns a flat array of all spikes found.
 
 export const detectSpikes = async () => {
-  console.log(`⏰ [${new Date().toISOString()}] Running spike detection for all orgs...`);
+  console.log(
+    `⏰ [${new Date().toISOString()}] Running spike detection for all orgs...`,
+  );
 
-  const orgIds = await DailyCost.distinct('orgId');
+  const orgIds = await DailyCost.distinct("orgId");
 
   if (orgIds.length === 0) {
-    console.log('🔍 Spike detection: no orgs with cost data yet.');
+    console.log("🔍 Spike detection: no orgs with cost data yet.");
     return [];
   }
 
-  const results = await Promise.all(orgIds.map((orgId) => detectSpikesForOrg(orgId)));
+  const results = await Promise.all(
+    orgIds.map((orgId) => detectSpikesForOrg(orgId)),
+  );
   const allSpikes = results.flat();
 
-  console.log(`🔍 Spike detection complete: ${allSpikes.length} spike(s) across ${orgIds.length} org(s).`);
+  console.log(
+    `🔍 Spike detection complete: ${allSpikes.length} spike(s) across ${orgIds.length} org(s).`,
+  );
   return allSpikes;
 };
