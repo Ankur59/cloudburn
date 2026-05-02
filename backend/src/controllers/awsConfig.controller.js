@@ -20,6 +20,7 @@ import {
   aggregateByService,
   aggregateByTeam,
 } from "../services/aws.service.js";
+import { buildDashboardData } from "../services/dashboard.service.js";
 import { saveDailyCosts } from "../services/cost.service.js";
 import BillingSnapshot from "../models/billingSnapshot.model.js";
 import { refreshRAGForOrg } from "../loaders/rag.loader.js";
@@ -171,6 +172,14 @@ export const getFullBilling = asyncHandler(async (req, res) => {
     .map(([month, cost]) => ({ month, cost: +cost.toFixed(6) }))
     .sort((a, b) => a.month.localeCompare(b.month));
 
+  const dashboardData = buildDashboardData({
+    summary,
+    monthComparison,
+    serviceBreakdown: serviceWithPercent,
+    dailyBreakdown,
+    byTeam
+  });
+
   // Upsert BillingSnapshot (one per org, replace on every fetch)
   await BillingSnapshot.findOneAndUpdate(
     { orgId: req.user.orgId },
@@ -188,6 +197,7 @@ export const getFullBilling = asyncHandler(async (req, res) => {
         monthlyByService: monthlyCostByService,
         byOperation,
         monthComparison,
+        dashboardData,
       },
       $setOnInsert: { orgId: req.user.orgId },
     },
@@ -227,6 +237,7 @@ export const getFullBilling = asyncHandler(async (req, res) => {
     byOperation,
     byRecordType,
     byTeam,
+    dashboardData,
     rawDailyRecords: records,
   });
 });

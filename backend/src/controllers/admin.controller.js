@@ -1,9 +1,9 @@
-import asyncHandler from '../middlewares/async.middleware.js';
-import { sendSuccess } from '../utils/responseHelper.js';
-import { runFullSync, syncOrgCosts } from '../services/costSync.service.js';
-import Organization from '../models/organization.model.js';
-import CostRecord from '../models/costRecord.model.js';
-import AppError from '../utils/AppError.js';
+import asyncHandler from "../middlewares/async.middleware.js";
+import { sendSuccess } from "../utils/responseHelper.js";
+import { runFullSync, syncOrgCosts } from "../services/costSync.service.js";
+import Organization from "../models/organization.model.js";
+import CostRecord from "../models/costRecord.model.js";
+import AppError from "../utils/AppError.js";
 
 // ── POST /api/admin/sync ──────────────────────────────────────────────────────
 // Manually trigger the cost sync (same logic the cron runs).
@@ -17,22 +17,25 @@ export const triggerSync = asyncHandler(async (req, res) => {
 
   if (orgId) {
     // Single-org mode — useful for debugging a specific org
-    const org = await Organization
-      .findById(orgId)
-      .select('+awsAccessKey +awsSecretKey')
+    const org = await Organization.findById(orgId)
+      .select("+awsAccessKey +awsSecretKey")
       .lean();
 
-    if (!org) throw new AppError('Organization not found.', 404);
-    if (!org.awsAccessKey) throw new AppError('AWS credentials not configured for this org.', 400);
+    if (!org) throw new AppError("Organization not found.", 404);
+    if (!org.awsAccessKey)
+      throw new AppError("AWS credentials not configured for this org.", 400);
 
     const stats = await syncOrgCosts(org);
-    result = { summary: { orgsTotal: 1, orgsSucceeded: 1, orgsFailed: 0, ...stats }, orgs: [{ status: 'ok', ...stats }] };
+    result = {
+      summary: { orgsTotal: 1, orgsSucceeded: 1, orgsFailed: 0, ...stats },
+      orgs: [{ status: "ok", ...stats }],
+    };
   } else {
     // Full sync — all connected orgs (same as cron)
     result = await runFullSync();
   }
 
-  return sendSuccess(res, 200, 'Cost sync completed.', result);
+  return sendSuccess(res, 200, "Cost sync completed.", result);
 });
 
 // ── GET /api/admin/sync/preview ───────────────────────────────────────────────
@@ -41,7 +44,7 @@ export const triggerSync = asyncHandler(async (req, res) => {
 
 export const previewCostRecords = asyncHandler(async (req, res) => {
   const { orgId, date } = req.query;
-  if (!orgId) throw new AppError('orgId query param is required.', 400);
+  if (!orgId) throw new AppError("orgId query param is required.", 400);
 
   const filter = { orgId };
   if (date) filter.date = date;
@@ -53,19 +56,19 @@ export const previewCostRecords = asyncHandler(async (req, res) => {
       { $match: filter },
       {
         $group: {
-          _id:          null,
-          totalCost:    { $sum: '$cost' },
+          _id: null,
+          totalCost: { $sum: "$cost" },
           totalRecords: { $sum: 1 },
-          dateMin:      { $min: '$date' },
-          dateMax:      { $max: '$date' },
-          services:     { $addToSet: '$service' },
-          teams:        { $addToSet: '$teamName' },
+          dateMin: { $min: "$date" },
+          dateMax: { $max: "$date" },
+          services: { $addToSet: "$service" },
+          teams: { $addToSet: "$teamName" },
         },
       },
     ]),
   ]);
 
-  return sendSuccess(res, 200, 'Cost records fetched.', {
+  return sendSuccess(res, 200, "Cost records fetched.", {
     total,
     summary: summary[0] ?? null,
     records,

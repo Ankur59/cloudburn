@@ -39,7 +39,7 @@ const startServer = async () => {
 
   // 3) Start hourly spike-detection cron (needs io to emit events)
   initSpikeJob(io);
-
+  
   // 4) Begin accepting HTTP + WebSocket connections
   httpServer.listen(config.PORT, () => {
     console.log(

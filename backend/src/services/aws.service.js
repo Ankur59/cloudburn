@@ -123,7 +123,7 @@ export const getAwsCost = (accessKey, secretKey) =>
     ],
     GroupBy: [
       { Type: "DIMENSION", Key: "SERVICE" },
-      { Type: "TAG", Key: "Name" },
+      { Type: "TAG", Key: "Team" },
     ],
   });
 
@@ -371,9 +371,9 @@ export const getMonthComparison = async (accessKey, secretKey) => {
     changePercent:
       lastMonth.total > 0
         ? +(
-          ((thisMonth.total - lastMonth.total) / lastMonth.total) *
-          100
-        ).toFixed(1)
+            ((thisMonth.total - lastMonth.total) / lastMonth.total) *
+            100
+          ).toFixed(1)
         : null,
     byService: byService.sort((a, b) => b.thisMonthCost - a.thisMonthCost),
   };
@@ -387,11 +387,9 @@ export const getMonthComparison = async (accessKey, secretKey) => {
 export const transformAwsCost = (data) => {
   const results = [];
   data.ResultsByTime?.forEach((day) => {
-
     const date = day.TimePeriod.Start;
 
     day.Groups?.forEach((group) => {
-
       const service = group.Keys?.[0] || "unknown";
 
       const team = parseTagValue(group.Keys?.[1]);
@@ -417,6 +415,7 @@ export const transformAwsCost = (data) => {
       results.push({
         service,
         team,
+        cost: amortizedCost,
         amortizedCost: amortizedCost, // primary — matches AWS Console
         netAmortizedCost: netAmortizedCost, // after credits/discounts
         unblendedCost, // on-demand only (0 for RI resources)

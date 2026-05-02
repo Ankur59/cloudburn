@@ -41,6 +41,9 @@ const billingSnapshotSchema = new mongoose.Schema(
 
     // Month-over-month comparison: { lastMonthTotal, thisMonthTotal, byService }
     monthComparison: { type: mongoose.Schema.Types.Mixed, default: {} },
+
+    // Dashboard formatted data
+    dashboardData: { type: mongoose.Schema.Types.Mixed, default: {} },
   },
   { timestamps: false },
 );

@@ -118,6 +118,18 @@ const buildTextChunks = async (orgId) => {
         `Delta: $${(mc.delta || 0).toFixed(6)} (${mc.changePercent ?? 'N/A'}% change).`,
       );
     }
+
+    // Dashboard Data (Frontend Context)
+    if (snap.dashboardData) {
+      if (snap.dashboardData.kpis) {
+        const kpiStr = snap.dashboardData.kpis.map(k => `${k.label}: ${k.value} (${k.trend || ''} ${k.subtitle || ''})`).join('\n');
+        texts.push(`Dashboard KPIs:\n${kpiStr}`);
+      }
+      if (snap.dashboardData.teams) {
+        const teamStr = snap.dashboardData.teams.map(t => `${t.name}: Spent $${t.spent} (Budget $${t.budget}, Status: ${t.status})`).join('\n');
+        texts.push(`Dashboard Top Spending Teams:\n${teamStr}`);
+      }
+    }
   }
 
   return texts;

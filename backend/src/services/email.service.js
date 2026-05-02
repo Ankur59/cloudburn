@@ -91,3 +91,19 @@ export const sendInvitationEmail = ({ to, inviterName, teamName, orgName, rawTok
     html:    invitationEmailTemplate({ inviterName, teamName, orgName, inviteUrl }),
   });
 };
+
+import { spikeEmailTemplate } from '../templates/spikeEmail.js';
+
+/**
+ * Sends a Cost Spike Alert email to organization members.
+ */
+export const sendSpikeAlertEmail = ({ to, toName, service, previousCost, currentCost, multiplier, aiExplanation }) => {
+  const dashboardUrl = `${config.CLIENT_URL}/dashboard`;
+
+  return sendEmail({
+    to,
+    toName: toName || to,
+    subject: `🚨 CRITICAL: AWS Cost Spike on ${service}`,
+    html: spikeEmailTemplate({ service, previousCost, currentCost, multiplier, aiExplanation, dashboardUrl }),
+  });
+};
