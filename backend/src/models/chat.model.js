@@ -12,16 +12,6 @@ const chatSchema = new mongoose.Schema(
       default: "New Chat",
       trim: true,
     },
-    isShared: {
-      type: Boolean,
-      default: false,
-    },
-    shareSlug: {
-      type: String,
-      default: null,
-      unique: true,
-      sparse: true, // null values pe unique apply nahi hogi
-    },
   },
   { timestamps: true },
 );

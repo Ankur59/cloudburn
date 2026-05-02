@@ -50,10 +50,10 @@ const CustomLegend = () => {
 };
 
 export default function DailyCostTrend({ data = [] }) {
-  // Normalize: API sends aws as { cost, credits, grossCost }; chart uses flat numbers
+  // Normalize: API sends aws as { cost, credits, netCost }; chart uses flat numbers
   const chartData = data.map((d) => ({
     date: d.date,
-    aws: typeof d.aws === "object" ? (d.aws.grossCost ?? 0) : (d.aws ?? 0),
+    aws: typeof d.aws === "object" ? (d.aws.cost ?? d.aws.grossCost ?? 0) : (d.aws ?? 0),
   }));
 
   return (
