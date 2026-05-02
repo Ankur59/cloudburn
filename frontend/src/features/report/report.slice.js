@@ -5,10 +5,10 @@ const reportSlice = createSlice({
   initialState: {
     data: [],
     pagination: {
-      total: 0,
-      page: 1,
-      limit: 50,
+      totalRows: 0,
       totalPages: 0,
+      currentPage: 1,
+      pageSize: 50,
     },
     loading: false,
     error: null,
@@ -16,6 +16,7 @@ const reportSlice = createSlice({
   reducers: {
     setReportsData: (state, action) => {
       state.data = action.payload.reports || [];
+      // backend returns: { totalRows, totalPages, currentPage, pageSize }
       state.pagination = action.payload.pagination || state.pagination;
     },
     setLoading: (state, action) => {

@@ -251,11 +251,33 @@ export const buildDashboardData = (billingData) => {
 
 
 
-export const buildReportsData = async (orgId, page = 1, limit = 50) => {
+export const buildReportsData = async (orgId, page = 1, limit = 50, startDate = null, endDate = null, provider = null, team = null) => {
   const skip = (page - 1) * limit;
 
   // Only include records where grossCost > 0 (AmortizedCost — credits not deducted)
   const query = { orgId, grossCost: { $gt: 0 } };
+
+  // Apply optional date range filter
+  if (startDate || endDate) {
+    query.date = {};
+    if (startDate) query.date.$gte = startDate;
+    if (endDate)   query.date.$lte = endDate;
+  }
+  
+  if (provider && provider !== "All Providers") {
+    // We don't have a 'cloud' field in DailyCost yet. 
+    // Since everything is AWS currently, if they select AWS, do nothing.
+    // If they select GCP/Azure, return nothing.
+    if (provider !== "AWS") {
+      query.cloud = provider; // will naturally return 0 results
+    }
+  }
+  
+  if (team && team !== "All Teams") {
+    // We don't have a 'team' field in DailyCost yet (it's aggregated in memory).
+    // So if they filter by team, it will return nothing until we add that field.
+    query.team = team;
+  }
 
   // 1. Total count for pagination metadata
   const totalRows = await DailyCost.countDocuments(query);
@@ -330,3 +352,4 @@ export const buildReportsData = async (orgId, page = 1, limit = 50) => {
     },
   };
 };
+

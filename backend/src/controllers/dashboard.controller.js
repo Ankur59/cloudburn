@@ -45,13 +45,17 @@ export const getDashboardData = asyncHandler(async (req, res) => {
 
 // ── GET /api/dashboard/reports ───────────────────────────────────────────────
 export const getReportsData = asyncHandler(async (req, res) => {
-  const page = parseInt(req.query.page, 10) || 1;
-  const limit = parseInt(req.query.limit, 10) || 50;
+  const page      = parseInt(req.query.page,  10) || 1;
+  const limit     = parseInt(req.query.limit, 10) || 50;
+  const startDate = req.query.startDate || null;   // "YYYY-MM-DD"
+  const endDate   = req.query.endDate   || null;   // "YYYY-MM-DD"
+  const provider  = req.query.provider  || null;
+  const team      = req.query.team      || null;
 
-  const result = await buildReportsData(req.user.orgId, page, limit);
+  const result = await buildReportsData(req.user.orgId, page, limit, startDate, endDate, provider, team);
 
   return sendSuccess(res, 200, "Reports fetched successfully", {
-    reports: result.reports,
+    reports:    result.reports,
     pagination: result.pagination,
   });
 });

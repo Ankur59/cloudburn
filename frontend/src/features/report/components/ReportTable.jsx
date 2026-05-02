@@ -60,8 +60,8 @@ export default function ReportTable({
     return sortDir === "asc" ? cmp : -cmp;
   });
 
-  const { total = 0, page = 1, limit = 50, totalPages = 1 } = pagination || {};
-  const start = (page - 1) * limit;
+  const { totalRows = 0, currentPage = 1, pageSize = 50, totalPages = 1 } = pagination || {};
+  const start = (currentPage - 1) * pageSize;
   const currentCount = sortedData.length;
 
   if (loading) {
@@ -85,9 +85,9 @@ export default function ReportTable({
       <div className={styles.rowCount}>
         Showing{" "}
         <span>
-          {start + 1}–{Math.min(start + currentCount, total)}
+          {start + 1}–{Math.min(start + currentCount, totalRows)}
         </span>{" "}
-        of <span>{total.toLocaleString()}</span> rows
+        of <span>{totalRows.toLocaleString()}</span> rows
       </div>
 
       <div className={styles.scrollArea}>
@@ -108,13 +108,9 @@ export default function ReportTable({
           </thead>
           <tbody>
             {sortedData.map((row) => (
-              <tr key={row._id || Math.random()} className={styles.row}>
+              <tr key={row.id || Math.random()} className={styles.row}>
                 <td className={styles.td}>
-                  {new Date(row.date).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
+                  {row.date}
                 </td>
                 <td className={styles.td}>{row.service}</td>
                 <td className={styles.td}>
@@ -124,21 +120,25 @@ export default function ReportTable({
                 </td>
                 <td className={styles.td}>
                   <span
-                    className={`${styles.cloudBadge} ${styles[(row.provider || "").toLowerCase()] || ""}`}
+                    className={`${styles.cloudBadge} ${styles[(row.provider || row.cloud || "").toLowerCase()] || ""}`}
                   >
-                    {row.provider || row.cloud}
+                    {row.provider || row.cloud || "Unknown"}
                   </span>
                 </td>
                 <td className={`${styles.td} ${styles.mono}`}>
-                  ${(row.cost || 0).toLocaleString()}
+                  ${(row.cost || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
                 </td>
                 <td className={styles.td}>
-                  <span
-                    className={`${styles.delta} ${(row.delta || 0) >= 0 ? styles.up : styles.down}`}
-                  >
-                    {(row.delta || 0) >= 0 ? "↑" : "↓"}{" "}
-                    {Math.abs(row.delta || 0)}%
-                  </span>
+                  {row.delta === null ? (
+                    <span className={styles.delta} style={{ color: "var(--text-tertiary)" }}>—</span>
+                  ) : (
+                    <span
+                      className={`${styles.delta} ${(row.delta || 0) >= 0 ? styles.up : styles.down}`}
+                    >
+                      {(row.delta || 0) >= 0 ? "↑" : "↓"}{" "}
+                      {Math.abs(row.delta || 0)}%
+                    </span>
+                  )}
                 </td>
               </tr>
             ))}
@@ -164,18 +164,18 @@ export default function ReportTable({
       <div className={styles.pagination}>
         <button
           className={styles.pageBtn}
-          onClick={() => onPageChange(page - 1)}
-          disabled={page <= 1}
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage <= 1}
         >
           ← Prev
         </button>
         <span className={styles.pageInfo}>
-          Page {page} of {totalPages || 1}
+          Page {currentPage} of {totalPages || 1}
         </span>
         <button
           className={styles.pageBtn}
-          onClick={() => onPageChange(page + 1)}
-          disabled={page >= totalPages}
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage >= totalPages}
         >
           Next →
         </button>

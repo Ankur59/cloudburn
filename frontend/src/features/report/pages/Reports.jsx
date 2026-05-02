@@ -10,6 +10,7 @@ import styles from './Reports.module.css';
 
 export default function Reports() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [currentFilters, setCurrentFilters] = useState({ datePreset: '30d' });
   
   // Real data state from Redux
   const { data, pagination, loading } = useSelector((state) => state.report);
@@ -19,17 +20,43 @@ export default function Reports() {
   const currentOrg = user?.orgName || 'Acme Corporation';
   const organizations = [currentOrg];
 
-  useEffect(() => {
-    handleGetReports(1, 50);
-  }, [handleGetReports]);
+  const fetchWithFilters = (page, limit, filters) => {
+    let startDate = null;
+    let endDate = null;
+    
+    if (filters.datePreset && filters.datePreset !== 'Custom') {
+      const days = parseInt(filters.datePreset.replace('d', ''), 10);
+      const end = new Date();
+      const start = new Date();
+      start.setDate(end.getDate() - days);
+      
+      endDate = end.toISOString().split('T')[0];
+      startDate = start.toISOString().split('T')[0];
+    }
+    
+    // For Custom, we would ideally take startDate/endDate from filters if they exist
+    if (filters.startDate && filters.endDate) {
+      startDate = filters.startDate;
+      endDate = filters.endDate;
+    }
 
-  // Simulate report generation (you can adapt this to filters later)
+    const provider = filters.provider || null;
+    const team = filters.team || null;
+
+    handleGetReports(page, limit, startDate, endDate, provider, team);
+  };
+
+  useEffect(() => {
+    fetchWithFilters(1, 50, currentFilters);
+  }, []);
+
   const handleGenerate = (filters) => {
-    handleGetReports(1, 50);
+    setCurrentFilters(filters);
+    fetchWithFilters(1, pagination.pageSize || 50, filters);
   };
 
   const handlePageChange = (newPage) => {
-    handleGetReports(newPage, pagination.limit);
+    fetchWithFilters(newPage, pagination.pageSize || 50, currentFilters);
   };
 
   return (
@@ -47,7 +74,6 @@ export default function Reports() {
         />
 
         <div className={styles.content}>
-          {/* Page header */}
           <div className={styles.pageHeader}>
             <div>
               <h1>Reports & Analytics</h1>
@@ -55,7 +81,6 @@ export default function Reports() {
             </div>
           </div>
 
-          {/* Filter bar */}
           <FilterBar onGenerate={handleGenerate} loading={loading} />
 
           <ReportTable 
@@ -65,8 +90,7 @@ export default function Reports() {
             onPageChange={handlePageChange} 
           />
 
-          {/* Export section */}
-          <ExportBar />
+          <ExportBar data={data} currentFilters={currentFilters} />
         </div>
       </div>
     </div>

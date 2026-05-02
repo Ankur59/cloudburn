@@ -18,10 +18,44 @@ function DownloadIcon() {
   );
 }
 
-export default function ExportBar() {
+export default function ExportBar({ data = [], currentFilters = {} }) {
   const handleDownload = () => {
-    // In production: trigger real CSV download
-    alert('CSV download started (mock)');
+    if (!data || data.length === 0) {
+      alert("No data to export.");
+      return;
+    }
+
+    // CSV Headers
+    const headers = ["Date", "Raw Date", "Service", "Team", "Cloud", "Cost", "Previous Day Cost", "Delta %", "Credits"];
+    
+    // CSV Rows
+    const rows = data.map(row => [
+      `"${row.date || ''}"`,
+      `"${row.rawDate || ''}"`,
+      `"${row.service || ''}"`,
+      `"${row.team || 'Unallocated'}"`,
+      `"${row.cloud || row.provider || 'AWS'}"`,
+      row.cost || 0,
+      row.prev || 0,
+      row.delta !== null ? row.delta : '',
+      row.credits || 0
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(r => r.join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    
+    const rangeStr = currentFilters.datePreset || 'custom';
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `cloudburn_report_${rangeStr}_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
