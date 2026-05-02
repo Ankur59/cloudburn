@@ -55,7 +55,7 @@ const printSummary = (result) => {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 const run = async () => {
-  const mongoUri = process.env.MONGO_URI;
+  const mongoUri = "mongodb+srv://ankur7002151588_db_user:v9ujJw2ur7Mmht7N@cluster0.6ehflfz.mongodb.net/cloudburn";
   if (!mongoUri) {
     console.error('❌  MONGO_URI is not set in .env');
     process.exit(1);
