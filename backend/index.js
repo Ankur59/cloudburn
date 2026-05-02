@@ -3,6 +3,7 @@ import { Server } from 'socket.io';
 import app from './src/app.js';
 import { connectDB } from './src/config/db.js';
 import { config } from './src/config/config.js';
+import { initCronJobs } from './src/jobs/costSync.job.js';
 import { initRAG } from './src/loaders/rag.loader.js';
 import { initSpikeJob } from './src/jobs/spike.job.js';
 
@@ -22,6 +23,9 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log(`🔌 Client disconnected: ${socket.id}`);
   });
+
+  // Start scheduled jobs only after DB is connected
+  initCronJobs();
 });
 
 // ── Startup sequence ──────────────────────────────────────────────────────────

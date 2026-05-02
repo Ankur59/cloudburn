@@ -125,51 +125,49 @@ export const getFullBilling = asyncHandler(async (req, res) => {
   // Fire all 9 Cost Explorer queries in parallel
   const [
     dailyRaw,
-    monthlyCostByService,
-    byRegion,
-    byUsageType,
-    byOperation,
-    byRecordType,
-    dailyTrend90,
-    byTeam,
-    monthComparison,
+    // monthlyCostByService,
+    // byRegion,
+    // byUsageType,
+    // byOperation,
+    // byRecordType,
+    // dailyTrend90,
+    // byTeam,
+    // monthComparison,
   ] = await Promise.all([
     getAwsCost(accessKey, secretKey),
-    getMonthlyCostByService(accessKey, secretKey),
-    getCostByRegion(accessKey, secretKey),
-    getCostByUsageType(accessKey, secretKey),
-    getCostByOperation(accessKey, secretKey),
-    getCostByRecordType(accessKey, secretKey),
-    getDailySpendTrend(accessKey, secretKey),
-    getCostByTeam(accessKey, secretKey),
-    getMonthComparison(accessKey, secretKey),
+    
+    // getMonthlyCostByService(accessKey, secretKey),
+    // getCostByRegion(accessKey, secretKey),
+    // getCostByUsageType(accessKey, secretKey),
+    // getCostByOperation(accessKey, secretKey),
+    // getCostByRecordType(accessKey, secretKey),
+    // getDailySpendTrend(accessKey, secretKey),
+    // getCostByTeam(accessKey, secretKey),
+    // getMonthComparison(accessKey, secretKey),
   ]);
 
   // 1) Save per-day per-service records
   const records = transformAwsCost(dailyRaw);
-  await saveDailyCosts(records, req.user.orgId);
+  // const summary = getTotalCost(records);
+  // const serviceBreakdown = aggregateByService(records);
+  // const dailyBreakdown = aggregateByDate(records);
 
-  // 2) Save full billing snapshot — replaces previous snapshot for this org
-  //    This gives RAG rich context: service totals, monthly, operations, etc.
-  const summary   = getTotalCost(records);
-  const serviceBreakdown = aggregateByService(records);
-  const dailyBreakdown   = aggregateByDate(records);
-
-  const serviceWithPercent = serviceBreakdown.map((s) => ({
-    ...s,
-    percent:
-      summary.grossCost > 0
-        ? +((s.cost / summary.grossCost) * 100).toFixed(2)
-        : 0,
-  }));
+  // Percent of gross spend per service (gross = before credits, always positive)
+  // const serviceWithPercent = serviceBreakdown.map((s) => ({
+  //   ...s,
+  //   percent:
+  //     summary.grossCost > 0
+  //       ? +((s.cost / summary.grossCost) * 100).toFixed(2)
+  //       : 0,
+  // }));
 
   const monthlyTotalsMap = {};
-  monthlyCostByService.forEach(({ month, cost }) => {
-    monthlyTotalsMap[month] = (monthlyTotalsMap[month] || 0) + cost;
-  });
-  const monthlyTrend = Object.entries(monthlyTotalsMap)
-    .map(([month, cost]) => ({ month, cost: +cost.toFixed(6) }))
-    .sort((a, b) => a.month.localeCompare(b.month));
+  // monthlyCostByService.forEach(({ month, cost }) => {
+  //   monthlyTotalsMap[month] = (monthlyTotalsMap[month] || 0) + cost;
+  // });
+  // const monthlyTrend = Object.entries(monthlyTotalsMap)
+  //   .map(([month, cost]) => ({ month, cost: +cost.toFixed(6) }))
+  //   .sort((a, b) => a.month.localeCompare(b.month));
 
   // Upsert BillingSnapshot (one per org, replace on every fetch)
   await BillingSnapshot.findOneAndUpdate(
@@ -202,31 +200,25 @@ export const getFullBilling = asyncHandler(async (req, res) => {
   );
 
   return sendSuccess(res, 200, "Full billing data fetched successfully", {
-    summary: {
-      grossCost: summary.grossCost,
-      totalCost: summary.totalCost,
-      credits: summary.totalCredit,
-      topService: summary.topService,
-      currency: "USD",
-      period: {
-        daily: "last_30_days",
-        trend: "last_90_days",
-        monthly: "last_12_months",
-      },
-    },
-    monthComparison,
-    serviceBreakdown: serviceWithPercent,
-    dailyBreakdown,
-    dailyTrend90,
-    monthly: {
-      totalTrend: monthlyTrend,
-      byService: monthlyCostByService,
-    },
-    byRegion,
-    byUsageType,
-    byOperation,
-    byRecordType,
-    byTeam,
+    // summary: {
+    //   // last30DaysTotal: summary.totalCost,
+    //   // topService: summary.topService,
+    //   currency: "USD",
+    //   period: {
+    //     daily: "last_30_days",
+    //     trend: "last_90_days",
+    //     monthly: "last_12_months",
+    //   },
+    // },
+    // monthly: {
+    //   // totalTrend: monthlyTrend,
+    //   // byService: monthlyCostByService,
+    // },
+    // byRegion,
+    // byUsageType,
+    // byOperation,
+    // byRecordType,
+    // byTeam,
     rawDailyRecords: records,
   });
 });
