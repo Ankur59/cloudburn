@@ -1,33 +1,47 @@
 import mongoose from 'mongoose';
 
-// ── SpikeAlert ─────────────────────────────────────────────────────────────────
-// Created when a service cost is ≥ 2× yesterday's cost.
-// One document per (date, service) pair — upserted by the spike job.
+// Created when current metric value > previous value * 1.5 (50% spike).
+// One alert per (orgId + resourceId + metricName) spike event.
 
 const spikeAlertSchema = new mongoose.Schema(
   {
     orgId: {
-      type: String,
-      required: [true, 'orgId is required'],
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Organization',
+      required: true,
     },
-    date: {
+    teamId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Team',
+      default: null,
+    },
+    resourceId: {
       type: String,
-      required: [true, 'date is required'], // "YYYY-MM-DD"
+      required: true,
     },
     service: {
       type: String,
-      required: [true, 'service is required'],
+      required: true, // "EC2" | "RDS" | "S3"
     },
-    previousCost: { type: Number, required: true },
-    currentCost:  { type: Number, required: true },
-    multiplier:   { type: Number, required: true },
-    aiExplanation: { type: String, default: '' },
+    metricName: {
+      type: String,
+      required: true, // "CPUUtilization" | "InstanceCount"
+    },
+    previousValue: { type: Number, required: true },
+    currentValue:  { type: Number, required: true },
+    // currentValue / previousValue — how many times larger
+    multiplier:    { type: Number, required: true },
+    message:       { type: String, required: true },
+    alertType:     { type: String, default: 'SPIKE' },
     isRead:        { type: Boolean, default: false },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
-spikeAlertSchema.index({ orgId: 1, date: 1, service: 1 });
+// Alert list per org, sorted by newest
+spikeAlertSchema.index({ orgId: 1, createdAt: -1 });
+// Team-scoped alert queries
+spikeAlertSchema.index({ orgId: 1, teamId: 1, createdAt: -1 });
 
 const SpikeAlert = mongoose.model('SpikeAlert', spikeAlertSchema);
 export default SpikeAlert;

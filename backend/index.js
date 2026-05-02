@@ -6,6 +6,7 @@ import { config } from './src/config/config.js';
 import { initRAG } from './src/loaders/rag.loader.js';
 import { initSpikeJob } from './src/jobs/spike.job.js';
 import { initCronJobs } from './src/jobs/costSync.job.js';
+import { initResourceSyncJob } from './src/jobs/resourceSync.job.js';
 
 // ── HTTP server (wraps express — required for socket.io) ──────────────────────
 const httpServer = createServer(app);
@@ -25,7 +26,8 @@ io.on('connection', (socket) => {
   });
 
   // Start scheduled jobs only after DB is connected
-  initCronJobs();
+  initCronJobs();          // daily cost sync  (00:01)
+  initResourceSyncJob();   // resource monitor (every 5 min)
 });
 
 // ── Startup sequence ──────────────────────────────────────────────────────────
@@ -37,8 +39,10 @@ const startServer = async () => {
   //    (no-op on first run when collection is still empty)
   await initRAG();
 
-  // 3) Start hourly spike-detection cron (needs io to emit events)
+  // 3) Start cron jobs (needs io for WebSocket events)
   initSpikeJob(io);
+  initCronJobs();          // daily cost sync  (00:01 UTC)
+  initResourceSyncJob();   // resource monitor (every 5 min)
   
   // 4) Begin accepting HTTP + WebSocket connections
   httpServer.listen(config.PORT, () => {

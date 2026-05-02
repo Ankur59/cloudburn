@@ -7,7 +7,13 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx nodemon index.js",
     "sync": "node scripts/syncCosts.js",
-    "sync:org": "node scripts/syncCosts.js --orgId"
+    "sync:org": "node scripts/syncCosts.js --orgId",
+    "sync:resources": "node scripts/syncResources.js",
+    "sync:resources:org": "node scripts/syncResources.js --orgId",
+    "seed:snapshots": "node scripts/seedSnapshots.js",
+    "seed:snapshots:org": "node scripts/seedSnapshots.js --orgId",
+    "test:spike:email": "node scripts/testSpikeEmail.js",
+    "test:spike:email:org": "node scripts/testSpikeEmail.js --orgId"
   },
   "keywords": [],
   "author": "",
@@ -17,7 +23,12 @@
     "nodemon": "^3.1.14"
   },
   "dependencies": {
+    "@aws-sdk/client-cloudwatch": "^3.1041.0",
     "@aws-sdk/client-cost-explorer": "^3.1040.0",
+    "@aws-sdk/client-dynamodb": "^3.1041.0",
+    "@aws-sdk/client-ec2": "^3.1041.0",
+    "@aws-sdk/client-rds": "^3.1041.0",
+    "@aws-sdk/client-s3": "^3.1041.0",
     "@aws-sdk/client-sts": "^3.1039.0",
     "@getbrevo/brevo": "^5.0.4",
     "@huggingface/transformers": "^4.2.0",
