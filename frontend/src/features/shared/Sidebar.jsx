@@ -7,11 +7,11 @@ import {Link} from "react-router-dom"
 const navItems = [
   { icon: 'dashboard', label: 'Dashboard', href: '/dashboard' },
   { icon: 'alerts',    label: 'Alerts',         href: '/alerts' },
+  { icon: 'ai-insights',    label: 'AI Insights',    href: '/ai-insights' },
   { icon: 'cloud',     label: 'Cloud Accounts',  href: '/connect' },
   { icon: 'teams',     label: 'Teams',           href: '/teams' },
   { icon: 'budget',    label: 'Budget',          href: '/budget' },
   { icon: 'reports',   label: 'Reports',         href: '/reports' },
-  { icon: 'settings',  label: 'Settings',        href: '#' },
   { icon: 'admin',     label: 'Admin',           href: '#' },
 ]
 
@@ -25,6 +25,12 @@ function NavIcon({ type }) {
         <rect x="14" y="14" width="7" height="7" rx="1" />
       </svg>
     ),
+    
+    "ai-insights": (
+     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+  <path d="M12 2v4M12 18v4M2 12h4M18 12h4M5.64 5.64l2.83 2.83M15.54 15.54l2.83 2.83M5.64 18.36l2.83-2.83M15.54 8.46l2.83-2.83" strokeLinecap="round"/>
+</svg>
+    ),  
     alerts: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
