@@ -2,7 +2,8 @@ import axios from "axios";
 import { refreshApi } from "../features/auth/service/auth.api";
 
 const axiosInstance = axios.create({
-  baseURL: "https://api.cloudburn.online/api",// IGONRE KARO FALTU LINK HE
+  // baseURL:  "https://api.cloudburn.online/api",// IGONRE KARO FALTU LINK HE
+  baseURL:  "http://localhost:5000/api",// IGONRE KARO FALTU LINK HE
   withCredentials: true, // keeps the httpOnly refreshToken cookie working
 });
 

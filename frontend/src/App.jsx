@@ -1,13 +1,15 @@
 import AppRouter from './app/AppRouter';
 import AppLayout from './app/Layout';
-import Loader from "./features/shared/Loader"
+import Loader from "./features/shared/Loader";
+import SkeletonLoader from './features/shared/SkeletonLoader';
 
 
 const App = () => {
   return (
     <AppLayout>
-      {/* <AppRouter /> */}
-      <Loader/>
+      <AppRouter />
+      {/* <Loader/> */}
+      {/* <SkeletonLoader/> */}
     </AppLayout>
   );
 };
