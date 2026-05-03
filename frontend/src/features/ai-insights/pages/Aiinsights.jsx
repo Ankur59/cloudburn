@@ -6,7 +6,7 @@ import InsightFilterBar from '../components/InsightFilterBar';
 import InsightCard from '../components/InsightCard';
 import InsightSkeleton from '../components/InsightSkeleton';
 import useInsights from '../hooks/useInsights';
-import styles from './AiInsights.module.css';
+import styles from './Aiinsights.module.css';
 
 const DEFAULT_FILTERS = { priority: '', service: '', sortDesc: true };
 const TABS = ['Active Suggestions', 'Applied', 'Dismissed'];
