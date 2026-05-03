@@ -32,7 +32,7 @@ export const logoutApi = async () => {
 
 // GET /api/auth/me  — protected
 export const getMeApi = async () => {
-  const response = await axiosInstance.get("/auth/me");
+  const response = await axiosInstance.get(`/auth/me?t=${new Date().getTime()}`);
   return response;
 };
 

@@ -1,7 +1,48 @@
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { HuggingFaceTransformersEmbeddings } from '@langchain/community/embeddings/huggingface_transformers';
-import DailyCost from '../models/dailyCost.model.js';
+import { Pinecone } from '@pinecone-database/pinecone';
 import BillingSnapshot from '../models/billingSnapshot.model.js';
+
+// ── Pinecone Setup ────────────────────────────────────────────────────────────
+let pc = null;
+const INDEX_NAME = 'cloudburn-rag';
+const DIMENSION = 384; // all-MiniLM-L6-v2
+
+const getPineconeClient = () => {
+  if (!pc) {
+    if (!process.env.PINECONE_API_KEY) {
+      throw new Error("PINECONE_API_KEY is not defined in environment variables.");
+    }
+    pc = new Pinecone({
+      apiKey: process.env.PINECONE_API_KEY,
+    });
+  }
+  return pc;
+};
+
+// Get or create index helper
+const getPineconeIndex = async () => {
+  const client = getPineconeClient();
+  const existingIndexes = await client.listIndexes();
+  const indexExists = existingIndexes.indexes?.some(i => i.name === INDEX_NAME);
+  
+  if (!indexExists) {
+    console.log(`Creating Pinecone index: ${INDEX_NAME}... (this might take a minute)`);
+    await client.createIndex({
+      name: INDEX_NAME,
+      dimension: DIMENSION,
+      metric: 'cosine',
+      spec: {
+        serverless: {
+          cloud: 'aws',
+          region: 'us-east-1' // You can change this to match your preferred region
+        }
+      },
+      waitUntilReady: true
+    });
+  }
+  return client.index(INDEX_NAME);
+};
 
 // ── Shared embeddings model (singleton — model download happens once) ──────────
 let embeddingsModel = null;
@@ -15,38 +56,6 @@ const getEmbeddingsModel = () => {
   return embeddingsModel;
 };
 
-// ── Cosine similarity helper ──────────────────────────────────────────────────
-const cosineSim = (a, b) => {
-  let dot = 0, normA = 0, normB = 0;
-  for (let i = 0; i < a.length; i++) {
-    dot   += a[i] * b[i];
-    normA += a[i] * a[i];
-    normB += b[i] * b[i];
-  }
-  if (normA === 0 || normB === 0) return 0;
-  return dot / (Math.sqrt(normA) * Math.sqrt(normB));
-};
-
-// ── Lightweight in-memory vector store ───────────────────────────────────────
-const createMemoryVectorStore = (docs) => ({
-  _docs: docs,
-  async similaritySearch(query, k = 5) {
-    const model = getEmbeddingsModel();
-    const queryEmbedding = await model.embedQuery(query);
-    return this._docs
-      .map((doc) => ({
-        ...doc,
-        score: cosineSim(queryEmbedding, doc.embedding),
-      }))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, k)
-      .map(({ pageContent }) => ({ pageContent }));
-  },
-});
-
-// ── Per-org vector store Map ───────────────────────────────────────────────────
-const orgVectorStores = new Map();
-
 // ── buildTextChunks ────────────────────────────────────────────────────────────
 // Builds rich text chunks from DailyCost + BillingSnapshot for an org.
 // More text = richer AI context.
@@ -54,17 +63,7 @@ const orgVectorStores = new Map();
 const buildTextChunks = async (orgId) => {
   const texts = [];
 
-  // 1) Per-day per-service cost records
-  const dailyRecords = await DailyCost.find({ orgId }).lean();
-  if (dailyRecords.length > 0) {
-    dailyRecords.forEach(({ date, service, grossCost, netCost, credits }) => {
-      texts.push(
-        `Date: ${date} | Service: ${service} | Gross: $${grossCost.toFixed(6)} | Net: $${netCost.toFixed(6)} | Credits: $${credits.toFixed(6)}`,
-      );
-    });
-  }
-
-  // 2) Snapshot: service breakdown totals
+  // 1) Snapshot: service breakdown totals
   const snap = await BillingSnapshot.findOne({ orgId }).lean();
   if (snap) {
     texts.push(
@@ -172,7 +171,7 @@ const buildTextChunks = async (orgId) => {
       );
       texts.push(`Cost breakdown by Record Type (Usage/Tax/Credits):\n${lines.join('\n')}`);
     }
-  } // <-- Added missing closing brace for if (snap) {
+  }
 
   return texts;
 };
@@ -183,7 +182,6 @@ const buildVectorStoreForOrg = async (orgId) => {
 
   if (texts.length === 0) {
     console.warn(`⚠️  RAG [${orgId}]: No billing data found.`);
-    orgVectorStores.delete(orgId);
     return;
   }
 
@@ -199,22 +197,35 @@ const buildVectorStoreForOrg = async (orgId) => {
   console.log(`📐 RAG [${orgId}]: Embedding ${chunks.length} chunk(s)...`);
   const embeddings = await model.embedDocuments(chunks);
 
-  const docs = chunks.map((pageContent, i) => ({
-    pageContent,
-    embedding: embeddings[i],
+  const index = await getPineconeIndex();
+
+  const records = chunks.map((pageContent, i) => ({
+    id: `${orgId}-chunk-${i}`,
+    values: embeddings[i],
+    metadata: {
+      orgId: orgId.toString(),
+      pageContent
+    }
   }));
 
-  orgVectorStores.set(orgId, createMemoryVectorStore(docs));
-  console.log(`✅ RAG [${orgId}]: ${texts.length} text block(s) → ${docs.length} chunk(s) indexed.`);
+  console.log(`📦 RAG [${orgId}]: Upserting to Pinecone...`);
+  // Upsert in batches of 100
+  const batchSize = 100;
+  for (let i = 0; i < records.length; i += batchSize) {
+    const batch = records.slice(i, i + batchSize);
+    await index.upsert({ records: batch });
+  }
+  
+  console.log(`✅ RAG [${orgId}]: ${texts.length} text block(s) → ${chunks.length} chunk(s) indexed in Pinecone.`);
 };
 
 // ── initRAG ───────────────────────────────────────────────────────────────────
 // Called once on server startup — indexes all orgs that have billing data.
 
 export const initRAG = async () => {
-  console.log('🔍 Initialising RAG vector store(s)...');
+  console.log('🔍 Initialising RAG vector store in Pinecone...');
   try {
-    const orgIds = await DailyCost.distinct('orgId');
+    const orgIds = await BillingSnapshot.distinct('orgId');
 
     if (orgIds.length === 0) {
       console.warn(
@@ -225,7 +236,7 @@ export const initRAG = async () => {
     }
 
     await Promise.all(orgIds.map((orgId) => buildVectorStoreForOrg(orgId)));
-    console.log(`✅ RAG ready for ${orgIds.length} organisation(s).`);
+    console.log(`✅ RAG ready for ${orgIds.length} organisation(s) in Pinecone.`);
   } catch (err) {
     console.error('❌ RAG initialisation failed:', err.message);
   }
@@ -245,4 +256,30 @@ export const refreshRAGForOrg = async (orgId) => {
 };
 
 // ── getVectorStore ─────────────────────────────────────────────────────────────
-export const getVectorStore = (orgId) => orgVectorStores.get(orgId);
+// Returns an object matching the expected interface (with similaritySearch)
+export const getVectorStore = (orgId) => {
+  return {
+    async similaritySearch(query, k = 5) {
+      try {
+        const model = getEmbeddingsModel();
+        const queryEmbedding = await model.embedQuery(query);
+        const index = await getPineconeIndex();
+        
+        const results = await index.query({
+          vector: queryEmbedding,
+          topK: k,
+          filter: { orgId: orgId.toString() },
+          includeMetadata: true
+        });
+
+        // Map results back to expected format
+        return results.matches.map(match => ({
+          pageContent: match.metadata.pageContent
+        }));
+      } catch (err) {
+        console.error("Pinecone similarity search failed:", err);
+        return [];
+      }
+    }
+  };
+};
