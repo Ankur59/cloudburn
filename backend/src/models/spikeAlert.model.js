@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 
-// Created when current metric value > previous value * 1.5 (50% spike).
-// One alert per (orgId + resourceId + metricName) spike event.
+// Created when current metric value > previous value * 1.5 (50% spike)
+// OR when cost > previous day cost * 2 (100% cost spike).
+// Handles both resource metric spikes and daily cost spikes.
 
 const spikeAlertSchema = new mongoose.Schema(
   {
@@ -15,23 +16,31 @@ const spikeAlertSchema = new mongoose.Schema(
       ref: 'Team',
       default: null,
     },
+    // Resource metric spike specific fields
     resourceId: {
       type: String,
-      required: true,
     },
     service: {
       type: String,
-      required: true, // "EC2" | "RDS" | "S3"
+      required: true, // e.g., "EC2" | "RDS" | "S3" | "Total"
     },
     metricName: {
       type: String,
-      required: true, // "CPUUtilization" | "InstanceCount"
     },
-    previousValue: { type: Number, required: true },
-    currentValue:  { type: Number, required: true },
-    // currentValue / previousValue — how many times larger
+    previousValue: { type: Number },
+    currentValue:  { type: Number },
+    message:       { type: String },
+
+    // Cost spike specific fields
+    date: {
+      type: String, // "YYYY-MM-DD"
+    },
+    previousCost: { type: Number },
+    currentCost:  { type: Number },
+    aiExplanation: { type: String },
+
+    // Shared fields
     multiplier:    { type: Number, required: true },
-    message:       { type: String, required: true },
     alertType:     { type: String, default: 'SPIKE' },
     isRead:        { type: Boolean, default: false },
   },

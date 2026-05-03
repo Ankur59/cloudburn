@@ -34,4 +34,7 @@ export const config = {
   // Google OAuth
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+
+  // pinecone
+  PINECONE_API_KEY: process.env.PINECONE_API_KEY,
 };

@@ -2,6 +2,7 @@ import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { HuggingFaceTransformersEmbeddings } from "@langchain/community/embeddings/huggingface_transformers";
 import { Pinecone } from "@pinecone-database/pinecone";
 import BillingSnapshot from "../models/billingSnapshot.model.js";
+import { config } from "../config/config.js";
 
 // ── Pinecone Setup ────────────────────────────────────────────────────────────
 let pc = null;
@@ -10,13 +11,13 @@ const DIMENSION = 384; // all-MiniLM-L6-v2
 
 const getPineconeClient = () => {
   if (!pc) {
-    if (!process.env.PINECONE_API_KEY) {
+    if (!config.PINECONE_API_KEY) {
       throw new Error(
         "PINECONE_API_KEY is not defined in environment variables.",
       );
     }
     pc = new Pinecone({
-      apiKey: process.env.PINECONE_API_KEY,
+      apiKey: config.PINECONE_API_KEY,
     });
   }
   return pc;
