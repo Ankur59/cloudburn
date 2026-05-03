@@ -1,13 +1,26 @@
+/* ================================================================
+   Reports.module.css — Full responsive layout
+   Sidebar widths match Sidebar.module.css:
+     Desktop expanded  : 256px
+     Desktop collapsed : 80px
+     Tablet  (≤1024px) : 80px
+     Mobile  (≤640px)  : 0 (overlay drawer)
+   ================================================================ */
+
 .page {
   display: flex;
   min-height: 100vh;
   background-color: var(--page-base);
+  overflow-x: hidden;
 }
 
 .main {
   flex: 1;
   margin-left: 256px;
   transition: margin-left 0.3s ease;
+  min-width: 0; /* prevents flex overflow */
+  display: flex;
+  flex-direction: column;
 }
 
 .main.expanded {
@@ -15,40 +28,59 @@
 }
 
 .content {
-  padding: 24px 32px 40px;
+  padding: clamp(1rem, 3vw, 2rem) clamp(1rem, 3vw, 2rem);
+  flex: 1;
+  min-width: 0;
 }
 
+/* ── Page Header ────────────────────── */
 .pageHeader {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 24px;
+  margin-bottom: clamp(1rem, 2vw, 1.5rem);
 }
 
 .pageHeader h1 {
-  font-size: 26px;
+  font-size: clamp(1.375rem, 3vw, 1.75rem);
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 4px;
+  margin: 0 0 4px;
+  line-height: 1.2;
 }
 
 .pageHeader p {
-  font-size: 14px;
+  font-size: clamp(0.8125rem, 1.5vw, 0.875rem);
   color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
 }
 
+/* ─── Breakpoints ────────────────────── */
+
+/* Tablet */
 @media (max-width: 1024px) {
-  .main {
+  .main,
+  .main.expanded {
     margin-left: 80px;
   }
 }
 
-@media (max-width: 768px) {
-  .main {
-    margin-left: 0;
+/* Mobile */
+@media (max-width: 640px) {
+  .main,
+  .main.expanded {
+    margin-left: 0; /* sidebar is overlay */
   }
 
   .content {
-    padding: 16px;
+    padding: 0.875rem;
+  }
+
+  .pageHeader p {
+    /* Allow subtitle to wrap nicely, not overflow */
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }

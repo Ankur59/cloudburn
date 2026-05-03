@@ -10,6 +10,7 @@ import styles from './Reports.module.css';
 
 export default function Reports() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [currentFilters, setCurrentFilters] = useState({ datePreset: '30d' });
   
   // Real data state from Redux
@@ -34,7 +35,6 @@ export default function Reports() {
       startDate = start.toISOString().split('T')[0];
     }
     
-    // For Custom, we would ideally take startDate/endDate from filters if they exist
     if (filters.startDate && filters.endDate) {
       startDate = filters.startDate;
       endDate = filters.endDate;
@@ -64,10 +64,13 @@ export default function Reports() {
       <Sidebar
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        mobileOpen={mobileSidebarOpen}
+        onMobileClose={() => setMobileSidebarOpen(false)}
       />
 
       <div className={`${styles.main} ${sidebarCollapsed ? styles.expanded : ''}`}>
         <Header
+          onMenuToggle={() => setMobileSidebarOpen(true)}
           currentOrg={currentOrg}
           organizations={organizations}
           onOrgChange={() => {}}
@@ -76,7 +79,7 @@ export default function Reports() {
         <div className={styles.content}>
           <div className={styles.pageHeader}>
             <div>
-              <h1>Reports & Analytics</h1>
+              <h1>Reports &amp; Analytics</h1>
               <p>Export and analyze your cloud cost data across providers and teams</p>
             </div>
           </div>

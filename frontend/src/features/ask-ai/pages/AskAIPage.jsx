@@ -139,6 +139,7 @@ function TypingIndicator() {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function AskAIPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
@@ -184,10 +185,13 @@ export default function AskAIPage() {
 
   return (
     <div className={styles.page}>
-      <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} />
+      <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        mobileOpen={mobileSidebarOpen}
+        onMobileClose={() => setMobileSidebarOpen(false)}
+      />
 
       <div className={`${styles.mainContent} ${sidebarCollapsed ? styles.expanded : ''}`}>
-        <Header />
+        <Header onMenuToggle={() => setMobileSidebarOpen(true)} />
 
         <div className={styles.chatLayout}>
           {/* ── History Panel ── */}

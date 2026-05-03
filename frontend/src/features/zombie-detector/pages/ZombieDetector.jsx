@@ -93,6 +93,7 @@ export default function ZombieDetector() {
   const { resources, lastScan, loading } = useSelector((state) => state.zombieDetector);
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [currentOrg, setCurrentOrg]             = useState('Acme Corporation');
   const [activeTab, setActiveTab]               = useState('Active Zombies');
   const [filters, setFilters]                   = useState(DEFAULT_FILTERS);
@@ -212,10 +213,12 @@ export default function ZombieDetector() {
       <Sidebar
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        mobileOpen={mobileSidebarOpen}
+        onMobileClose={() => setMobileSidebarOpen(false)}
       />
 
       <div className={`${styles.main} ${sidebarCollapsed ? styles.expanded : ''}`}>
-        <Header
+        <Header onMenuToggle={() => setMobileSidebarOpen(true)}
           currentOrg={currentOrg}
           organizations={organizations}
           onOrgChange={setCurrentOrg}

@@ -126,6 +126,7 @@ export default function Alerts() {
   const { alerts, loading } = useSelector((state) => state.alerts);
   
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [currentOrg, setCurrentOrg] = useState('Acme Corporation');
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
 
@@ -189,12 +190,14 @@ export default function Alerts() {
       <Sidebar
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        mobileOpen={mobileSidebarOpen}
+        onMobileClose={() => setMobileSidebarOpen(false)}
       />
 
       {/* Main content area */}
       <div className={`${styles.main} ${sidebarCollapsed ? styles.expanded : ''}`}>
         {/* Top bar */}
-        <Header
+        <Header onMenuToggle={() => setMobileSidebarOpen(true)}
           currentOrg={currentOrg}
           organizations={organizations}
           onOrgChange={setCurrentOrg}
