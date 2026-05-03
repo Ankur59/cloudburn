@@ -195,11 +195,13 @@ function NavIcon({ type }) {
   return icons[type] || null;
 }
 
-export default function Sidebar({ collapsed, onToggle }) {
+export default function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }) {
   const currentPath = window.location.pathname;
 
   return (
-    <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ""}`}>
+    <>
+      {mobileOpen && <div className={styles.backdrop} onClick={onMobileClose} />}
+      <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ""} ${mobileOpen ? styles.mobileOpen : ""}`}>
       <div className={styles.logo}>
         <div className={styles.logoIcon}>
           <svg
@@ -275,5 +277,6 @@ export default function Sidebar({ collapsed, onToggle }) {
         </div>
       </div>
     </aside>
+    </>
   );
 }

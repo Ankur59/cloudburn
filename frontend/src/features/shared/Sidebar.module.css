@@ -9,7 +9,7 @@
   display: flex;
   flex-direction: column;
   padding: 16px;
-  transition: width 0.3s ease;
+  transition: width 0.3s ease, transform 0.3s ease;
   z-index: 100;
 }
 
@@ -162,4 +162,22 @@
 
 .logoutBtn:hover {
   color: var(--text-primary);
+}
+
+@media (max-width: 1280px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.mobileOpen {
+    transform: translateX(0);
+  }
+  .backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 90;
+  }
 }

@@ -259,3 +259,11 @@
   font-size: 11px;
   color: var(--text-secondary);
 }
+
+@media (max-width: 768px) {
+  .detailTable {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}

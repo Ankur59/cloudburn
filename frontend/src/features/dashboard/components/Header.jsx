@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import useAuth from '../../auth/hook/useAuth'
 import styles from './Header.module.css'
 
-export default function Header() {
+export default function Header({ onMenuClick }) {
   const [orgDropdownOpen, setOrgDropdownOpen] = useState(false)
   const [notifDropdownOpen, setNotifDropdownOpen] = useState(false)
   const [userDropdownOpen, setUserDropdownOpen] = useState(false)
@@ -71,6 +71,13 @@ export default function Header() {
   return (
     <header className={styles.header}>
       <div className={styles.leftSection}>
+        <button className={styles.menuButton} onClick={onMenuClick}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
         <div className={styles.orgSelector} ref={orgRef}>
           <button 
             className={styles.orgButton}
