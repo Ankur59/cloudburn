@@ -5,9 +5,22 @@ const handleCastError = (err) =>
   new AppError(`Invalid ${err.path}: ${err.value}`, 400);
 
 const handleDuplicateKey = (err) => {
-  const field = Object.keys(err.keyValue)[0];
+  let field = 'field';
+  let value = 'value';
+  
+  const keyValue = err.keyValue || (err.writeErrors && err.writeErrors[0]?.err?.keyValue);
+  
+  if (keyValue && typeof keyValue === 'object') {
+    field = Object.keys(keyValue)[0];
+    value = keyValue[field];
+    return new AppError(
+      `'${value}' is already registered for ${field}. Please use a different value.`,
+      409
+    );
+  }
+
   return new AppError(
-    `'${err.keyValue[field]}' is already registered for ${field}. Please use a different value.`,
+    'Duplicate key error. A record with these unique fields already exists.',
     409
   );
 };

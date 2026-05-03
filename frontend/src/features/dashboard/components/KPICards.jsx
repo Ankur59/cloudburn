@@ -1,43 +1,6 @@
-'use client'
-
 import styles from './KPICards.module.css'
 
-export default function KPICards() {
-  const kpis = [
-    {
-      label: 'Total Spend (MTD)',
-      value: '$124,589',
-      trend: '+12.5%',
-      trendDirection: 'up',
-      subtitle: 'from last month',
-      icon: 'dollar',
-      budgetUsed: 62,
-    },
-    {
-      label: 'Savings This Month',
-      value: '$8,420',
-      subtitle: 'Reserved instance savings',
-      icon: 'savings',
-      valueColor: 'success',
-    },
-    {
-      label: 'Projected Month-End Cost',
-      value: '$156,420',
-      trend: '+8.2%',
-      trendDirection: 'up',
-      subtitle: 'vs last month projection',
-      icon: 'projection',
-    },
-    {
-      label: 'Active Alerts',
-      value: '7',
-      subtitle: '3 critical',
-      subtitleHighlight: '4 warnings',
-      icon: 'alert',
-      valueColor: 'danger',
-    },
-  ]
-
+export default function KPICards({ kpis = [] }) {
   return (
     <div className={styles.kpiGrid}>
       {kpis.map((kpi, index) => (

@@ -1,0 +1,259 @@
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 22px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 22px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.headerLeft {}
+
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+
+.subtitle {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.headerRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.thisMonth {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+
+.deltaBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 100px;
+}
+
+.deltaBadge.up   { background: rgba(224,82,82,0.12); color: #e05252; }
+.deltaBadge.down { background: rgba(76,175,131,0.12); color: #4caf83; }
+
+.deltaLabel {
+  font-weight: 400;
+  opacity: 0.75;
+}
+
+/* ── Chart ── */
+.chartWrap {
+  margin-bottom: 20px;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 160px;
+  gap: 12px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  text-align: center;
+  padding: 0 2rem;
+  margin-bottom: 16px;
+}
+
+.empty svg {
+  opacity: 0.3;
+}
+
+/* ── Compare Row ── */
+.compareRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+}
+
+.compareItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.compareLabel {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.compareValue {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.compareValue.current {
+  color: #38d9a9;
+}
+
+.compareMiniBar {
+  height: 4px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.compareFillLast {
+  height: 100%;
+  background: rgba(91,127,212,0.6);
+  border-radius: 99px;
+  transition: width 0.6s ease;
+}
+
+.compareFillThis {
+  height: 100%;
+  background: #38d9a9;
+  border-radius: 99px;
+  transition: width 0.6s ease;
+}
+
+.compareArrow {
+  font-size: 18px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.compareArrow.up   { color: #e05252; }
+.compareArrow.down { color: #4caf83; }
+
+/* ── Service Section ── */
+.serviceSection {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding-top: 18px;
+}
+
+.serviceSectionTitle {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  margin: 0 0 12px;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.table th {
+  text-align: left;
+  color: var(--text-secondary);
+  font-weight: 500;
+  padding: 5px 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.table td {
+  padding: 7px 8px;
+  color: var(--text-primary);
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  vertical-align: middle;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.svcName {
+  font-weight: 500;
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mono {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 12px;
+  color: var(--text-primary);
+}
+
+.deltaChip {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+.deltaChip.up   { background: rgba(224,82,82,0.12); color: #e05252; }
+.deltaChip.down { background: rgba(76,175,131,0.12); color: #4caf83; }
+
+/* ── Tooltip ── */
+.tooltip {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  min-width: 130px;
+}
+
+.ttLabel {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin: 0 0 4px;
+}
+
+.ttValue {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.ttNote {
+  font-size: 10px;
+  color: #38d9a9;
+  margin: 4px 0 0;
+}
+
+/* Color helpers */
+.up   { color: #e05252; }
+.down { color: #4caf83; }

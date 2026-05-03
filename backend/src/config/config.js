@@ -27,4 +27,7 @@ export const config = {
 
   // Email verification token TTL (24 h in ms)
   EMAIL_VERIFICATION_TTL_MS: 24 * 60 * 60 * 1000,
+
+  // AI — Groq (LLaMA3)
+  GROQ_API_KEY: process.env.GROQ_API_KEY,
 };

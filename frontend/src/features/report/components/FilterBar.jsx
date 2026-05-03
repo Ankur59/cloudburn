@@ -2,13 +2,18 @@ import { useState } from 'react';
 import styles from './FilterBar.module.css';
 
 const DATE_PRESETS = ['7d', '30d', '90d', 'Custom'];
-const PROVIDERS = ['All Providers', 'AWS', 'GCP', 'Azure'];
+const PROVIDERS = ['All Providers', 'AWS'];
 const TEAMS = ['All Teams', 'Team Alpha', 'Team Beta', 'Platform', 'Data'];
 
 export default function FilterBar({ onGenerate, loading }) {
   const [datePreset, setDatePreset] = useState('30d');
   const [provider, setProvider] = useState('All Providers');
   const [team, setTeam] = useState('All Teams');
+
+  const handlePresetClick = (p) => {
+    setDatePreset(p);
+    onGenerate({ datePreset: p, provider, team });
+  };
 
   const handleGenerate = () => {
     onGenerate({ datePreset, provider, team });
@@ -22,7 +27,7 @@ export default function FilterBar({ onGenerate, loading }) {
           <button
             key={p}
             className={`${styles.presetBtn} ${datePreset === p ? styles.active : ''}`}
-            onClick={() => setDatePreset(p)}
+            onClick={() => handlePresetClick(p)}
           >
             {p}
           </button>
@@ -33,7 +38,10 @@ export default function FilterBar({ onGenerate, loading }) {
       <select
         className={styles.select}
         value={provider}
-        onChange={(e) => setProvider(e.target.value)}
+        onChange={(e) => {
+          setProvider(e.target.value);
+          onGenerate({ datePreset, provider: e.target.value, team });
+        }}
       >
         {PROVIDERS.map((p) => (
           <option key={p} value={p}>{p}</option>
@@ -44,7 +52,10 @@ export default function FilterBar({ onGenerate, loading }) {
       <select
         className={styles.select}
         value={team}
-        onChange={(e) => setTeam(e.target.value)}
+        onChange={(e) => {
+          setTeam(e.target.value);
+          onGenerate({ datePreset, provider, team: e.target.value });
+        }}
       >
         {TEAMS.map((t) => (
           <option key={t} value={t}>{t}</option>

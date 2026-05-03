@@ -1,176 +1,12 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import Sidebar from '../../shared/Sidebar';
 import Header from '../../dashboard/components/Header';
 import SummaryBar from '../components/SummaryBar';
 import InsightFilterBar from '../components/InsightFilterBar';
 import InsightCard from '../components/InsightCard';
 import InsightSkeleton from '../components/InsightSkeleton';
-import styles from './Aiinsights.module.css';
-
-// ─── Mock Data ────────────────────────────────────────────────────────────────
-// savingsNum is a plain number used for sorting.
-// savings is the formatted string shown in the UI.
-const INITIAL_INSIGHTS = [
-  // ── Cost Optimization ─────────────────────────────────────────────────────
-  {
-    id: 'ins-1',
-    group: 'Cost Optimization',
-    title: 'Switch EC2 instances to Savings Plan',
-    service: 'AWS · EC2',
-    explanation:
-      'Your Platform Engineering team has been running 12 on-demand m5.2xlarge instances at full capacity for 3+ months. Committing to a 1-year Compute Savings Plan would lock in a 40% discount with no architecture changes required.',
-    savings: '$3,840/mo',
-    savingsNum: 3840,
-    confidence: 94,
-    priority: 'critical',
-    actionLabel: 'Apply Optimization',
-    isNew: true,
-    status: 'active',
-  },
-  {
-    id: 'ins-2',
-    group: 'Cost Optimization',
-    title: 'Right-size underutilised RDS instances',
-    service: 'AWS · RDS',
-    explanation:
-      'Three RDS db.r5.2xlarge instances are running at an average of 8% CPU utilisation. Downsizing to db.r5.large would reduce compute costs by 70% while comfortably handling the observed query load.',
-    savings: '$2,100/mo',
-    savingsNum: 2100,
-    confidence: 88,
-    priority: 'high',
-    actionLabel: 'Apply Optimization',
-    isNew: true,
-    status: 'active',
-  },
-  {
-    id: 'ins-3',
-    group: 'Cost Optimization',
-    title: 'Remove orphaned S3 buckets',
-    service: 'AWS · S3',
-    explanation:
-      'We detected 14 S3 buckets with zero GET/PUT activity in the last 60 days that are still incurring storage costs. These appear to be leftover from deprecated projects and are safe to archive or delete.',
-    savings: '$420/mo',
-    savingsNum: 420,
-    confidence: 97,
-    priority: 'high',
-    actionLabel: 'Review Resource',
-    isNew: false,
-    status: 'active',
-  },
-  {
-    id: 'ins-4',
-    group: 'Cost Optimization',
-    title: 'Optimise BigQuery query patterns',
-    service: 'GCP · BigQuery',
-    explanation:
-      'The ETL pipeline is running full table scans on a 2TB dataset every 15 minutes. Adding a partition filter on the event_date column would reduce bytes billed by an estimated 85%, dramatically cutting query costs.',
-    savings: '$4,200/mo',
-    savingsNum: 4200,
-    confidence: 91,
-    priority: 'critical',
-    actionLabel: 'Review Resource',
-    isNew: false,
-    status: 'active',
-  },
-
-  // ── Performance ────────────────────────────────────────────────────────────
-  {
-    id: 'ins-5',
-    group: 'Performance',
-    title: 'Enable CDN for S3 static assets',
-    service: 'AWS · S3',
-    explanation:
-      'Your application fetches large static assets directly from S3 on every request instead of routing through CloudFront. Enabling the CDN would reduce latency by 60% and cut S3 egress costs.',
-    savings: '$680/mo',
-    savingsNum: 680,
-    confidence: 85,
-    priority: 'high',
-    actionLabel: 'Apply Optimization',
-    isNew: true,
-    status: 'active',
-  },
-  {
-    id: 'ins-6',
-    group: 'Performance',
-    title: 'Fix Azure Functions retry loop',
-    service: 'Azure · Functions',
-    explanation:
-      'The fn-order-processor function is retrying failed jobs 50 times before timing out due to a missing dead-letter queue configuration. This inflates execution counts by 50x and slows downstream services.',
-    savings: '$610/mo',
-    savingsNum: 610,
-    confidence: 99,
-    priority: 'critical',
-    actionLabel: 'Review Resource',
-    isNew: true,
-    status: 'active',
-  },
-
-  // ── Security ───────────────────────────────────────────────────────────────
-  {
-    id: 'ins-7',
-    group: 'Security',
-    title: 'Rotate exposed IAM access keys',
-    service: 'AWS · EC2',
-    explanation:
-      'Two IAM access keys have not been rotated in over 180 days and were recently found in a public GitHub commit (now reverted). These keys have broad EC2 permissions. Immediate rotation is strongly recommended.',
-    savings: '$0/mo',
-    savingsNum: 0,
-    confidence: 100,
-    priority: 'critical',
-    actionLabel: 'Review Resource',
-    isNew: true,
-    status: 'active',
-  },
-  {
-    id: 'ins-8',
-    group: 'Security',
-    title: 'Enable GCP audit logging on Compute',
-    service: 'GCP · Compute',
-    explanation:
-      'Data Access audit logs are disabled for the production Compute Engine project. Enabling them is a compliance requirement under SOC 2 Type II and gives full visibility into API calls made to your infrastructure.',
-    savings: '$0/mo',
-    savingsNum: 0,
-    confidence: 90,
-    priority: 'high',
-    actionLabel: 'Apply Optimization',
-    isNew: false,
-    status: 'active',
-  },
-
-  // ── Applied ────────────────────────────────────────────────────────────────
-  {
-    id: 'ins-9',
-    group: 'Cost Optimization',
-    title: 'Enabled S3 Intelligent-Tiering',
-    service: 'AWS · S3',
-    explanation:
-      'S3 Intelligent-Tiering was applied to the media-uploads bucket, automatically moving infrequently accessed objects to cheaper storage tiers. This optimisation is now live.',
-    savings: '$240/mo',
-    savingsNum: 240,
-    confidence: 95,
-    priority: 'low',
-    actionLabel: 'Applied',
-    isNew: false,
-    status: 'applied',
-  },
-
-  // ── Dismissed ─────────────────────────────────────────────────────────────
-  {
-    id: 'ins-10',
-    group: 'Cost Optimization',
-    title: 'Migrate to ARM-based instances',
-    service: 'AWS · EC2',
-    explanation:
-      'Migrating the API fleet from x86 to Graviton3 instances would yield a 20% cost reduction. Dismissed because the app has a dependency on an x86-only library.',
-    savings: '$1,100/mo',
-    savingsNum: 1100,
-    confidence: 78,
-    priority: 'high',
-    actionLabel: 'Apply Optimization',
-    isNew: false,
-    status: 'dismissed',
-  },
-];
+import useInsights from '../hooks/useInsights';
+import styles from './AiInsights.module.css';
 
 const DEFAULT_FILTERS = { priority: '', service: '', sortDesc: true };
 const TABS = ['Active Suggestions', 'Applied', 'Dismissed'];
@@ -180,74 +16,101 @@ const TAB_STATUS_MAP = {
   'Dismissed':          'dismissed',
 };
 
+// ─── Relative time helper ──────────────────────────────────────────────────────
+const relativeTime = (isoDate) => {
+  if (!isoDate) return 'Never';
+  const diffMs  = Date.now() - new Date(isoDate).getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1)  return 'just now';
+  if (diffMin < 60) return `${diffMin} minute${diffMin === 1 ? '' : 's'} ago`;
+  const diffH = Math.floor(diffMin / 60);
+  if (diffH < 24)   return `${diffH} hour${diffH === 1 ? '' : 's'} ago`;
+  const diffD = Math.floor(diffH / 24);
+  return `${diffD} day${diffD === 1 ? '' : 's'} ago`;
+};
+
 // ─── AI Insights Page ─────────────────────────────────────────────────────────
 export default function AiInsights() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [currentOrg, setCurrentOrg]             = useState('Acme Corporation');
-  const [insights, setInsights]                 = useState(INITIAL_INSIGHTS);
-  const [loading, setLoading]                   = useState(false);
-  const [lastScan, setLastScan]                 = useState('2 minutes ago');
+  const [currentOrg, setCurrentOrg]             = useState('My Organisation');
   const [activeTab, setActiveTab]               = useState('Active Suggestions');
   const [filters, setFilters]                   = useState(DEFAULT_FILTERS);
+  const [toast, setToast]                       = useState(null); // { msg, type }
 
-  const organizations = ['Acme Corporation', 'TechStart Inc.', 'Global Dynamics'];
+  // ── Real data via 4-layer architecture (Redux-only, no local duplicate state)
+  const {
+    insights,       // directly from Redux — updateInsightStatus modifies these in place
+    fetchedAt,
+    generatedAt,
+    loading,
+    error,
+    fetchInsights,
+    refreshInsights,
+    applyInsight,
+    dismissInsight,
+  } = useInsights();
 
-  // ── Run AI Scan: show skeleton for 2s, then mark all active as new ─────────
-  const handleScan = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setInsights((prev) =>
-        prev.map((ins) => (ins.status === 'active' ? { ...ins, isNew: true } : ins))
-      );
-      setLastScan('just now');
-      setLoading(false);
-    }, 2000);
-  };
-
-  // ── Card action: apply or dismiss an insight ───────────────────────────────
-  const handleAction = (insightId, action) => {
-    if (action === 'apply') {
-      setInsights((prev) =>
-        prev.map((ins) =>
-          ins.id === insightId ? { ...ins, status: 'applied', isNew: false } : ins
-        )
-      );
-    } else if (action === 'dismiss') {
-      setInsights((prev) =>
-        prev.map((ins) =>
-          ins.id === insightId ? { ...ins, status: 'dismissed', isNew: false } : ins
-        )
-      );
+  // ── Auto-fetch on mount — only if Redux has no data yet ───────────────────
+  useEffect(() => {
+    if (insights.length === 0) {
+      fetchInsights();
     }
-    // 'review' — no state change in this mock
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ── Toast helper ──────────────────────────────────────────────────────────
+  const showToast = useCallback((msg, type = 'success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3000);
+  }, []);
+
+  // ── Run AI Scan — re-fetches and refreshes Redux + InsightCache ──────────
+  const handleScan = () => {
+    refreshInsights();
   };
 
-  const handleFilterChange = (key, value) => {
+  // ── Card action: apply | review | dismiss ─────────────────────────────────
+  const handleAction = useCallback((insightId, action) => {
+    if (action === 'apply') {
+      applyInsight(insightId);
+      showToast('✅ Insight marked as applied — visible in the Applied tab');
+      setActiveTab('Applied');              // switch tab so user sees it move
+    } else if (action === 'dismiss') {
+      dismissInsight(insightId);
+      showToast('🚫 Insight dismissed — permanently removed');
+    } else if (action === 'review') {
+      showToast('🔎 Opening AWS Console...', 'info');
+      // Hardcoded AWS console link as requested
+      window.open('https://console.aws.amazon.com/cost-management/home', '_blank');
+    }
+  }, [applyInsight, dismissInsight, showToast]);
+
+  const handleFilterChange = (key, value) =>
     setFilters((prev) => ({ ...prev, [key]: value }));
-  };
 
-  const handleToggleSort = () => {
+  const handleToggleSort = () =>
     setFilters((prev) => ({ ...prev, sortDesc: !prev.sortDesc }));
-  };
 
   // ── Derived: filtered + sorted insights for the active tab ────────────────
   const visibleInsights = useMemo(() => {
     const targetStatus = TAB_STATUS_MAP[activeTab];
-    return insights
+    return [...insights]
       .filter((ins) => {
-        if (ins.status !== targetStatus)                      return false;
+        if (ins.status !== targetStatus)                          return false;
         if (filters.priority && ins.priority !== filters.priority) return false;
         if (filters.service  && ins.service  !== filters.service)  return false;
         return true;
       })
       .sort((a, b) =>
-        filters.sortDesc ? b.savingsNum - a.savingsNum : a.savingsNum - b.savingsNum
+        filters.sortDesc ? b.savingsNum - a.savingsNum : a.savingsNum - b.savingsNum,
       );
   }, [insights, activeTab, filters]);
 
   // ── Summary bar values ─────────────────────────────────────────────────────
   const activeInsights = insights.filter((i) => i.status === 'active');
-  const totalSavings   = activeInsights.reduce((sum, i) => sum + i.savingsNum, 0);
+  const appliedCount   = insights.filter((i) => i.status === 'applied').length;
+  const dismissedCount = insights.filter((i) => i.status === 'dismissed').length;
+  const totalSavings   = activeInsights.reduce((sum, i) => sum + (i.savingsNum || 0), 0);
   const fmt            = (n) => '$' + n.toLocaleString('en-US');
 
   // ── Group insights by category for the Active tab ─────────────────────────
@@ -261,6 +124,14 @@ export default function AiInsights() {
     return groups;
   }, [visibleInsights, activeTab]);
 
+  // ── Tab label helper ──────────────────────────────────────────────────────
+  const tabLabel = (tab) => {
+    if (tab === 'Active Suggestions') return `${tab} (${activeInsights.length})`;
+    if (tab === 'Applied')            return `${tab} (${appliedCount})`;
+    if (tab === 'Dismissed')          return `${tab} (${dismissedCount})`;
+    return tab;
+  };
+
   return (
     <div className={styles.page}>
       <Sidebar
@@ -271,16 +142,24 @@ export default function AiInsights() {
       <div className={`${styles.main} ${sidebarCollapsed ? styles.expanded : ''}`}>
         <Header
           currentOrg={currentOrg}
-          organizations={organizations}
+          organizations={['My Organisation']}
           onOrgChange={setCurrentOrg}
         />
 
         <div className={styles.content}>
+
+          {/* Toast notification */}
+          {toast && (
+            <div className={`${styles.toast} ${styles[`toast_${toast.type}`]}`}>
+              {toast.msg}
+            </div>
+          )}
+
           {/* Page heading + Scan button */}
           <div className={styles.pageHeader}>
             <div>
               <h1>AI Insights</h1>
-              <p>Claude AI-powered suggestions to optimise your cloud spend</p>
+              <p>AI-powered suggestions based on your real AWS billing data</p>
             </div>
             <button
               id="run-ai-scan-btn"
@@ -291,18 +170,30 @@ export default function AiInsights() {
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M12 2v4M12 18v4M2 12h4M18 12h4M5.64 5.64l2.83 2.83M15.54 15.54l2.83 2.83M5.64 18.36l2.83-2.83M15.54 8.46l2.83-2.83" strokeLinecap="round"/>
               </svg>
-              {loading ? 'Scanning...' : 'Run AI Scan'}
+              {loading ? 'Analysing...' : 'Run AI Scan'}
             </button>
           </div>
 
-          {/* Top summary bar */}
-          <SummaryBar
-            totalSavings={fmt(totalSavings)}
-            suggestionCount={activeInsights.length}
-            lastScan={lastScan}
-          />
+          {/* Error state */}
+          {error && !loading && (
+            <div className={styles.errorState}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <span>{error}</span>
+            </div>
+          )}
 
-          {/* Tabs */}
+          {/* Top summary bar */}
+          {!error && (
+            <SummaryBar
+              totalSavings={fmt(totalSavings)}
+              suggestionCount={activeInsights.length}
+              lastScan={relativeTime(generatedAt || fetchedAt)}
+            />
+          )}
+
+          {/* Tabs — show live counts */}
           <div className={styles.tabs}>
             {TABS.map((tab) => (
               <button
@@ -311,7 +202,7 @@ export default function AiInsights() {
                 className={`${styles.tab} ${activeTab === tab ? styles.active : ''}`}
                 onClick={() => setActiveTab(tab)}
               >
-                {tab}{tab === 'Active Suggestions' ? ` (${activeInsights.length})` : ''}
+                {tabLabel(tab)}
               </button>
             ))}
           </div>
@@ -327,7 +218,7 @@ export default function AiInsights() {
           {loading && <InsightSkeleton count={4} />}
 
           {/* Empty state */}
-          {!loading && visibleInsights.length === 0 && (
+          {!loading && !error && visibleInsights.length === 0 && (
             <div className={styles.emptyState}>
               <div className={styles.emptyIcon}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -336,12 +227,16 @@ export default function AiInsights() {
               </div>
               <p className={styles.emptyTitle}>
                 {activeTab === 'Active Suggestions'
-                  ? 'No optimizations found — your cloud is running efficiently'
-                  : `No ${activeTab.toLowerCase()} suggestions`}
+                  ? insights.length === 0
+                    ? 'Run an AI Scan to generate insights from your billing data'
+                    : 'No active suggestions — all done!'
+                  : `No ${activeTab.toLowerCase()} suggestions yet`}
               </p>
               <p className={styles.emptySubtitle}>
                 {activeTab === 'Active Suggestions'
-                  ? 'Run a new scan to check for fresh opportunities.'
+                  ? insights.length === 0
+                    ? 'Click "Run AI Scan" above. Make sure billing data has been fetched first.'
+                    : 'All suggestions have been applied or dismissed.'
                   : 'Nothing here yet.'}
               </p>
             </div>
@@ -357,7 +252,11 @@ export default function AiInsights() {
                 </div>
                 <div className={styles.cardGrid}>
                   {cards.map((insight) => (
-                    <InsightCard key={insight.id} insight={insight} onAction={handleAction} />
+                    <InsightCard
+                      key={insight.id}
+                      insight={insight}
+                      onAction={handleAction}
+                    />
                   ))}
                 </div>
               </div>
@@ -368,10 +267,15 @@ export default function AiInsights() {
           {!loading && activeTab !== 'Active Suggestions' && visibleInsights.length > 0 && (
             <div className={styles.cardGrid}>
               {visibleInsights.map((insight) => (
-                <InsightCard key={insight.id} insight={insight} onAction={handleAction} />
+                <InsightCard
+                  key={insight.id}
+                  insight={insight}
+                  onAction={handleAction}
+                />
               ))}
             </div>
           )}
+
         </div>
       </div>
     </div>
