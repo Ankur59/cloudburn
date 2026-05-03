@@ -8,6 +8,7 @@ import { initSpikeJob } from './src/jobs/spike.job.js';
 import { initCronJobs } from './src/jobs/costSync.job.js';
 import { initResourceSyncJob } from './src/jobs/resourceSync.job.js';
 import { initInsightRefreshJob } from './src/jobs/insightRefresh.job.js';
+import { initZombieJob } from './src/jobs/zombie.job.js';
 
 // ── HTTP server (wraps express — required for socket.io) ──────────────────────
 const httpServer = createServer(app);
@@ -25,10 +26,6 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log(`🔌 Client disconnected: ${socket.id}`);
   });
-
-  // Start scheduled jobs only after DB is connected
-  initCronJobs();          // daily cost sync  (00:01)
-  initResourceSyncJob();   // resource monitor (every 5 min)
 });
 
 // ── Startup sequence ──────────────────────────────────────────────────────────
@@ -45,6 +42,7 @@ const startServer = async () => {
   initCronJobs();               // daily cost sync  (00:01 UTC)
   initResourceSyncJob();        // resource monitor (every 5 min)
   initInsightRefreshJob();      // AI insights refresh (daily at midnight)
+  initZombieJob(io);            // zombie detection  (every 12h)
   
   // 4) Begin accepting HTTP + WebSocket connections
   httpServer.listen(config.PORT, () => {

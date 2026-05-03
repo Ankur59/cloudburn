@@ -11,6 +11,8 @@ import awsConfigRoutes  from "./routes/awsConfig.routes.js";
 import adminRoutes      from "./routes/admin.routes.js";
 import chatRoutes       from "./routes/chat.routes.js";
 import dashboardRoutes  from "./routes/dashboard.routes.js";
+import zombieRoutes     from "./routes/zombie.routes.js";
+import alertRoutes      from "./routes/alert.routes.js";
 
 import { config }            from "./config/config.js";
 import { applyMiddlewares }  from "./loaders/middleware.js";
@@ -30,6 +32,8 @@ app.use("/api/aws",         awsConfigRoutes);
 app.use("/api/admin",       adminRoutes);
 app.use("/api/chat",        chatRoutes);
 app.use("/api/dashboard",   dashboardRoutes);
+app.use("/api/zombie",      zombieRoutes);
+app.use("/api/alerts",      alertRoutes);
 
 // ── Health ────────────────────────────────────────────────────────────────────
 app.get("/health", (_req, res) =>

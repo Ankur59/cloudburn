@@ -6,10 +6,6 @@ import styles from './AlertCard.module.css';
  *
  * Renders a single alert row. Clicking it expands an inline drawer
  * showing root cause, affected resources, cost breakdown, and action buttons.
- *
- * Props:
- *  - alert: alert data object (see MOCK_ALERTS in Alerts.jsx for shape)
- *  - onResolve: (alertId) => void — called when user marks alert as resolved
  */
 export default function AlertCard({ alert, onResolve }) {
   const [expanded, setExpanded] = useState(false);
@@ -18,6 +14,7 @@ export default function AlertCard({ alert, onResolve }) {
   const handleToggle = () => setExpanded((prev) => !prev);
 
   const isCritical = alert.severity === 'critical';
+  const isZombie = alert.type === 'Zombie';
 
   return (
     <div
@@ -34,36 +31,45 @@ export default function AlertCard({ alert, onResolve }) {
         >
           {/* Left: badge + title + meta */}
           <div className={styles.left}>
-            <span className={`${styles.badge} ${isCritical ? styles.critical : styles.warning}`}>
-              {isCritical ? (
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                </svg>
+            <div className={styles.iconContainer}>
+              {isZombie ? (
+                <div className={`${styles.typeIcon} ${styles.zombie}`}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                  </svg>
+                </div>
               ) : (
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <circle cx="12" cy="12" r="10"/>
-                  <line x1="12" y1="8" x2="12" y2="12"/>
-                  <line x1="12" y1="16" x2="12.01" y2="16"/>
-                </svg>
+                <div className={`${styles.typeIcon} ${styles.spike}`}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                    <polyline points="17 6 23 6 23 12" />
+                  </svg>
+                </div>
               )}
-              {isCritical ? 'Critical' : 'Warning'}
-            </span>
+            </div>
 
             <div className={styles.meta}>
-              <p className={styles.title}>{alert.title}</p>
+              <div className={styles.titleRow}>
+                <p className={styles.title}>{alert.title}</p>
+                <span className={`${styles.typeBadge} ${isZombie ? styles.zombie : styles.spike}`}>
+                  {alert.type}
+                </span>
+              </div>
               <div className={styles.subMeta}>
                 <span className={styles.service}>{alert.service}</span>
-                <span className={styles.type}>{alert.type}</span>
                 <span className={styles.timestamp}>{alert.timestamp}</span>
               </div>
             </div>
           </div>
 
-          {/* Right: cost impact + status + chevron */}
+          {/* Right: cost impact/usage + status + chevron */}
           <div className={styles.right}>
-            <span className={`${styles.cost} ${!isCritical ? styles.warning : ''}`}>
-              +{alert.costImpact}
-            </span>
+            <div className={styles.impactContainer}>
+              <span className={`${styles.cost} ${!isCritical ? styles.warning : ''}`}>
+                {isZombie ? alert.resources[0].cost : `+${alert.costImpact}`}
+              </span>
+              <span className={styles.impactLabel}>{isZombie ? 'Avg Usage' : 'Impact'}</span>
+            </div>
 
             <span className={`${styles.statusBadge} ${alert.status === 'Active' ? styles.active : styles.resolved}`}>
               <span className={`${styles.statusDot} ${alert.status === 'Active' ? styles.active : styles.resolved}`} />
@@ -82,18 +88,18 @@ export default function AlertCard({ alert, onResolve }) {
         {expanded && (
           <div className={styles.drawer}>
             <div className={styles.drawerGrid}>
-              {/* Root cause */}
+              {/* Root cause / AI Explanation */}
               <div className={styles.drawerSection}>
-                <h4>Root Cause</h4>
-                <p>{alert.rootCause}</p>
+                <h4>AI Analysis</h4>
+                <p className={styles.explanation}>{alert.rootCause}</p>
               </div>
 
-              {/* Affected Resources */}
+              {/* Details */}
               <div className={styles.drawerSection}>
-                <h4>Affected Resources</h4>
+                <h4>{isZombie ? 'Resource Details' : 'Cost Breakdown'}</h4>
                 <div className={styles.resourceList}>
-                  {alert.resources.map((r) => (
-                    <div key={r.name} className={styles.resourceItem}>
+                  {alert.resources.map((r, idx) => (
+                    <div key={idx} className={styles.resourceItem}>
                       <span className={styles.resourceName}>{r.name}</span>
                       <span className={styles.resourceCost}>{r.cost}</span>
                     </div>
@@ -103,39 +109,41 @@ export default function AlertCard({ alert, onResolve }) {
 
               {/* Actions */}
               <div className={styles.drawerActions}>
-                <button
-                  id={`alert-review-${alert.id}`}
-                  className={styles.actionBtn}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                    <polyline points="15 3 21 3 21 9"/>
-                    <line x1="10" y1="14" x2="21" y2="3"/>
-                  </svg>
-                  Review Resource
-                </button>
+                {isZombie ? (
+                  <button className={`${styles.actionBtn} ${styles.dangerBtn}`}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                    Terminate Resource
+                  </button>
+                ) : (
+                  <button className={styles.actionBtn}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="2" y="4" width="20" height="16" rx="2" />
+                      <path d="M7 15h0M2 9.5h20" />
+                    </svg>
+                    Set Budget Limit
+                  </button>
+                )}
 
-                <button
-                  id={`alert-budget-${alert.id}`}
-                  className={styles.actionBtn}
-                >
+                <button className={styles.actionBtn}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="2" y="4" width="20" height="16" rx="2"/>
-                    <path d="M7 15h0M2 9.5h20"/>
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
                   </svg>
-                  Set Budget Alert
+                  View in Dashboard
                 </button>
 
                 {alert.status === 'Active' && (
                   <button
-                    id={`alert-resolve-${alert.id}`}
                     className={`${styles.actionBtn} ${styles.resolveBtn}`}
                     onClick={() => onResolve(alert.id)}
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <polyline points="20 6 9 17 4 12"/>
+                      <polyline points="20 6 9 17 4 12" />
                     </svg>
-                    Mark as Resolved
+                    Dismiss Alert
                   </button>
                 )}
               </div>
