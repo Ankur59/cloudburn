@@ -7,6 +7,7 @@ import {
   getMeApi,
   updateProfileApi,
   verifyEmailApi,
+  setOrgNameApi,
 } from "../service/auth.api";
 import {
   setUser,
@@ -136,6 +137,25 @@ const useAuth = () => {
     [dispatch],
   );
 
+  const handleSetOrgName = useCallback(
+    async (orgName) => {
+      try {
+        dispatch(setLoading(true));
+        dispatch(setError(null));
+        await setOrgNameApi(orgName);
+        await handleGetme(); // refresh user profile to get hasSetOrgName = true
+        return { success: true };
+      } catch (error) {
+        const message = error?.response?.data?.message || "Failed to set organization name";
+        dispatch(setError(message));
+        return { success: false, message };
+      } finally {
+        dispatch(setLoading(false));
+      }
+    },
+    [dispatch, handleGetme]
+  );
+
   const handleGoogleLoginRedirect = useCallback(() => {
     // Use VITE_API_URL if it exists, otherwise assume running on same domain or default to localhost:5000
     const apiUrl = axiosInstance.defaults.baseURL;
@@ -178,6 +198,7 @@ const useAuth = () => {
     handleUpdateProfile,
     handleGoogleLoginRedirect,
     handleGoogleCallback,
+    handleSetOrgName,
   };
 };
 

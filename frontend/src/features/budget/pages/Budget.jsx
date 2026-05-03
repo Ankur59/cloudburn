@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setTeamBudgets, updateTeamBudget } from '../budget.slice';
 import Sidebar from '../../shared/Sidebar';
 import Header from '../../dashboard/components/Header';
 import GlobalBudgetCard from '../components/GlobalBudgetCard';
@@ -30,10 +32,18 @@ const INITIAL_TEAM_BUDGETS = [
 
 // ─── Budget Page ──────────────────────────────────────────────────────────────
 export default function Budget() {
+  const dispatch = useDispatch();
+  const { teamBudgets } = useSelector((state) => state.budget);
+
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [currentOrg, setCurrentOrg]             = useState('Acme Corporation');
-  const [teamBudgets, setTeamBudgets]           = useState(INITIAL_TEAM_BUDGETS);
   const [editingTeam, setEditingTeam]           = useState(null); // team being edited, or null
+
+  useEffect(() => {
+    if (teamBudgets.length === 0) {
+      dispatch(setTeamBudgets(INITIAL_TEAM_BUDGETS));
+    }
+  }, [dispatch, teamBudgets.length]);
 
   const organizations = ['Acme Corporation', 'TechStart Inc.', 'Global Dynamics'];
 
@@ -51,9 +61,7 @@ export default function Budget() {
 
   // Save updated budget + threshold back into state
   const handleSave = ({ id, budget, alertThreshold }) => {
-    setTeamBudgets((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, budget, alertThreshold } : t))
-    );
+    dispatch(updateTeamBudget({ id, budget, alertThreshold }));
     setEditingTeam(null);
   };
 

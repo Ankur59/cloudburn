@@ -58,6 +58,9 @@ const userSchema = new mongoose.Schema(
     emailVerificationToken: { type: String, default: null, select: false },
     emailVerificationExpiry: { type: Date, default: null },
 
+    // ── Onboarding ───────────────────────────────────────────────────────────
+    hasSetOrgName: { type: Boolean, default: true },
+
     // ── Auth ─────────────────────────────────────────────────────────────────
     // Stored as SHA-256 hash — raw token lives in httpOnly cookie only
     refreshToken: { type: String, default: null, select: false },

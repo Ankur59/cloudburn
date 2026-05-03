@@ -3,6 +3,8 @@ import { sendSuccess } from '../utils/responseHelper.js';
 import * as authService from '../services/auth.service.js';
 import passport from 'passport';
 import { config } from '../config/config.js';
+import Organization from '../models/organization.model.js';
+import AppError from '../utils/AppError.js';
 
 // ── POST /api/auth/register 
 export const register = asyncHandler(async (req, res) => {
@@ -56,7 +58,25 @@ export const logout = asyncHandler(async (req, res) => {
 
 // ── GET /api/auth/me 
 export const getMe = asyncHandler(async (req, res) => {
-  return sendSuccess(res, 200, 'User profile fetched.', { user: req.user });
+  const org = await Organization.findById(req.user.orgId);
+  const user = req.user.toObject();
+  user.isCloudConnected = !!(org && org.awsConnectedAt);
+  user.orgName = org ? org.name : null;
+  return sendSuccess(res, 200, 'User profile fetched.', { user });
+});
+
+// ── PUT /api/auth/set-org
+export const setOrgName = asyncHandler(async (req, res) => {
+  const { orgName } = req.body;
+  if (!orgName) throw new AppError('Organization name is required', 400);
+
+  const user = req.user;
+  user.hasSetOrgName = true;
+  await user.save();
+
+  await Organization.findByIdAndUpdate(user.orgId, { name: orgName });
+
+  return sendSuccess(res, 200, 'Organization name updated successfully.');
 });
 
 // ── GET /api/auth/google

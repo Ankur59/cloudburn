@@ -38,6 +38,22 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // Handle onboarding (organization name setup)
+  if (user.hasSetOrgName === false && location.pathname !== '/onboarding') {
+    return <Navigate to="/onboarding" replace />;
+  }
+
+  // Handle cloud connection check
+  // Note: we let them access /onboarding without cloud connected
+  if (
+    user.hasSetOrgName && 
+    !user.isCloudConnected && 
+    location.pathname !== '/connect' && 
+    location.pathname !== '/onboarding'
+  ) {
+    return <Navigate to="/connect" replace />;
+  }
+
   // Auth checked, user exists, token exists -> allow access
   return children;
 };

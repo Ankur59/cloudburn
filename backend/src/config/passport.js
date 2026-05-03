@@ -52,6 +52,7 @@ passport.use(
           googleId: profile.id,
           inviteAccepted: true,
           isEmailVerified: true, // Trusted from Google
+          hasSetOrgName: false, // Must be set by user
         });
 
         return done(null, user);
