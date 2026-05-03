@@ -88,7 +88,7 @@ Each insight object must have EXACTLY these fields:
   "title": "short action title (max 10 words)",
   "service": "AWS · <ServiceName>",
   "explanation": "2-3 sentences explaining the finding and recommendation based on the real cost data above. Reference actual dollar amounts from the data.",
-  "savingsNum": <estimated monthly savings as a plain number, 0 if not applicable>,
+  "savingsNum": <estimated monthly savings as a plain number (e.g. 15.50), use 20% of the service cost if not explicitly calculable>,
   "confidence": <integer 70-99>,
   "priority": "critical" | "high" | "medium" | "low",
   "actionLabel": "Apply Optimization" | "Review Resource"
@@ -100,6 +100,7 @@ Rules:
 - For services with high cost percentages, recommend Reserved Instances or Savings Plans.
 - If a service has zero usage in some regions, flag it.
 - If month-over-month cost increased significantly, flag it as critical.
+- ALWAYS provide a non-zero "savingsNum" for Cost Optimization insights (estimate 15-20% of the cost).
 - Do NOT invent data not present in the billing context.
 `);
 
