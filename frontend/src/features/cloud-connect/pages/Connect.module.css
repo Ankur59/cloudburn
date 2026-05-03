@@ -1,0 +1,133 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 4rem 1rem;
+  background-color: var(--page-base);
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,0.03) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(255,255,255,0.02) 0%, transparent 50%);
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 3.5rem;
+}
+
+
+
+.logoText {
+  font-size: 1.3rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.contentWrapper {
+  width: 100%;
+  max-width: 750px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+
+}
+
+.mainCard {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  margin-bottom: 1.5rem;
+  min-height: 400px;
+
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 24px -8px rgba(0,0,0,0.5);
+}
+
+.mainCard::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+}
+
+.cardInner {
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  
+}
+
+/* Actions Footer */
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0 0.5rem;
+}
+
+.actions.right {
+  justify-content: flex-end;
+}
+
+.btnBack {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnBack:hover {
+  color: var(--text-primary);
+  border-color: var(--text-tertiary);
+  background: rgba(255,255,255,0.02);
+}
+
+.btnNext {
+  background: var(--text-primary);
+  border: 1px solid var(--text-primary);
+  color: var(--page-base);
+  padding: 0.75rem 2rem;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(255,255,255,0.15);
+}
+
+.btnNext:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255,255,255,0.25);
+  background: #ffffff;
+}
+
+.btnNext:active {
+  transform: translateY(0);
+}
+
+.btnDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btnDisabled:hover {
+  transform: none;
+  box-shadow: none;
+  background: var(--text-primary);
+}

@@ -34,12 +34,22 @@ const teamSchema = new mongoose.Schema(
       maxlength: [500, 'Notes cannot exceed 500 characters'],
       default: null,
     },
+    // Auto-generated from team name: lowercase, spaces → hyphens, no special chars
+    // Used as an AWS resource tag — immutable after creation
+    teamKey: {
+      type: String,
+      required: true,
+      trim: true,
+    },
   },
   { timestamps: true }
 );
 
-// Compound index: one org will query its own teams frequently
+// Unique team name per org
 teamSchema.index({ orgId: 1, name: 1 }, { unique: true });
+
+// Unique teamKey per org — used for AWS tagging
+teamSchema.index({ orgId: 1, teamKey: 1 }, { unique: true });
 
 const Team = mongoose.model('Team', teamSchema);
 export default Team;

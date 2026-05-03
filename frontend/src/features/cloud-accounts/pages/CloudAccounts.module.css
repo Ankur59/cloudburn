@@ -1,0 +1,93 @@
+/* CloudAccounts page layout */
+.page {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--page-base);
+}
+
+.main {
+  flex: 1;
+  margin-left: 256px;
+  transition: margin-left 0.3s ease;
+}
+
+.main.expanded {
+  margin-left: 80px;
+}
+
+.content {
+  padding: 24px 32px 40px;
+}
+
+/* Page Header */
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.pageHeaderLeft h1 {
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.pageHeaderLeft p {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Primary "Connect New Account" button */
+.connectBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 6px;
+  border: none;
+  background-color: #ffffff;
+  color: #000000;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.connectBtn:hover { opacity: 0.88; }
+
+/* Section label */
+.sectionLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  margin-bottom: 12px;
+}
+
+/* Account card grid */
+.accountGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .main { margin-left: 80px; }
+  .accountGrid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .main { margin-left: 0; }
+  .content { padding: 16px; }
+  .accountGrid { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,68 @@
+/* // Cloudburn Dashboard - Global Styles
+// Dark theme with Geist fonts */
+
+:root {
+  --page-base: #0A0A0A;
+  --card-bg: #111111;
+  --elevated-bg: #1A1A1A;
+  --border-color: #222222;
+
+  --text-primary: #EDEDED;
+  --text-secondary: #A1A1A1;
+  --text-tertiary: #555555;
+
+  --success: #4DB87A;
+  --danger: #C94E4E;
+  --warning: #C9882A;
+  --info: #5B7FD4;
+
+  --aws-color: #5B7FD4;
+  --gcp-color: #4DB87A;
+  --azure-color: #C9882A;
+
+  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: var(--font-geist-mono), 'SF Mono', 'Monaco', monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  background-color: var(--page-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* // Utility classes for mono font (cost numbers) */
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+/* // Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--page-base);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}

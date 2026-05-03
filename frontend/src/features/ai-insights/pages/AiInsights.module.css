@@ -1,0 +1,245 @@
+/* AiInsights Page Layout */
+.page {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--page-base);
+}
+
+.main {
+  flex: 1;
+  margin-left: 256px;
+  transition: margin-left 0.3s ease;
+}
+
+.main.expanded {
+  margin-left: 80px;
+}
+
+.content {
+  padding: 24px 32px 40px;
+}
+
+/* Page Header */
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.pageHeader h1 {
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.pageHeader p {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Run AI Scan button */
+.scanBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 6px;
+  border: none;
+  background-color: #ffffff;
+  color: #000000;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.scanBtn:hover {
+  opacity: 0.88;
+}
+
+.scanBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Spinning animation for the scan icon while loading */
+.scanBtn.scanning svg {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 20px;
+}
+
+.tab {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.tab:hover {
+  color: var(--text-secondary);
+}
+
+.tab.active {
+  color: var(--text-primary);
+  border-bottom-color: #ffffff;
+}
+
+/* Group section header */
+.groupHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 24px 0 12px;
+}
+
+.groupHeader:first-child {
+  margin-top: 0;
+}
+
+.groupLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-tertiary);
+}
+
+.groupLine {
+  flex: 1;
+  height: 1px;
+  background-color: var(--border-color);
+}
+
+/* Card grid */
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+/* Empty state */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  text-align: center;
+  gap: 14px;
+}
+
+.emptyIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background-color: rgba(77, 184, 122, 0.1);
+  border: 1px solid rgba(77, 184, 122, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--success);
+}
+
+.emptyTitle {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.emptySubtitle {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  max-width: 320px;
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .main {
+    margin-left: 80px;
+  }
+  .cardGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .main {
+    margin-left: 0;
+  }
+  .content {
+    padding: 16px;
+  }
+  .cardGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Error state */
+.errorState {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  background-color: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 8px;
+  color: #f87171;
+  font-size: 13px;
+}
+
+/* Toast notification */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 9999;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  background: rgba(30, 30, 40, 0.96);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #e2e8f0;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  animation: slideUp 0.25s ease;
+  max-width: 380px;
+  line-height: 1.5;
+}
+
+.toast_success { border-color: rgba(77, 184, 122, 0.4); color: #6ee7a0; }
+.toast_info    { border-color: rgba(99, 179, 237, 0.4); color: #90cdf4; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+

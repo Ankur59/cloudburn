@@ -1,0 +1,146 @@
+.cardHeader {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.cardTitle {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.cardSubtitle {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+ 
+}
+
+.providerGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.providerCard {
+  background-color: var(--elevated-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.providerCard::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.providerCard:hover::before {
+  opacity: 1;
+}
+
+.providerCard:hover {
+  border-color: var(--text-tertiary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.providerCard.selected {
+  border-color: var(--text-primary);
+  background-color: rgba(255, 255, 255, 0.03);
+  box-shadow: 0 0 0 1px var(--text-primary);
+}
+
+.providerCard.unselected {
+  opacity: 0.8;
+  filter: blur(1px) brightness(0.6);
+  transform: scale(0.98);
+}
+
+.providerCard.unselected:hover {
+  opacity: 0.8;
+  filter: blur(0px) brightness(1);
+  transform: translateY(-2px);
+}
+
+.providerCard.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+.providerCard.disabled:hover {
+  border-color: var(--border-color);
+  transform: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.providerCard.disabled:hover::before {
+  opacity: 0;
+}
+
+.providerIcon {
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  z-index: 1;
+}
+
+.providerName {
+  font-size: 0.95rem;
+  font-weight: 500;
+  z-index: 1;
+  white-space: nowrap;
+}
+
+.providerBadge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.5rem;
+  background-color: rgba(255,255,255,0.05);
+  border-radius: 4px;
+  z-index: 1;
+}
+
+.providerBadgeMuted {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.5rem;
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 4px;
+  z-index: 1;
+}
+
+.checkIconWrapper {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 2;
+  animation: scaleIn 0.2s ease;
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}

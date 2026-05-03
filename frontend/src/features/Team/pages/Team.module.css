@@ -1,0 +1,69 @@
+/* Team Page Layout */
+.page {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--page-base);
+}
+
+.main {
+  flex: 1;
+  margin-left: 256px;
+  transition: margin-left 0.3s ease;
+}
+
+.main.expanded {
+  margin-left: 80px;
+}
+
+.content {
+  padding: 24px 32px 40px;
+}
+
+/* Page Header */
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.pageHeader h1 {
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.pageHeader p {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Two-column layout: left = team list, right = team detail */
+.layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .main {
+    margin-left: 80px;
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .main {
+    margin-left: 0;
+  }
+
+  .content {
+    padding: 16px;
+  }
+}

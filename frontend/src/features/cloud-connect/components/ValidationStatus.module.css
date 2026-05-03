@@ -1,0 +1,123 @@
+.validationState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  text-align: center;
+  min-height: 300px;
+}
+
+.fadeIn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.loaderContainer {
+  height: 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.pulseLoader {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background-color: var(--success);
+  animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(77, 184, 122, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(77, 184, 122, 0); }
+  100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(77, 184, 122, 0); }
+}
+
+.successIcon {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  border: 3px solid var(--success);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--success);
+  margin-bottom: 1.5rem;
+  background-color: rgba(77, 184, 122, 0.1);
+  box-shadow: 0 0 20px rgba(77, 184, 122, 0.2);
+}
+
+.errorIcon {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  border: 3px solid var(--danger);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--danger);
+  margin-bottom: 1.5rem;
+  background-color: rgba(201, 78, 78, 0.1);
+  box-shadow: 0 0 20px rgba(201, 78, 78, 0.2);
+}
+
+.validationTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.01em;
+}
+
+.validationSubtitle {
+  color: var(--text-tertiary);
+  font-size: 0.9rem;
+}
+
+.validationMessage {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  max-width: 320px;
+  line-height: 1.5;
+  margin-bottom: 2rem;
+}
+
+.servicesFound {
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: rgba(255,255,255,0.05);
+  border-radius: 2rem;
+}
+
+.servicesFound .highlight {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.retryButton {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.retryButton:hover {
+  background: rgba(255,255,255,0.05);
+  border-color: var(--text-secondary);
+}

@@ -91,3 +91,41 @@ export const sendInvitationEmail = ({ to, inviterName, teamName, orgName, rawTok
     html:    invitationEmailTemplate({ inviterName, teamName, orgName, inviteUrl }),
   });
 };
+
+import { spikeEmailTemplate } from '../templates/spikeEmail.js';
+import { resourceSpikeEmailTemplate } from '../templates/resourceSpikeEmail.js';
+
+/**
+ * Sends a Cost Spike Alert email to organization members.
+ */
+export const sendSpikeAlertEmail = ({ to, toName, service, previousCost, currentCost, multiplier, aiExplanation }) => {
+  const dashboardUrl = `${config.CLIENT_URL}/dashboard`;
+  return sendEmail({
+    to,
+    toName: toName || to,
+    subject: `🚨 CRITICAL: AWS Cost Spike on ${service}`,
+    html: spikeEmailTemplate({ service, previousCost, currentCost, multiplier, aiExplanation, dashboardUrl }),
+  });
+};
+
+/**
+ * Sends a resource metric spike alert email.
+ * recipients = [{ email, name }] — pass both admin + team lead when applicable.
+ */
+export const sendResourceSpikeAlert = ({ recipients, ...alertData }) => {
+  const dashboardUrl = `${config.CLIENT_URL}/dashboard`;
+
+  return Promise.all(
+    recipients.map(({ email, name }) =>
+      sendEmail({
+        to:      email,
+        toName:  name || email,
+        subject: `⚠️ Spike: ${alertData.service} ${alertData.metricName} on ${alertData.resourceId}`,
+        html:    resourceSpikeEmailTemplate({ recipientName: name || email, dashboardUrl, ...alertData }),
+      }).catch((err) =>
+        console.error(`  [email] Failed to ${email}: ${err.message}`)
+      )
+    )
+  );
+};
+

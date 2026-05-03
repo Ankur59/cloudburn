@@ -1,11 +1,12 @@
-import './app.scss'
+import AppRouter from './app/AppRouter';
+import AppLayout from './app/Layout';
 
 const App = () => {
   return (
-    <div>
-      Dashboard page
-    </div>
-  )
-}
+    <AppLayout>
+      <AppRouter />
+    </AppLayout>
+  );
+};
 
-export default App
+export default App;

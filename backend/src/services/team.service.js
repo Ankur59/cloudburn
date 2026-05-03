@@ -1,9 +1,23 @@
 import Team from '../models/team.model.js';
 import AppError from '../utils/AppError.js';
 
+// ── Team Key Generator ────────────────────────────────────────────────────────
+// Rules: lowercase → spaces to hyphens → strip non-alphanumeric (keep hyphens)
+//        → collapse repeated hyphens → trim leading/trailing hyphens
+// Example: "Frontend Team (v2)!" → "frontend-team-v2"
+export const generateTeamKey = (name) =>
+  name
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')         // spaces → hyphens
+    .replace(/[^a-z0-9-]/g, '')   // remove everything except a-z, 0-9, hyphen
+    .replace(/-+/g, '-')          // collapse consecutive hyphens
+    .replace(/^-|-$/g, '');       // strip leading/trailing hyphens
+
 // ── Create Team ───────────────────────────────────────────────────────────────
 export const createTeam = async ({ orgId, name, budgetLimit, alertThreshold, notes }) => {
-  const team = await Team.create({ orgId, name, budgetLimit, alertThreshold, notes });
+  const teamKey = generateTeamKey(name);
+  const team = await Team.create({ orgId, name, teamKey, budgetLimit, alertThreshold, notes });
   return team;
 };
 
@@ -43,6 +57,11 @@ export const getTeamById = async ({ teamId, orgId }) => {
 
 // ── Update Team ───────────────────────────────────────────────────────────────
 export const updateTeam = async ({ teamId, orgId, updates }) => {
+  // Keep teamKey in sync if the name is being renamed
+  if (updates.name) {
+    updates.teamKey = generateTeamKey(updates.name);
+  }
+
   const team = await Team.findOneAndUpdate(
     { _id: teamId, orgId },           // scoped to org — prevents cross-org tampering
     { $set: updates },
@@ -57,3 +76,5 @@ export const deleteTeam = async ({ teamId, orgId }) => {
   const team = await Team.findOneAndDelete({ _id: teamId, orgId });
   if (!team) throw new AppError('Team not found.', 404);
 };
+
+

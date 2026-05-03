@@ -1,0 +1,88 @@
+.chartCard {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-top: 24px;
+}
+
+.chartHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.chartHeader h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+
+.chartSubtitle {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legendDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legendLabel {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.chartContainer {}
+
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  text-align: center;
+  padding: 0 2rem;
+}
+
+.tooltip {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.tooltipLabel {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0 0 6px;
+}
+
+.tooltipItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.tooltipName {
+  color: var(--text-secondary);
+}
+
+.tooltipValue {
+  font-weight: 700;
+}

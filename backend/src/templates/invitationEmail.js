@@ -8,7 +8,12 @@
  * @param {string} options.inviteUrl    - Full accept-invite URL with token
  * @returns {string} HTML string
  */
-export const invitationEmailTemplate = ({ inviterName, teamName, orgName, inviteUrl }) => /* html */ `
+export const invitationEmailTemplate = ({
+  inviterName,
+  teamName,
+  orgName,
+  inviteUrl,
+}) => /* html */ `
 <!DOCTYPE html>
 <html lang="en">
 <head>

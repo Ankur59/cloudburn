@@ -1,0 +1,39 @@
+/* AlertEmptyState.module.css */
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  text-align: center;
+  gap: 16px;
+}
+
+.iconWrapper {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: rgba(77, 184, 122, 0.1);
+  border: 1px solid rgba(77, 184, 122, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--success);
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  max-width: 300px;
+  line-height: 1.6;
+}

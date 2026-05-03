@@ -1,0 +1,183 @@
+/* TeamBudgetCard.module.css */
+
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: border-color 0.2s;
+}
+
+.card:hover {
+  border-color: #333;
+}
+
+/* Header row: team name + provider badge + edit button */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.teamName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.providerBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  align-self: flex-start;
+}
+
+.providerBadge.aws {
+  background-color: rgba(201, 136, 42, 0.12);
+  color: var(--warning);
+  border: 1px solid rgba(201, 136, 42, 0.2);
+}
+
+.providerBadge.gcp {
+  background-color: rgba(91, 127, 212, 0.12);
+  color: var(--info);
+  border: 1px solid rgba(91, 127, 212, 0.2);
+}
+
+.providerBadge.azure {
+  background-color: rgba(91, 127, 212, 0.12);
+  color: var(--info);
+  border: 1px solid rgba(91, 127, 212, 0.2);
+}
+
+/* Edit button */
+.editBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: none;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.editBtn:hover {
+  border-color: #444;
+  color: var(--text-primary);
+  background-color: var(--elevated-bg);
+}
+
+/* Spend display */
+.spendRow {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.currentSpend {
+  font-size: 22px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+
+.totalBudget {
+  font-size: 14px;
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
+}
+
+/* Progress bar */
+.progressTrack {
+  width: 100%;
+  height: 6px;
+  background-color: var(--elevated-bg);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+
+.progressFill.healthy { background-color: var(--success); }
+.progressFill.warning { background-color: var(--warning); }
+.progressFill.danger  { background-color: var(--danger); }
+
+/* Footer row: % label + status badge + alert threshold */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pctLabel {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+}
+
+.footerRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.alertThreshold {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+/* Status badges */
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+}
+
+.statusBadge.healthy {
+  background-color: rgba(77, 184, 122, 0.1);
+  color: var(--success);
+  border: 1px solid rgba(77, 184, 122, 0.2);
+}
+
+.statusBadge.warning {
+  background-color: rgba(201, 136, 42, 0.1);
+  color: var(--warning);
+  border: 1px solid rgba(201, 136, 42, 0.2);
+}
+
+.statusBadge.danger {
+  background-color: rgba(201, 78, 78, 0.1);
+  color: var(--danger);
+  border: 1px solid rgba(201, 78, 78, 0.2);
+}
