@@ -281,12 +281,102 @@
 }
 
 @media (max-width: 768px) {
-  .table {
-    display: block;
-    overflow-x: auto;
+  /* Cost card: stack vertically */
+  .costCard {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px;
+  }
+  .costValue { font-size: 22px; }
+  .costStats  { gap: 16px; flex-wrap: wrap; }
+
+  /* Members header */
+  .membersHeader {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 16px;
+  }
+  .inviteBtn { width: 100%; justify-content: center; min-height: 40px; }
+
+  /* Make table a block container */
+  .table     { display: block; width: 100%; }
+  .tableHead { display: none; }
+
+  /* tbody: vertical list of cards */
+  .tableBody {
+    display: flex;
+    flex-direction: column;
   }
 
-  .costStats {
-    gap: 16px;
+  /*
+   * Each <tr> = a card with a 2-column grid:
+   *
+   *  [ Avatar + Name  ]  [    Role Badge   ]
+   *  [ email@addr.com ]  [  Jan 12, 2025   ]
+   *  [                    Remove button → ]
+   */
+  .tableBody tr {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+      "name   role"
+      "email  date"
+      "remove remove";
+    column-gap: 12px;
+    row-gap: 6px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-color);
   }
+  .tableBody tr:last-child { border-bottom: none; }
+
+  /* Reset all td defaults */
+  .tableBody td {
+    display: flex;
+    align-items: center;
+    padding: 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  /* Column 1, Row 1 — Avatar + Name */
+  .tableBody td:nth-child(1) {
+    grid-area: name;
+    gap: 8px;
+  }
+  .nameText { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+
+  /* Column 2, Row 1 — Role badge (right-aligned) */
+  .tableBody td:nth-child(2) {
+    grid-area: role;
+    justify-self: end;
+    align-self: center;
+  }
+
+  /* Column 1, Row 2 — Email (left, muted, small) */
+  .tableBody td:nth-child(3) {
+    grid-area: email;
+    font-size: 12px;
+    color: var(--text-tertiary);
+    word-break: break-all;
+    align-self: center;
+  }
+
+  /* Column 2, Row 2 — Joined date (right-aligned, muted) */
+  .tableBody td:nth-child(4) {
+    grid-area: date;
+    font-size: 11px;
+    color: var(--text-tertiary);
+    justify-self: end;
+    align-self: center;
+    white-space: nowrap;
+  }
+
+  /* Row 3 — Remove button (right-aligned) */
+  .tableBody td:nth-child(5) {
+    grid-area: remove;
+    justify-content: flex-end;
+    margin-top: 2px;
+  }
+  .removeBtn { min-height: 36px; }
 }

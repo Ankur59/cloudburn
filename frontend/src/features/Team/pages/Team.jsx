@@ -73,6 +73,7 @@ export default function Team() {
   const { teams } = useSelector((state) => state.team);
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [currentOrg, setCurrentOrg]   = useState('Acme Corporation');
   const [selectedTeamId, setSelectedTeamId] = useState(MOCK_TEAMS[0].id);
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -126,6 +127,8 @@ export default function Team() {
       <Sidebar
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        mobileOpen={mobileSidebarOpen}
+        onMobileClose={() => setMobileSidebarOpen(false)}
       />
 
       {/* Main content area */}
@@ -135,6 +138,7 @@ export default function Team() {
           currentOrg={currentOrg}
           organizations={organizations}
           onOrgChange={setCurrentOrg}
+          onMenuClick={() => setMobileSidebarOpen(true)}
         />
 
         <div className={styles.content}>
