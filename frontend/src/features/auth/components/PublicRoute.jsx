@@ -15,7 +15,7 @@ const PublicRoute = ({ children }) => {
     if (!isAuthChecked) {
       handleGetme();
     }
-  }, []);
+  }, [isAuthChecked]);
 
   // Wait for the auth check to finish before deciding
   if (!isAuthChecked) {

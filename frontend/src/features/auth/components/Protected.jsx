@@ -12,14 +12,22 @@ const ProtectedRoute = ({ children }) => {
   const { handleGetme } = useAuth();
 
   useEffect(() => {
+    // If auth state is unknown, fetch it so we know if they should be redirected
     if (!isAuthChecked) {
       handleGetme();
     }
-  }, [isAuthChecked, handleGetme]);
+  }, [isAuthChecked]);
 
   if (!isAuthChecked) {
     return (
-      <div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
         <SkeletonLoader />
       </div>
     );
