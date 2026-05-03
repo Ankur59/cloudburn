@@ -57,7 +57,7 @@ const detectSpikesForOrg = async (orgId) => {
 
       // Upsert SpikeAlert scoped to this org
       const alert = await SpikeAlert.findOneAndUpdate(
-        { orgId, date: todayStr, service },
+        { orgId, date: todayStr, service, alertType: 'SPIKE' },
         {
           $set: {
             previousCost: +previousCost.toFixed(8),
@@ -65,7 +65,7 @@ const detectSpikesForOrg = async (orgId) => {
             multiplier: +multiplier.toFixed(4),
             aiExplanation,
           },
-          $setOnInsert: { orgId, isRead: false },
+          $setOnInsert: { orgId, isRead: false, alertType: 'SPIKE' },
         },
         { upsert: true, returnDocument: "after" },
       );

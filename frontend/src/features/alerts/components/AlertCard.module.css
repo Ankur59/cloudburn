@@ -10,6 +10,7 @@
   overflow: hidden;
   cursor: pointer;
   transition: background-color 0.2s, border-color 0.2s;
+  margin-bottom: 12px;
 }
 
 .card:hover {
@@ -20,11 +21,12 @@
 .card.expanded {
   background-color: var(--elevated-bg);
   border-color: #333;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 /* Colored left border by severity */
 .severityBar {
-  width: 3px;
+  width: 4px;
   align-self: stretch;
   flex-shrink: 0;
 }
@@ -42,63 +44,90 @@
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px;
+  gap: 20px;
+  padding: 18px 24px;
   min-width: 0;
 }
 
-/* Left: badge + info */
+/* Left: icon + info */
 .left {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
+  align-items: center;
+  gap: 16px;
   flex: 1;
   min-width: 0;
 }
 
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  white-space: nowrap;
+.iconContainer {
   flex-shrink: 0;
-  margin-top: 1px;
-  font-family: var(--font-sans);
 }
 
-.badge.critical {
-  background-color: rgba(201, 78, 78, 0.15);
+.typeIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--page-base);
+  border: 1px solid var(--border-color);
+}
+
+.typeIcon.spike {
   color: var(--danger);
+  background-color: rgba(201, 78, 78, 0.1);
 }
 
-.badge.warning {
-  background-color: rgba(201, 136, 42, 0.15);
+.typeIcon.zombie {
   color: var(--warning);
+  background-color: rgba(201, 136, 42, 0.1);
 }
 
 .meta {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .title {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.typeBadge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.typeBadge.spike {
+  background-color: rgba(201, 78, 78, 0.15);
+  color: var(--danger);
+}
+
+.typeBadge.zombie {
+  background-color: rgba(201, 136, 42, 0.15);
+  color: var(--warning);
 }
 
 .subMeta {
   display: flex;
   align-items: center;
   gap: 12px;
-  flex-wrap: wrap;
 }
 
 .service {
@@ -112,26 +141,23 @@
   font-family: var(--font-mono);
 }
 
-.type {
-  font-size: 11px;
-  color: var(--text-tertiary);
-  background-color: var(--elevated-bg);
-  border: 1px solid var(--border-color);
-  padding: 1px 6px;
-  border-radius: 4px;
-  font-family: var(--font-sans);
-}
-
-/* Right: cost + status */
+/* Right: impact + status */
 .right {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 24px;
   flex-shrink: 0;
 }
 
+.impactContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 100px;
+}
+
 .cost {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--danger);
   font-family: var(--font-mono);
@@ -141,25 +167,34 @@
   color: var(--warning);
 }
 
+.impactLabel {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
 .statusBadge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 3px 10px;
-  border-radius: 4px;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
   font-size: 12px;
   font-weight: 500;
-  font-family: var(--font-sans);
+  background-color: var(--page-base);
+  border: 1px solid var(--border-color);
 }
 
 .statusBadge.active {
-  background-color: rgba(201, 78, 78, 0.1);
   color: var(--danger);
+  border-color: rgba(201, 78, 78, 0.2);
 }
 
 .statusBadge.resolved {
-  background-color: rgba(77, 184, 122, 0.1);
   color: var(--success);
+  border-color: rgba(77, 184, 122, 0.2);
 }
 
 .statusDot {
@@ -170,6 +205,7 @@
 
 .statusDot.active {
   background-color: var(--danger);
+  box-shadow: 0 0 8px var(--danger);
 }
 
 .statusDot.resolved {
@@ -188,27 +224,16 @@
 
 /* Expanded drawer section */
 .drawer {
-  padding: 0 16px 20px 31px;
+  padding: 0 24px 24px 80px;
   border-top: 1px solid var(--border-color);
-  animation: slideDown 0.2s ease;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  background-color: rgba(255, 255, 255, 0.02);
 }
 
 .drawerGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  padding-top: 20px;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 40px;
+  padding-top: 24px;
 }
 
 .drawerSection h4 {
@@ -217,26 +242,30 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-tertiary);
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
-.drawerSection p {
-  font-size: 13px;
+.explanation {
+  font-size: 14px;
   color: var(--text-secondary);
   line-height: 1.6;
+  background-color: var(--page-base);
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
 }
 
 .resourceList {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .resourceItem {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 10px;
+  padding: 10px 14px;
   background-color: var(--page-base);
   border: 1px solid var(--border-color);
   border-radius: 6px;
@@ -252,15 +281,15 @@
   font-size: 12px;
   color: var(--text-primary);
   font-family: var(--font-mono);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .drawerActions {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding-top: 20px;
-  margin-top: 4px;
+  gap: 12px;
+  padding-top: 24px;
+  margin-top: 8px;
   border-top: 1px solid var(--border-color);
   grid-column: 1 / -1;
 }
@@ -268,12 +297,11 @@
 .actionBtn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  border-radius: 6px;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
   font-size: 13px;
-  font-weight: 500;
-  font-family: var(--font-sans);
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
   border: 1px solid var(--border-color);
@@ -283,33 +311,54 @@
 
 .actionBtn:hover {
   border-color: #555;
-  background-color: #222;
+  background-color: #333;
+  transform: translateY(-1px);
+}
+
+.dangerBtn {
+  color: var(--danger);
+  border-color: rgba(201, 78, 78, 0.2);
+}
+
+.dangerBtn:hover {
+  background-color: rgba(201, 78, 78, 0.1);
+  border-color: var(--danger);
 }
 
 .resolveBtn {
-  background-color: rgba(77, 184, 122, 0.1);
-  border-color: rgba(77, 184, 122, 0.25);
-  color: var(--success);
+  background-color: var(--success);
+  border-color: var(--success);
+  color: white;
+  margin-left: auto;
 }
 
 .resolveBtn:hover {
-  background-color: rgba(77, 184, 122, 0.2);
-  border-color: rgba(77, 184, 122, 0.4);
+  background-color: #3ca36b;
+  transform: scale(1.02);
+}
+
+@media (max-width: 1024px) {
+  .drawerGrid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
 }
 
 @media (max-width: 768px) {
   .body {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
+    padding: 16px;
   }
 
   .right {
     width: 100%;
     justify-content: space-between;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
   }
 
-  .drawerGrid {
-    grid-template-columns: 1fr;
+  .drawer {
+    padding-left: 16px;
   }
 }

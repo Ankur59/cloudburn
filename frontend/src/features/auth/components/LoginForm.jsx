@@ -43,6 +43,7 @@ const LoginForm = () => {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm({
     mode: "onTouched",
@@ -58,6 +59,12 @@ const LoginForm = () => {
       } else {
         navigate("/onboarding");
       }
+    } else if (result.firstFieldError) {
+      // Show the error inline on the specific field
+      setError(result.firstFieldError.path, {
+        type: "server",
+        message: result.firstFieldError.msg,
+      });
     }
   };
 

@@ -40,6 +40,34 @@ In exactly 3-4 sentences, explain: (1) the most likely technical reason for this
   }
 };
 
+// ── generateZombieExplanation ──────────────────────────────────────────────────
+export const generateZombieExplanation = async ({
+  service,
+  resourceId,
+  metricName,
+  avgValue,
+  idleDays,
+}) => {
+  const prompt = `You are a cloud infrastructure optimization expert. An idle (zombie) resource has been detected.
+
+Details:
+- AWS Service: ${service}
+- Resource ID: ${resourceId}
+- Idle Metric: ${metricName}
+- Average Usage: ${avgValue.toFixed(2)}% (below idle threshold)
+- Idle Duration: ${idleDays} days
+
+In exactly 3-4 sentences, explain: (1) why this ${service} resource is flagged as a zombie, (2) the common business or technical reasons for this resource being orphaned, and (3) the specific impact of terminating it (e.g., data loss risks or easy recovery). Be concise and professional.`;
+
+  try {
+    const response = await groq.invoke([{ role: 'user', content: prompt }]);
+    return response.content?.trim() || 'AI explanation unavailable.';
+  } catch (err) {
+    console.error('⚠️  Groq zombie explanation failed:', err.message);
+    return 'AI explanation unavailable due to a temporary error.';
+  }
+};
+
 // ── askGroq ───────────────────────────────────────────────────────────────────
 // General-purpose chat invocation used by chat.service.js.
 // Accepts a LangChain-compatible messages array and returns the answer string.

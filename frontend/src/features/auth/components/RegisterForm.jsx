@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import useAuth from "../hook/useAuth";
 import styles from "./RegisterForm.module.css";
@@ -32,13 +33,14 @@ const GoogleIcon = () => (
 );
 
 const RegisterForm = () => {
-  const navigate = useNavigate();
   const { handleRegister, handleGoogleLoginRedirect } = useAuth();
   const { loading, error } = useSelector((state) => state.auth);
+  const [registeredEmail, setRegisteredEmail] = useState("");
 
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm({
     mode: "onTouched",
@@ -57,10 +59,34 @@ const RegisterForm = () => {
       password: data.password,
     });
     if (result.success) {
-      // Redirect to verify-email page so user can enter the token
-      navigate("/verify-email", { state: { email: data.email } });
+      setRegisteredEmail(data.email);
+    } else if (result.firstFieldError) {
+      // Show the error inline on the specific field
+      setError(result.firstFieldError.path, {
+        type: "server",
+        message: result.firstFieldError.msg,
+      });
     }
   };
+
+  // ── Post-registration success screen ─────────────────────────────────────
+  if (registeredEmail) {
+    return (
+      <div className={styles.form} style={{ textAlign: "center", padding: "1.5rem 0" }}>
+        <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>📧</div>
+        <h2 style={{ fontWeight: 700, marginBottom: "0.5rem" }}>Check your inbox</h2>
+        <p style={{ color: "var(--text-secondary, #9ca3af)", fontSize: "0.9rem", lineHeight: 1.6 }}>
+          We sent a verification link to{" "}
+          <strong style={{ color: "inherit" }}>{registeredEmail}</strong>.<br />
+          Click the link in the email to activate your account.
+        </p>
+        <p style={{ marginTop: "1.5rem", fontSize: "0.8rem", color: "var(--text-secondary, #9ca3af)" }}>
+          Already verified?{" "}
+          <Link to="/login" className={styles.footerLink}>Sign in</Link>
+        </p>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>

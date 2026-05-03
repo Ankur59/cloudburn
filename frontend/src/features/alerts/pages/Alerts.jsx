@@ -8,114 +8,65 @@ import AlertList from '../components/AlertList';
 import AlertSkeleton from '../components/AlertSkeleton';
 import styles from './Alerts.module.css';
 
-// ─── Mock Data ───────────────────────────────────────────────────────────────
-// In a real app, this would come from an API call.
-// Shape of each alert object is documented here for clarity.
-const MOCK_ALERTS = [
-  {
-    id: 'alert-1',
-    severity: 'critical',             // 'critical' | 'warning'
-    type: 'Spike',                    // 'Spike' | 'Budget Breach' | 'Anomaly'
-    title: 'EC2 Compute Cost Spike Detected',
-    service: 'AWS · EC2',
-    provider: 'AWS',
-    timestamp: '2026-05-02 · 08:42 AM',
-    costImpact: '$3,240 / day',
-    status: 'Active',                 // 'Active' | 'Resolved'
-    rootCause:
-      'A fleet of m5.4xlarge instances was auto-scaled to 48 units due to a misconfigured scale-out policy. The threshold was set to 20% CPU instead of 80%, causing excessive scaling during normal traffic.',
-    resources: [
-      { name: 'i-0abc1234 (m5.4xlarge)', cost: '+$1,120/day' },
-      { name: 'i-0def5678 (m5.4xlarge)', cost: '+$1,120/day' },
-      { name: 'i-0ghi9012 (m5.2xlarge)', cost: '+$1,000/day' },
-    ],
-  },
-  {
-    id: 'alert-2',
-    severity: 'critical',
-    type: 'Budget Breach',
-    title: 'Monthly Budget Limit Exceeded — Production',
-    service: 'GCP · Compute Engine',
-    provider: 'GCP',
-    timestamp: '2026-05-02 · 07:15 AM',
-    costImpact: '$8,500 over budget',
-    status: 'Active',
-    rootCause:
-      'The Production workspace has exceeded its $40,000 monthly budget by $8,500. The primary driver is unoptimized BigQuery jobs running full table scans on a 2TB dataset every 15 minutes.',
-    resources: [
-      { name: 'bigquery-prod-etl-job', cost: '+$4,200/day' },
-      { name: 'compute-engine-prod-01', cost: '+$890/day' },
-    ],
-  },
-  {
-    id: 'alert-3',
-    severity: 'warning',
-    type: 'Anomaly',
-    title: 'Unusual Data Transfer Activity — S3 Buckets',
-    service: 'AWS · S3',
-    provider: 'AWS',
-    timestamp: '2026-05-02 · 06:30 AM',
-    costImpact: '$420 / day',
-    status: 'Active',
-    rootCause:
-      'S3 egress costs are 340% above the 30-day baseline. This appears to be caused by a new deployment that is fetching large static assets from S3 on every request instead of using the CloudFront CDN.',
-    resources: [
-      { name: 's3://prod-assets-bucket', cost: '+$280/day' },
-      { name: 's3://media-uploads-bucket', cost: '+$140/day' },
-    ],
-  },
-  {
-    id: 'alert-4',
-    severity: 'warning',
+import { getAlertsApi, resolveAlertApi } from '../alerts.api';
+
+// ─── Normalization ────────────────────────────────────────────────────────────
+// Maps backend SpikeAlert documents to the UI format used in this component.
+const normalizeAlert = (alert) => {
+  const isSpike = alert.alertType === 'SPIKE';
+  const isZombie = alert.alertType === 'ZOMBIE';
+  
+  if (isZombie) {
+    return {
+      id: alert._id || alert.id,
+      severity: alert.idleDays > 30 ? 'critical' : 'warning',
+      type: 'Zombie',
+      title: `Idle ${alert.service} Resource Detected`,
+      service: `AWS · ${alert.service}`,
+      provider: 'AWS',
+      timestamp: new Date(alert.createdAt).toLocaleString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+      }).replace(',', ' ·'),
+      costImpact: alert.message || 'Potential waste detected',
+      status: alert.isRead ? 'Resolved' : 'Active',
+      rootCause: alert.aiExplanation || 'Analyzing idle patterns...',
+      resources: [
+        { name: `Resource: ${alert.resourceId}`, cost: `Usage: ${alert.currentValue}%` },
+      ],
+    };
+  }
+
+  // SPIKE normalization
+  const impact = (alert.currentCost || 0) - (alert.previousCost || 0);
+  return {
+    id: alert._id || alert.id,
+    severity: (alert.multiplier || 0) >= 2 ? 'critical' : 'warning',
     type: 'Spike',
-    title: 'Azure Functions Execution Count Spike',
-    service: 'Azure · Functions',
-    provider: 'Azure',
-    timestamp: '2026-05-01 · 11:58 PM',
-    costImpact: '$610 / day',
-    status: 'Active',
-    rootCause:
-      'A retry loop bug introduced in the v2.4.1 deployment is causing Azure Functions to re-execute failed jobs in an infinite loop. Each failed invocation retries 50 times before timing out.',
-    resources: [
-      { name: 'fn-order-processor', cost: '+$380/day' },
-      { name: 'fn-notification-sender', cost: '+$230/day' },
-    ],
-  },
-  {
-    id: 'alert-5',
-    severity: 'warning',
-    type: 'Budget Breach',
-    title: 'Dev Environment Approaching Monthly Budget',
-    service: 'AWS · Multiple',
+    title: `${alert.service} Cost Spike Detected`,
+    service: `AWS · ${alert.service}`,
     provider: 'AWS',
-    timestamp: '2026-05-01 · 09:00 PM',
-    costImpact: '85% of $5,000 budget',
-    status: 'Active',
-    rootCause:
-      'The Dev environment has consumed 85% of its monthly budget with 12 days remaining. Several dev instances were left running over the weekend instead of being shut down via the scheduled stop policy.',
+    timestamp: new Date(alert.createdAt).toLocaleString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    }).replace(',', ' ·'),
+    costImpact: `$${impact.toFixed(2)} increase`,
+    status: alert.isRead ? 'Resolved' : 'Active',
+    rootCause: alert.aiExplanation || 'Analyzing spike patterns...',
     resources: [
-      { name: 'dev-ec2-cluster (x6)', cost: '+$180/day' },
-      { name: 'dev-rds-postgres', cost: '+$45/day' },
+      { name: `${alert.service} (Current)`, cost: `$${(alert.currentCost || 0).toFixed(2)}` },
+      { name: `${alert.service} (Previous)`, cost: `$${(alert.previousCost || 0).toFixed(2)}` },
     ],
-  },
-  {
-    id: 'alert-6',
-    severity: 'critical',
-    type: 'Anomaly',
-    title: 'RDS Storage Auto-Scaling — Unexpected Growth',
-    service: 'AWS · RDS',
-    provider: 'AWS',
-    timestamp: '2026-05-01 · 04:20 PM',
-    costImpact: '$1,800 / month',
-    status: 'Resolved',
-    rootCause:
-      'RDS storage auto-scaled from 500 GB to 2 TB due to a migration script that failed to clean up temporary tables. The tables have since been dropped and storage is being reclaimed.',
-    resources: [
-      { name: 'rds-prod-postgres-primary', cost: '+$1,200/mo' },
-      { name: 'rds-prod-postgres-replica', cost: '+$600/mo' },
-    ],
-  },
-];
+  };
+};
 
 // ─── Default filter state ────────────────────────────────────────────────────
 const DEFAULT_FILTERS = { search: '', type: '', severity: '', provider: '' };
@@ -126,19 +77,39 @@ export default function Alerts() {
   const { alerts, loading } = useSelector((state) => state.alerts);
   
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [currentOrg, setCurrentOrg] = useState('Acme Corporation');
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
 
-  const organizations = ['Acme Corporation', 'TechStart Inc.', 'Global Dynamics'];
-
-  // Simulate an API fetch on mount
+  // Fetch real alerts on mount
   useEffect(() => {
-    dispatch(setLoading(true));
-    const timer = setTimeout(() => {
-      dispatch(setAlerts(MOCK_ALERTS));
-      dispatch(setLoading(false));
-    }, 1200);
-    return () => clearTimeout(timer);
+    const fetchAlerts = async () => {
+      try {
+        console.log('🔍 Fetching alerts...');
+        dispatch(setLoading(true));
+        const response = await getAlertsApi();
+        
+        // Correct data path: response.data is the body, response.data.data is the payload
+        const rawAlerts = response.data?.data?.alerts || response.data?.alerts || [];
+        console.log(`✅ Fetched ${rawAlerts.length} alerts`);
+        
+        const normalized = rawAlerts.map(alert => {
+          try {
+            return normalizeAlert(alert);
+          } catch (e) {
+            console.error('Failed to normalize alert:', alert, e);
+            return null;
+          }
+        }).filter(Boolean);
+
+        dispatch(setAlerts(normalized));
+      } catch (err) {
+        console.error('❌ Failed to fetch alerts:', err);
+        dispatch(setError(err.message));
+      } finally {
+        dispatch(setLoading(false));
+      }
+    };
+    
+    fetchAlerts();
   }, [dispatch]);
 
   // Handle individual filter field change
@@ -151,9 +122,14 @@ export default function Alerts() {
     setFilters(DEFAULT_FILTERS);
   };
 
-  // Mark an alert as resolved
-  const handleResolve = (alertId) => {
-    dispatch(resolveAlert(alertId));
+  // Mark an alert as resolved via API
+  const handleResolve = async (alertId) => {
+    try {
+      await resolveAlertApi(alertId);
+      dispatch(resolveAlert(alertId));
+    } catch (err) {
+      console.error('Failed to resolve alert:', err);
+    }
   };
 
   // Derive filtered + sorted alerts from state
@@ -194,11 +170,7 @@ export default function Alerts() {
       {/* Main content area */}
       <div className={`${styles.main} ${sidebarCollapsed ? styles.expanded : ''}`}>
         {/* Top bar */}
-        <Header
-          currentOrg={currentOrg}
-          organizations={organizations}
-          onOrgChange={setCurrentOrg}
-        />
+        <Header />
 
         <div className={styles.content}>
           {/* Page heading */}

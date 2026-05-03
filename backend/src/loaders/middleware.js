@@ -8,6 +8,7 @@ import express from 'express';
 export const applyMiddlewares = (app, config) => {
     app.use(cors({
         origin: config.CLIENT_URL,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
         credentials: true,
     }));
 

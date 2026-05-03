@@ -59,7 +59,9 @@ const userSchema = new mongoose.Schema(
     emailVerificationExpiry: { type: Date, default: null },
 
     // ── Onboarding ───────────────────────────────────────────────────────────
-    hasSetOrgName: { type: Boolean, default: true },
+    // false by default — set to true once admin sets the org name on /onboarding.
+    // Google OAuth users also start as false (see passport.js).
+    hasSetOrgName: { type: Boolean, default: false },
 
     // ── Auth ─────────────────────────────────────────────────────────────────
     // Stored as SHA-256 hash — raw token lives in httpOnly cookie only
