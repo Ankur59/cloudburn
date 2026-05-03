@@ -1,6 +1,8 @@
 import axios from "axios";
 import { refreshApi } from "../features/auth/service/auth.api";
 
+
+
 const axiosInstance = axios.create({
   baseURL: "http://localhost:5000/api",// IGONRE KARO FALTU LINK HE
   withCredentials: true, // keeps the httpOnly refreshToken cookie working
@@ -93,7 +95,9 @@ axiosInstance.interceptors.response.use(
     } catch (refreshError) {
       processQueue(refreshError, null);
       localStorage.removeItem("accessToken");
-      window.location.href = "/login";
+      if (!window.location.pathname.includes("/login") && !window.location.pathname.includes("/register")) {
+        window.location.href = "/login";
+      }
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;

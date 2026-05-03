@@ -4,35 +4,46 @@ import Stepper from '../components/Stepper';
 import ProviderSelection from '../components/ProviderSelection';
 import CredentialsForm from '../components/CredentialsForm';
 import ValidationStatus from '../components/ValidationStatus';
+import useCloudConnect from '../hook/useCloudConnect';
+import { useNavigate } from 'react-router-dom';
 import styles from './Connect.module.css';
 
-
-
-
 const Connect = () => {
+  const navigate = useNavigate();
+  const { handleConnectAws } = useCloudConnect();
   const [step, setStep] = useState(1);
   const [provider, setProvider] = useState('aws'); // default aws
   const [credentials, setCredentials] = useState({ accessKey: '', secretKey: '' });
   const [validationStatus, setValidationStatus] = useState('idle'); // idle, loading, success, error
 
-  // Simulate validation
+  // Trigger validation when reaching step 3
   useEffect(() => {
-    if (step === 3 && validationStatus === 'idle') {
-      setValidationStatus('loading');
-      
-      // Simulate API call
-      const timer = setTimeout(() => {
-        // Simple mock: if both fields have more than 5 chars, succeed, else fail
-        if (credentials.accessKey.length > 5 && credentials.secretKey.length > 5) {
+    let isMounted = true;
+
+    const performValidation = async () => {
+      if (step === 3 && validationStatus === 'idle') {
+        setValidationStatus('loading');
+        
+        const result = await handleConnectAws(credentials);
+        
+        if (!isMounted) return;
+        
+        if (result.success) {
           setValidationStatus('success');
         } else {
+          // We can optionally pass result.message to the ValidationStatus component
+          // For now, setting 'error' triggers the UI state
           setValidationStatus('error');
         }
-      }, 2000);
+      }
+    };
 
-      return () => clearTimeout(timer);
-    }
-  }, [step, validationStatus, credentials]);
+    performValidation();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [step, validationStatus, credentials, handleConnectAws]);
 
 
 
@@ -79,7 +90,7 @@ const Connect = () => {
       {/* Header */}
 
       <div className={styles.logoContainer}>
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="white" stroke-width="2"></circle><path d="M10 16C10 13 12 10 16 10C20 10 22 13 22 16" stroke="white" stroke-width="2" stroke-linecap="round"></path><circle cx="16" cy="20" r="2" fill="white"></circle></svg>
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="white" strokeWidth="2"></circle><path d="M10 16C10 13 12 10 16 10C20 10 22 13 22 16" stroke="white" strokeWidth="2" strokeLinecap="round"></path><circle cx="16" cy="20" r="2" fill="white"></circle></svg>
       <div className={styles.logoText}>Cloudburn</div>
       </div>
 
@@ -138,7 +149,7 @@ const Connect = () => {
           )}
 
           {step === 3 && validationStatus === 'success' && (
-            <button className={styles.btnNext} onClick={() => alert('Navigate to dashboard')}>Go to Dashboard</button>
+            <button className={styles.btnNext} onClick={() => navigate('/dashboard')}>Go to Dashboard</button>
           )}
         </div>
       </div>

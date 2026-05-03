@@ -33,7 +33,7 @@ const GoogleIcon = () => (
 
 const RegisterForm = () => {
   const navigate = useNavigate();
-  const { handleRegister } = useAuth();
+  const { handleRegister, handleGoogleLoginRedirect } = useAuth();
   const { loading, error } = useSelector((state) => state.auth);
 
   const {
@@ -66,7 +66,11 @@ const RegisterForm = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-      <button type="button" className={styles.googleButton}>
+      <button 
+        type="button" 
+        className={styles.googleButton}
+        onClick={handleGoogleLoginRedirect}
+      >
         <GoogleIcon />
         Continue with Google
       </button>

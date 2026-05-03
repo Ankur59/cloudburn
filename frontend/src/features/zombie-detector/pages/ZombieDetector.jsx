@@ -1,4 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setResources, setLastScan, setLoading, markResource, markResourcesBulk, terminateResource, removeResource } from '../zombieDetector.slice';
 import Sidebar from '../../shared/Sidebar';
 import Header from '../../dashboard/components/Header';
 import ZombieSummaryCards from '../components/ZombieSummaryCards';
@@ -87,11 +89,11 @@ const fmt = (n) => '$' + n.toLocaleString('en-US');
 
 // ─── ZombieDetector Page ──────────────────────────────────────────────────────
 export default function ZombieDetector() {
+  const dispatch = useDispatch();
+  const { resources, lastScan, loading } = useSelector((state) => state.zombieDetector);
+
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [currentOrg, setCurrentOrg]             = useState('Acme Corporation');
-  const [resources, setResources]               = useState(MOCK_RESOURCES);
-  const [loading, setLoading]                   = useState(false);
-  const [lastScan, setLastScan]                 = useState('5 minutes ago');
   const [activeTab, setActiveTab]               = useState('Active Zombies');
   const [filters, setFilters]                   = useState(DEFAULT_FILTERS);
   const [selectedIds, setSelectedIds]           = useState(new Set());
@@ -99,15 +101,21 @@ export default function ZombieDetector() {
   const [sortKey, setSortKey]                   = useState('idleDays');
   const [sortDesc, setSortDesc]                 = useState(true);
 
+  useEffect(() => {
+    if (resources.length === 0) {
+      dispatch(setResources(MOCK_RESOURCES));
+    }
+  }, [dispatch, resources.length]);
+
   const organizations = ['Acme Corporation', 'TechStart Inc.', 'Global Dynamics'];
 
   // ── Run Zombie Scan ──────────────────────────────────────────────────────────
   const handleScan = () => {
-    setLoading(true);
+    dispatch(setLoading(true));
     setSelectedIds(new Set());
     setTimeout(() => {
-      setLastScan('just now');
-      setLoading(false);
+      dispatch(setLastScan('just now'));
+      dispatch(setLoading(false));
     }, 2000);
   };
 
@@ -166,27 +174,26 @@ export default function ZombieDetector() {
 
   // ── Resource actions ─────────────────────────────────────────────────────────
   const handleMark = (id) => {
-    setResources((prev) => prev.map((r) => r.id === id ? { ...r, status: 'Marked' } : r));
+    dispatch(markResource(id));
     setSelectedIds((prev) => { const n = new Set(prev); n.delete(id); return n; });
   };
 
   const handleMarkAll = () => {
-    const ids = new Set(selectedIds);
-    setResources((prev) => prev.map((r) => ids.has(r.id) ? { ...r, status: 'Marked' } : r));
+    dispatch(markResourcesBulk(Array.from(selectedIds)));
     setSelectedIds(new Set());
   };
 
   const handleTerminate = (id) => {
-    setResources((prev) => prev.map((r) => r.id === id ? { ...r, status: 'Cleaned' } : r));
+    dispatch(terminateResource(id));
   };
 
   const handleSnooze = (id) => {
     // Snooze: remove from active list for this session
-    setResources((prev) => prev.filter((r) => r.id !== id));
+    dispatch(removeResource(id));
   };
 
   const handleIgnore = (id) => {
-    setResources((prev) => prev.filter((r) => r.id !== id));
+    dispatch(removeResource(id));
   };
 
   const handleExport = () => {

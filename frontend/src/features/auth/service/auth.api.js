@@ -36,10 +36,15 @@ export const getMeApi = async () => {
   return response;
 };
 
-// Placeholder — no backend endpoint yet
 export const updateProfileApi = async (formData) => {
   const response = await axiosInstance.patch("/auth/profile", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
+  return response;
+};
+
+// PUT /api/auth/set-org
+export const setOrgNameApi = async (orgName) => {
+  const response = await axiosInstance.put("/auth/set-org", { orgName });
   return response;
 };

@@ -36,8 +36,17 @@ const userSchema = new mongoose.Schema(
     },
     passwordHash: {
       type: String,
-      required: true,
+      required: false, // Not required for Google OAuth
       select: false,
+    },
+    authProvider: {
+      type: String,
+      enum: ['local', 'google'],
+      default: 'local'
+    },
+    googleId: {
+      type: String,
+      default: null
     },
     role: {
       type: String,
@@ -48,6 +57,9 @@ const userSchema = new mongoose.Schema(
     isEmailVerified: { type: Boolean, default: false },
     emailVerificationToken: { type: String, default: null, select: false },
     emailVerificationExpiry: { type: Date, default: null },
+
+    // ── Onboarding ───────────────────────────────────────────────────────────
+    hasSetOrgName: { type: Boolean, default: true },
 
     // ── Auth ─────────────────────────────────────────────────────────────────
     // Stored as SHA-256 hash — raw token lives in httpOnly cookie only

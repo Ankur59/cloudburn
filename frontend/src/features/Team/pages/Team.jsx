@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setTeams, addPendingInvite, removeMember } from '../team.slice';
 import Sidebar from '../../shared/Sidebar';
 import Header from '../../dashboard/components/Header';
 import TeamList from '../components/TeamList';
@@ -67,11 +69,19 @@ const MOCK_TEAMS = [
 
 // ─── Team Page ────────────────────────────────────────────────────────────────
 export default function Team() {
+  const dispatch = useDispatch();
+  const { teams } = useSelector((state) => state.team);
+
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [currentOrg, setCurrentOrg]   = useState('Acme Corporation');
-  const [teams, setTeams]             = useState(MOCK_TEAMS);
   const [selectedTeamId, setSelectedTeamId] = useState(MOCK_TEAMS[0].id);
   const [showInviteModal, setShowInviteModal] = useState(false);
+
+  useEffect(() => {
+    if (teams.length === 0) {
+      dispatch(setTeams(MOCK_TEAMS));
+    }
+  }, [dispatch, teams.length]);
 
   const organizations = ['Acme Corporation', 'TechStart Inc.', 'Global Dynamics'];
 
@@ -89,31 +99,20 @@ export default function Team() {
 
   // Add a new pending invite to the selected team
   const handleSendInvite = ({ email, role }) => {
-    setTeams((prev) =>
-      prev.map((team) => {
-        if (team.id !== selectedTeamId) return team;
-        const newMember = {
-          id: `m-${Date.now()}`,
-          name: email,
-          role,
-          email,
-          joined: '',
-          status: 'pending',
-        };
-        return { ...team, members: [...team.members, newMember] };
-      })
-    );
+    const newMember = {
+      id: `m-${Date.now()}`,
+      name: email,
+      role,
+      email,
+      joined: '',
+      status: 'pending',
+    };
+    dispatch(addPendingInvite({ teamId: selectedTeamId, member: newMember }));
   };
 
   // Remove an active member from the selected team
   const handleRemoveMember = (memberId) => {
-    setTeams((prev) =>
-      prev.map((team) => {
-        if (team.id !== selectedTeamId) return team;
-        const updated = team.members.filter((m) => m.id !== memberId);
-        return { ...team, members: updated, memberCount: updated.filter((m) => m.status === 'active').length };
-      })
-    );
+    dispatch(removeMember({ teamId: selectedTeamId, memberId }));
   };
 
   // Placeholder — in a real app would open a create team form
