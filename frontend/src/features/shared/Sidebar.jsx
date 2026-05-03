@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 
 const navItems = [
   { icon: "dashboard", label: "Dashboard", href: "/dashboard" },
+  { icon: "teams", label: "Teams", href: "/teams" },
   { icon: "alerts", label: "Alerts", href: "/alerts" },
   { icon: "ai-insights", label: "AI Insights", href: "/ai-insights" },
   { icon: "ask-ai", label: "Ask AI", href: "/ask-ai" },
@@ -14,7 +15,6 @@ const navItems = [
     href: "/zombie-detector",
   },
   { icon: "cloud", label: "Cloud Accounts", href: "/cloud-accounts" },
-  { icon: "teams", label: "Teams", href: "/teams" },
   { icon: "budget", label: "Budget", href: "/budget" },
   { icon: "reports", label: "Reports", href: "/reports" },
   { icon: "admin", label: "Admin", href: "#" },
