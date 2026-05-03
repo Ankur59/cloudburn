@@ -188,5 +188,59 @@
 
 /* Table scroll on mobile */
 @media (max-width: 768px) {
-  .wrapper { overflow-x: auto; }
+  /* Hide standard table headers, convert to block layout */
+  .table { display: block; width: 100%; box-sizing: border-box; }
+  .tableHead { display: none; }
+  .tableBody { display: flex; flex-direction: column; width: 100%; overflow: hidden; }
+
+  /* Each row becomes a flex-grid card */
+  .tableBody tr {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "check  type   actions"
+      ".      id     id"
+      ".      cloud  status"
+      ".      idle   cost";
+    gap: 8px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-color);
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .tableBody tr:last-child { border-bottom: none; }
+
+  /* Reset td defaults to work inside grid */
+  .tableBody td {
+    display: flex;
+    align-items: center;
+    padding: 0;
+  }
+
+  /* 1. Checkbox */
+  .tableBody td:nth-child(1) { grid-area: check; }
+  .checkboxCell { width: auto; padding-left: 0 !important; align-self: flex-start; margin-top: 4px; }
+
+  /* 2. Type */
+  .tableBody td:nth-child(2) { grid-area: type; align-self: flex-start; }
+  
+  /* 3. Resource ID */
+  .tableBody td:nth-child(3) { grid-area: id; margin-top: 4px; word-break: break-all; }
+  
+  /* 4. Cloud badge */
+  .tableBody td:nth-child(4) { grid-area: cloud; }
+
+  /* 5. Idle duration */
+  .tableBody td:nth-child(5) { grid-area: idle; }
+
+  /* 6. Cost */
+  .tableBody td:nth-child(6) { grid-area: cost; justify-content: flex-end; }
+
+  /* 7. Status badge */
+  .tableBody td:nth-child(7) { grid-area: status; justify-content: flex-end; }
+
+  /* 8. Actions */
+  .tableBody td:nth-child(8) { grid-area: actions; justify-content: flex-end; align-self: flex-start; }
+  .actions { opacity: 1; flex-direction: column; gap: 4px; }
+  .actionBtn { width: 100%; justify-content: center; min-height: 32px; }
 }

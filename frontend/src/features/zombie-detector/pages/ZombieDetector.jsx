@@ -93,6 +93,7 @@ export default function ZombieDetector() {
   const { resources, lastScan, loading } = useSelector((state) => state.zombieDetector);
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [currentOrg, setCurrentOrg]             = useState('Acme Corporation');
   const [activeTab, setActiveTab]               = useState('Active Zombies');
   const [filters, setFilters]                   = useState(DEFAULT_FILTERS);

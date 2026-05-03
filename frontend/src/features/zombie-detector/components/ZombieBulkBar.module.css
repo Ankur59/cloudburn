@@ -73,3 +73,10 @@
   background-color: rgba(201,136,42,0.15);
   border-color: rgba(201,136,42,0.5);
 }
+
+@media (max-width: 768px) {
+  .bar { flex-direction: column; align-items: stretch; gap: 12px; }
+  .info { text-align: center; }
+  .btnGroup { flex-direction: column; width: 100%; }
+  .btn { width: 100%; justify-content: center; min-height: 40px; }
+}
