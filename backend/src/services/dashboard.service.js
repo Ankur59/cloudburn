@@ -353,3 +353,142 @@ export const buildReportsData = async (orgId, page = 1, limit = 50, startDate = 
   };
 };
 
+import BillingSnapshot from "../models/billingSnapshot.model.js";
+
+// ── buildHistoricalData ───────────────────────────────────────────────────────
+export const buildHistoricalData = async (orgId, year, month) => {
+  console.log(`[buildHistoricalData] Incoming params -> year: "${year}", month: "${month}"`);
+  
+  let snapshot = await BillingSnapshot.findOne({ orgId });
+  
+  if (!snapshot) {
+    throw new Error("No billing data found. Please connect AWS and fetch billing data first.");
+  }
+
+  let parsedMonth = null;
+  if (month && String(month).trim() !== "" && String(month) !== "undefined" && String(month) !== "null" && String(month).toLowerCase() !== "all time") {
+    if (isNaN(month)) {
+      const monthNames = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+      const monthNamesShort = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+      const monthLower = month.toString().trim().toLowerCase();
+      
+      let monthIndex = monthNames.indexOf(monthLower);
+      if (monthIndex === -1) {
+        monthIndex = monthNamesShort.indexOf(monthLower);
+      }
+      
+      if (monthIndex !== -1) {
+        parsedMonth = String(monthIndex + 1).padStart(2, '0');
+      }
+    } else {
+      const m = parseInt(month, 10);
+      if (m >= 1 && m <= 12) {
+        parsedMonth = String(m).padStart(2, '0');
+      }
+    }
+  }
+
+  let parsedYear = year ? String(year).trim() : null;
+  // Ignore invalid years like "undefined" or "All Time"
+  if (parsedYear && (parsedYear === "undefined" || parsedYear === "null" || parsedYear === "" || parsedYear.toLowerCase() === "all time")) {
+    parsedYear = null;
+  }
+  // If only month is given, default to current year
+  if (parsedMonth && !parsedYear) {
+    parsedYear = new Date().getFullYear().toString();
+  }
+
+  const isSpecificMonth = parsedYear && parsedMonth;
+  const prefix = isSpecificMonth ? `${parsedYear}-${parsedMonth}` : (parsedYear ? `${parsedYear}` : null);
+  
+  console.log(`[buildHistoricalData] Parsed -> parsedYear: ${parsedYear}, parsedMonth: ${parsedMonth}, prefix: ${prefix}`);
+  
+  let trend = [];
+  let byServiceMap = {};
+  
+  // Extra details for the frontend
+  let detailedMonthly = [];
+
+  if (isSpecificMonth) {
+    // Return daily trend for that specific month
+    const days = snapshot.dailyTrend90 || [];
+    trend = days.filter(d => d.date.startsWith(prefix)).map(d => ({
+      date: d.date,
+      cost: d.cost || 0,
+      netCost: d.cost || 0,
+      credits: 0
+    }));
+
+    // Service breakdown for that specific month
+    const monthlySvc = snapshot.monthlyByService || [];
+    monthlySvc.filter(s => s.month === prefix).forEach(s => {
+      byServiceMap[s.service] = (byServiceMap[s.service] || 0) + (s.cost || 0);
+    });
+
+    // Provide the year's context as detail
+    detailedMonthly = (snapshot.monthlyTrend || []).filter(m => m.month.startsWith(parsedYear));
+
+  } else if (parsedYear) {
+    // Return monthly trend for that year
+    const months = snapshot.monthlyTrend || [];
+    trend = months.filter(m => m.month.startsWith(prefix)).map(m => ({
+      date: m.month,
+      cost: m.cost || 0,
+      netCost: m.cost || 0,
+      credits: 0
+    }));
+
+    detailedMonthly = trend;
+
+    // Service breakdown for that year
+    const monthlySvc = snapshot.monthlyByService || [];
+    monthlySvc.filter(s => s.month.startsWith(prefix)).forEach(s => {
+      byServiceMap[s.service] = (byServiceMap[s.service] || 0) + (s.cost || 0);
+    });
+  } else {
+    // Return all-time monthly trend
+    const months = snapshot.monthlyTrend || [];
+    trend = months.map(m => ({
+      date: m.month,
+      cost: m.cost || 0,
+      netCost: m.cost || 0,
+      credits: 0
+    }));
+
+    detailedMonthly = trend;
+
+    // Service breakdown all-time
+    const monthlySvc = snapshot.monthlyByService || [];
+    monthlySvc.forEach(s => {
+      byServiceMap[s.service] = (byServiceMap[s.service] || 0) + (s.cost || 0);
+    });
+  }
+
+  const byService = Object.entries(byServiceMap)
+    .map(([service, cost]) => ({ service, cost: +cost.toFixed(4), netCost: +cost.toFixed(4), credits: 0 }))
+    .sort((a, b) => b.cost - a.cost);
+
+  const totalCost = trend.reduce((acc, curr) => acc + curr.cost, 0);
+
+  return {
+    period: prefix || "All Time",
+    summary: {
+      totalCost: +totalCost.toFixed(4),
+      totalNetCost: +totalCost.toFixed(4),
+      totalCredits: 0,
+    },
+    trend: trend.map(t => ({...t, cost: +t.cost.toFixed(4), netCost: +t.netCost.toFixed(4)})),
+    byService,
+    // Add extra rich details so frontend can show a richer UI
+    details: {
+      monthlyOverview: detailedMonthly.map(m => ({
+        month: m.date || m.month,
+        cost: +(m.cost || 0).toFixed(4)
+      })),
+      recentDailyTrend: snapshot.dailyTrend90 ? snapshot.dailyTrend90.slice(-14) : [], // Last 14 days
+      topServiceOverall: snapshot.topService,
+      topServiceCostOverall: snapshot.topServiceCost
+    }
+  };
+};
+

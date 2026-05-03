@@ -59,3 +59,15 @@ export const getReportsData = asyncHandler(async (req, res) => {
     pagination: result.pagination,
   });
 });
+
+// ── GET /api/dashboard/historical ────────────────────────────────────────────
+// Fetches historical data grouped by month or year based on query parameters
+export const getHistoricalData = asyncHandler(async (req, res) => {
+  const { year, month } = req.query;
+  
+  // Need to import buildHistoricalData from dashboard.service.js
+  const { buildHistoricalData } = await import("../services/dashboard.service.js");
+  const historicalData = await buildHistoricalData(req.user.orgId, year, month);
+
+  return sendSuccess(res, 200, "Historical data fetched successfully", historicalData);
+});
