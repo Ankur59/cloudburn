@@ -259,3 +259,17 @@
   font-size: 11px;
   color: var(--text-secondary);
 }
+
+@media (max-width: 640px) {
+  .teamRow {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+  .teamLeft, .teamRight {
+    width: 100%;
+  }
+  .teamRight {
+    justify-content: space-between;
+    margin-top: 4px;
+  }
+}

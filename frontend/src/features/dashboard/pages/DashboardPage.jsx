@@ -15,6 +15,7 @@ import styles from './Dashboard.module.css'
 
 export default function Dashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const { data, loading, error, fetchDashboard } = useDashboard()
 
   useEffect(() => {
@@ -26,9 +27,11 @@ export default function Dashboard() {
       <Sidebar
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        mobileOpen={mobileSidebarOpen}
+        onMobileClose={() => setMobileSidebarOpen(false)}
       />
       <div className={`${styles.mainContent} ${sidebarCollapsed ? styles.expanded : ''}`}>
-        <Header />
+        <Header onMenuToggle={() => setMobileSidebarOpen(true)} />
         <div className={styles.content}>
           <div className={styles.pageHeader}>
             <h1>Dashboard</h1>
@@ -53,7 +56,7 @@ export default function Dashboard() {
           {/* KPI Cards */}
           {loading && !data ? (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
-              {[0,1,2,3].map(i => <StatCardSkeleton key={i} />)}
+              {[0, 1, 2, 3].map(i => <StatCardSkeleton key={i} />)}
             </div>
           ) : (
             <KPICards kpis={data?.kpis ?? []} />

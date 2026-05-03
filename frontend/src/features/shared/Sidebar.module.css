@@ -1,64 +1,121 @@
+/* ================================================================
+   Sidebar.module.css — Fully responsive sidebar
+   Desktop >1024px : 256px expanded / 80px collapsed
+   Tablet  ≤1024px : 80px icon-only (CSS-forced)
+   Mobile  ≤640px  : off-screen drawer, full-screen on open
+   ================================================================ */
+
+/* ── Base Sidebar ─────────────────────── */
 .sidebar {
   position: fixed;
-  left: 0;
   top: 0;
+  left: 0;
   bottom: 0;
   width: 256px;
   background-color: var(--card-bg);
   border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  padding: 16px;
-  transition: width 0.3s ease;
-  z-index: 100;
+  padding: 16px 12px;
+  transition: width 0.3s ease, transform 0.3s ease;
+  z-index: 200;
+  overflow: hidden;
 }
 
 .sidebar.collapsed {
   width: 80px;
 }
 
+/* ── Logo ────────────────────────────── */
 .logo {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
-  padding: 8px;
-  margin-bottom: 24px;
+  padding: 8px 4px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .logoIcon {
   width: 32px;
   height: 32px;
+  min-width: 32px;
   background-color: var(--elevated-bg);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text-primary);
+  flex-shrink: 0;
 }
 
 .logoText {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  flex: 1;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
+}
+
+.sidebar.collapsed .logoText {
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+}
+
+.mobileCloseBtn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.mobileCloseBtn:hover {
+  background-color: var(--elevated-bg);
   color: var(--text-primary);
 }
 
+/* ── Navigation ───────────────────────── */
 .nav {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+  padding-right: 2px;
 }
+
+.nav::-webkit-scrollbar { width: 4px; }
+.nav::-webkit-scrollbar-track { background: transparent; }
+.nav::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
 
 .navItem {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px;
-  border-radius: 4px;
+  padding: 11px 12px;
+  border-radius: 8px;
   color: var(--text-secondary);
   text-decoration: none;
   font-size: 14px;
-  transition: all 0.2s ease;
+  font-weight: 450;
+  font-family: var(--font-sans);
+  white-space: nowrap;
+  overflow: hidden;
+  transition: background-color 0.18s ease, color 0.18s ease;
+  min-height: 44px;
 }
 
 .navItem:hover {
@@ -69,58 +126,87 @@
 .navItem.active {
   background-color: var(--elevated-bg);
   color: var(--text-primary);
-  box-shadow: inset 3px 0 0 #ffffff;
+  box-shadow: inset 3px 0 0 0 #ffffff;
+  font-weight: 500;
 }
 
-.navItem svg {
-  flex-shrink: 0;
-}
+.navItem svg { flex-shrink: 0; opacity: 0.7; transition: opacity 0.18s ease; }
+.navItem:hover svg, .navItem.active svg { opacity: 1; }
+.navItem span { overflow: hidden; text-overflow: ellipsis; }
 
+.sidebar.collapsed .navItem span { opacity: 0; width: 0; pointer-events: none; }
+.sidebar.collapsed .navItem { justify-content: center; padding: 11px; gap: 0; }
+.sidebar.collapsed .navItem.active { box-shadow: inset 3px 0 0 0 #ffffff; }
+
+/* ── Footer ───────────────────────────── */
 .footer {
   margin-top: auto;
-  padding-top: 16px;
+  padding-top: 12px;
   border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
+/* ── Collapse Button ──────────────────── */
 .collapseBtn {
   display: flex;
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 12px;
+  padding: 10px 12px;
   border-radius: 8px;
   background: none;
   border: none;
   color: var(--text-secondary);
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.18s ease, color 0.18s ease;
   font-family: var(--font-sans);
+  white-space: nowrap;
+  overflow: hidden;
+  min-height: 44px;
 }
 
-.collapseBtn:hover {
-  background-color: var(--elevated-bg);
-  color: var(--text-primary);
+.collapseBtn:hover { background-color: var(--elevated-bg); color: var(--text-primary); }
+.sidebar.collapsed .collapseBtn { justify-content: center; padding: 10px; gap: 0; }
+.sidebar.collapsed .collapseBtn span { display: none; }
+
+/* ── Profile Section ──────────────────── */
+.profileWrapper {
+  position: relative;
 }
 
+/* The avatar row — styled as a button */
 .userInfo {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 8px;
-  margin-top: 8px;
+  gap: 10px;
+  padding: 10px 8px;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: background-color 0.18s ease;
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
 }
 
+.userInfo:hover { background-color: var(--elevated-bg); }
+.sidebar.collapsed .userInfo { justify-content: center; padding: 10px 0; }
+
 .avatar {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
   border-radius: 50%;
-  background-color: var(--info);
+  background-color: var(--info, #3b82f6);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 600;
   color: white;
   flex-shrink: 0;
 }
@@ -130,36 +216,205 @@
   flex-direction: column;
   flex: 1;
   min-width: 0;
+  overflow: hidden;
 }
 
+.sidebar.collapsed .userDetails { display: none; }
+
 .userName {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-family: var(--font-sans);
 }
 
 .userEmail {
-  font-size: 12px;
-  color: var(--info);
+  font-size: 11px;
+  color: var(--info, #3b82f6);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-family: var(--font-sans);
 }
 
-.logoutBtn {
-  background: none;
-  border: none;
+/* Chevron indicator */
+.profileChevron {
+  flex-shrink: 0;
   color: var(--text-secondary);
-  cursor: pointer;
-  padding: 4px;
+  transition: transform 0.2s ease;
+}
+
+.profileChevronOpen {
+  transform: rotate(180deg);
+}
+
+/* ── Profile Dropup Menu ──────────────── */
+.profileDropup {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 8px;
+  right: 8px;
+  background-color: var(--elevated-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0,0,0,0.3);
+  z-index: 300;
+  overflow: hidden;
+  animation: dropupIn 0.15s ease;
+}
+
+@keyframes dropupIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.profileDropupHeader {
+  padding: 14px 16px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.profileDropupName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+}
+
+.profileDropupEmail {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  word-break: break-all;
+}
+
+.profileDropupDivider {
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 2px 0;
+}
+
+.profileDropupItem {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-sans);
+  transition: background-color 0.15s ease;
+  min-height: 40px;
 }
 
-.logoutBtn:hover {
-  color: var(--text-primary);
+.profileDropupItem:hover { background-color: var(--border-color); }
+
+.profileDropupLogout { color: var(--danger); }
+.profileDropupLogout:hover { background-color: rgba(201, 78, 78, 0.1); }
+
+/* ── Overlay ──────────────────────────── */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 199;
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ================================================================
+   RESPONSIVE BREAKPOINTS
+   ================================================================ */
+
+/* ── Tablet (≤ 1024px) ──────────────── */
+@media (max-width: 1024px) {
+  .sidebar,
+  .sidebar.collapsed {
+    width: 80px;
+    padding: 16px 8px;
+  }
+
+  .logoText { display: none; }
+  .navItem span { display: none; }
+  .navItem { justify-content: center; padding: 11px; gap: 0; }
+  .collapseBtn { display: none; }
+  .userDetails { display: none; }
+  .profileChevron { display: none; }
+  .userInfo { justify-content: center; padding: 10px 0; }
+
+  /* On tablet, dropup should cover full sidebar width */
+  .profileDropup {
+    left: 4px;
+    right: 4px;
+  }
+}
+
+/* ── Mobile (≤ 640px) ─────────────────── */
+@media (max-width: 640px) {
+  .overlay { display: block; }
+
+  .sidebar,
+  .sidebar.collapsed {
+    transform: translateX(-100%);
+    width: 100vw;
+    padding: 24px;
+  }
+
+  .sidebar.mobileOpen {
+    transform: translateX(0);
+    box-shadow: 4px 0 40px rgba(0, 0, 0, 0.6);
+  }
+
+  .mobileCloseBtn { display: flex; }
+
+  /* Show all text on full-screen mobile menu */
+  .logoText,
+  .navItem span,
+  .profileChevron { display: block; }
+
+  .userDetails { display: flex; }
+
+  .navItem {
+    justify-content: flex-start;
+    padding: 14px 16px;
+    gap: 16px;
+    font-size: 16px;
+    min-height: 52px;
+  }
+
+  .navItem svg { width: 22px; height: 22px; }
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    font-size: 15px;
+  }
+
+  .userInfo { padding: 12px 8px; }
+  .userName { font-size: 14px; }
+  .userEmail { font-size: 12px; }
+
+  /* Dropup on mobile: appear above footer with more space */
+  .profileDropup {
+    left: 0;
+    right: 0;
+    bottom: calc(100% + 8px);
+  }
 }

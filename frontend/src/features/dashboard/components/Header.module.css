@@ -1,16 +1,28 @@
+/* ================================================================
+   Header.module.css — Sticky, glassmorphism, responsive
+   ================================================================ */
+
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 32px;
-  background-color: var(--card-bg);
+  padding: 12px 28px;
+  background-color: rgba(14, 14, 18, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  gap: 8px;
 }
 
+/* ── Left Section ──────────────────────── */
 .leftSection {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  min-width: 0;
 }
 
 .orgSelector {
@@ -21,7 +33,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
+  padding: 7px 10px;
   background: none;
   border: none;
   color: var(--text-primary);
@@ -30,6 +42,7 @@
   cursor: pointer;
   border-radius: 6px;
   font-family: var(--font-sans);
+  white-space: nowrap;
 }
 
 .orgButton:hover {
@@ -37,18 +50,21 @@
 }
 
 .badge {
-  padding: 4px 12px;
+  padding: 3px 10px;
   background-color: var(--info);
   color: white;
   font-size: 12px;
   font-weight: 500;
   border-radius: 4px;
+  white-space: nowrap;
 }
 
+/* ── Right Section ──────────────────────── */
 .rightSection {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
+  flex-shrink: 0;
 }
 
 .notifWrapper,
@@ -58,8 +74,8 @@
 
 .iconButton {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -68,6 +84,7 @@
   color: var(--text-secondary);
   cursor: pointer;
   border-radius: 8px;
+  transition: background-color 0.18s, color 0.18s;
 }
 
 .iconButton:hover {
@@ -79,13 +96,13 @@
   position: absolute;
   top: 4px;
   right: 4px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
   background-color: var(--danger);
   color: white;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 700;
   border-radius: 9px;
   display: flex;
   align-items: center;
@@ -95,13 +112,14 @@
 .userButton {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
+  gap: 6px;
+  padding: 5px 8px;
   background: none;
   border: none;
   color: var(--text-secondary);
   cursor: pointer;
   border-radius: 8px;
+  transition: background-color 0.18s;
 }
 
 .userButton:hover {
@@ -109,37 +127,45 @@
 }
 
 .userAvatar {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background-color: var(--info);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 600;
   color: white;
+  flex-shrink: 0;
 }
 
+/* ── Dropdowns ───────────────────────── */
 .dropdown {
   position: absolute;
   top: calc(100% + 8px);
   background-color: var(--elevated-bg);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 10px;
   min-width: 200px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   z-index: 1000;
   overflow: hidden;
+  animation: dropdownIn 0.14s ease;
+}
+
+@keyframes dropdownIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .dropdownHeader {
   padding: 12px 16px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-tertiary);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.06em;
 }
 
 .dropdownItem {
@@ -155,40 +181,33 @@
   cursor: pointer;
   text-align: left;
   font-family: var(--font-sans);
+  transition: background-color 0.15s;
+  min-height: 40px;
 }
 
-.dropdownItem:hover {
-  background-color: var(--border-color);
-}
-
-.dropdownItem.active {
-  background-color: var(--border-color);
-}
-
-.dropdownItem.logout {
-  color: var(--danger);
-}
+.dropdownItem:hover { background-color: var(--border-color); }
+.dropdownItem.active { background-color: var(--border-color); }
+.dropdownItem.logout { color: var(--danger); }
 
 .dropdownDivider {
   height: 1px;
   background-color: var(--border-color);
-  margin: 4px 0;
+  margin: 2px 0;
 }
 
 .notifDropdown {
   right: 0;
-  width: 320px;
+  width: 310px;
 }
 
 .notifItem {
   display: flex;
   gap: 12px;
   padding: 12px 16px;
+  transition: background-color 0.15s;
 }
 
-.notifItem:hover {
-  background-color: var(--border-color);
-}
+.notifItem:hover { background-color: var(--border-color); }
 
 .notifDot {
   width: 8px;
@@ -198,26 +217,19 @@
   flex-shrink: 0;
 }
 
-.notifDot.critical {
-  background-color: var(--danger);
-}
-
-.notifDot.warning {
-  background-color: var(--warning);
-}
-
-.notifDot.info {
-  background-color: var(--info);
-}
+.notifDot.critical { background-color: var(--danger); }
+.notifDot.warning  { background-color: var(--warning); }
+.notifDot.info     { background-color: var(--info); }
 
 .notifContent {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
 }
 
 .notifTitle {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--text-primary);
 }
@@ -238,9 +250,7 @@
   border-top: 1px solid var(--border-color);
 }
 
-.viewAllLink:hover {
-  background-color: var(--border-color);
-}
+.viewAllLink:hover { background-color: var(--border-color); }
 
 .userDropdown {
   right: 0;
@@ -248,13 +258,13 @@
 }
 
 .userInfo {
-  padding: 12px 16px;
+  padding: 14px 16px 10px;
 }
 
 .userName {
   display: block;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-primary);
 }
 
@@ -263,4 +273,78 @@
   font-size: 12px;
   color: var(--text-secondary);
   margin-top: 2px;
+  word-break: break-all;
+}
+
+/* ── Hamburger Button ─────────────────── */
+.hamburgerBtn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background-color 0.18s, color 0.18s;
+  /* Pull it flush to the left edge on mobile */
+  margin-left: -4px;
+}
+
+.hamburgerBtn:hover {
+  background-color: var(--elevated-bg);
+  color: var(--text-primary);
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+
+/* Tablet: show hamburger */
+@media (max-width: 1024px) {
+  .hamburgerBtn {
+    display: flex;
+  }
+}
+
+/* Mobile: compact header, hide heavy left section items */
+@media (max-width: 640px) {
+  .header {
+    padding: 8px 12px;
+  }
+
+  /* Hide org text on mobile, leave only icon+chevron */
+  .orgButton span {
+    display: none;
+  }
+
+  /* Hide chevron from orgButton on mobile */
+  .orgButton svg:last-child {
+    display: none;
+  }
+
+  /* Hide role badge on mobile — it's in the sidebar */
+  .badge {
+    display: none;
+  }
+
+  /* Tighter icon buttons on mobile */
+  .iconButton {
+    width: 34px;
+    height: 34px;
+  }
+
+  .userButton {
+    padding: 4px 6px;
+  }
+
+  /* Notification dropdown full-width on very small screens */
+  .notifDropdown {
+    width: calc(100vw - 24px);
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
 }
