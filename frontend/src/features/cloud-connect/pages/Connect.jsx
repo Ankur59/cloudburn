@@ -19,6 +19,7 @@ const Connect = () => {
     secretKey: "",
   });
   const [validationStatus, setValidationStatus] = useState("idle"); // idle, loading, success, error
+  const [showComingSoon, setShowComingSoon] = useState(false);
 
   // Trigger validation when reaching step 3
   useEffect(() => {
@@ -62,6 +63,10 @@ const Connect = () => {
   }, [step, credentials, handleConnectAws]);
 
   const handleNext = () => {
+    if (step === 1 && provider !== "aws") {
+      setShowComingSoon(true);
+      return;
+    }
     if (step < 3) setStep(step + 1);
   };
 
@@ -175,6 +180,28 @@ const Connect = () => {
           )}
         </div>
       </div>
+
+      {/* Coming Soon Popup */}
+      {showComingSoon && (
+        <div className={styles.popupOverlay} onClick={() => setShowComingSoon(false)}>
+          <div className={styles.popupContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.popupIcon}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </div>
+            <h3 className={styles.popupTitle}>Coming Soon</h3>
+            <p className={styles.popupText}>
+              Support for {provider === "gcp" ? "Google Cloud Platform" : "Microsoft Azure"} is currently under active development. Stay tuned for updates!
+            </p>
+            <button className={styles.popupBtn} onClick={() => setShowComingSoon(false)}>
+              Understood
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
