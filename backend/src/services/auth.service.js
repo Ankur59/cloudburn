@@ -145,6 +145,24 @@ export const loginUser = async ({ email, password }, res) => {
   return { user, accessToken };
 };
 
+// ── Google Login ─────────────────────────────────────────────────────────────
+
+export const handleGoogleLogin = async (user, res) => {
+  const accessToken = generateAccessToken({
+    id: user._id,
+    role: user.role,
+    orgId: user.orgId,
+  });
+  const rawRefresh = generateRefreshToken(user._id);
+
+  user.refreshToken = hashToken(rawRefresh);
+  await user.save({ validateBeforeSave: false });
+
+  setRefreshCookie(res, rawRefresh);
+
+  return { user, accessToken };
+};
+
 // ── Refresh Access Token ──────────────────────────────────────────────────────
 
 export const refreshAccessToken = async (rawRefreshToken, res) => {

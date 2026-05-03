@@ -30,4 +30,8 @@ export const config = {
 
   // AI — Groq (LLaMA3)
   GROQ_API_KEY: process.env.GROQ_API_KEY,
+
+  // Google OAuth
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
 };
