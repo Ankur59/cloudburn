@@ -1,5 +1,8 @@
 import express from "express";
 import morgan from "morgan";
+import passport from "passport";
+
+import "./config/passport.js"; // Initialize passport config
 
 import authRoutes       from "./routes/auth.routes.js";
 import teamRoutes       from "./routes/team.routes.js";
@@ -17,6 +20,7 @@ const app = express();
 
 applyMiddlewares(app, config);
 app.use(morgan("dev"));
+app.use(passport.initialize());
 
 // ── Routes ────────────────────────────────────────────────────────────────────
 app.use("/api/auth",        authRoutes);

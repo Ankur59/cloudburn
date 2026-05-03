@@ -12,10 +12,22 @@ export const getDashboardData = asyncHandler(async (req, res) => {
   const snapshot = await BillingSnapshot.findOne({ orgId: req.user.orgId });
 
   if (!snapshot) {
-    throw new AppError(
-      "No billing data found. Please connect AWS and fetch billing data first.",
-      404
-    );
+    // Instead of throwing 404, we return empty data with an isSyncing flag.
+    // This allows the frontend to show a loading/syncing screen gracefully 
+    // while the initial AWS data is being pulled in the background.
+    return sendSuccess(res, 200, "Billing data is currently syncing", {
+      isSyncing: true,
+      summary: { grossCost: 0, totalCost: 0, savings: 0, totalCredit: 0, topService: { name: "", cost: 0 } },
+      monthComparison: {},
+      serviceBreakdown: [],
+      dailyBreakdown: [],
+      dailyTrend90: [],
+      byTeam: [],
+      byRegion: [],
+      monthlyTrend: [],
+      byOperation: [],
+      byRecordType: [],
+    });
   }
 
   // Rebuild dashboard from raw snapshot fields every time — this ensures new
@@ -40,7 +52,7 @@ export const getDashboardData = asyncHandler(async (req, res) => {
     byRecordType: snapshot.byRecordType,
   });
 
-  return sendSuccess(res, 200, "Dashboard data fetched successfully", dashboardData);
+  return sendSuccess(res, 200, "Dashboard data fetched successfully", { ...dashboardData, isSyncing: false });
 });
 
 // ── GET /api/dashboard/reports ───────────────────────────────────────────────

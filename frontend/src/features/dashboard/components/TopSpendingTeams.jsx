@@ -18,6 +18,9 @@ const instanceStateColor = (state) => {
 export default function TopSpendingTeams({ teams = [] }) {
   const [expanded, setExpanded] = useState(null)
 
+  console.log(teams);
+  
+
   return (
     <div className={styles.teamsCard}>
       <h3 className={styles.title}>Team Breakdown</h3>
@@ -101,7 +104,11 @@ export default function TopSpendingTeams({ teams = [] }) {
                               />
                               <div className={styles.instanceInfo}>
                                 <span className={styles.instanceName}>
-                                  {inst.instanceName || inst.instanceType}
+                                  {inst.instanceName
+                                    ? inst.resourceId 
+                                      ? `${inst.instanceName} (${inst.resourceId})`
+                                      : inst.instanceName
+                                    : inst.resourceId || inst.instanceType}
                                 </span>
                                 <span className={styles.instanceMeta}>
                                   {inst.instanceType} · {inst.az !== 'unknown' ? inst.az : 'AZ unknown'}

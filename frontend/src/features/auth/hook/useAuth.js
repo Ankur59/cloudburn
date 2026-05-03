@@ -7,6 +7,7 @@ import {
   getMeApi,
   updateProfileApi,
   verifyEmailApi,
+  setOrgNameApi,
 } from "../service/auth.api";
 import {
   setUser,
@@ -16,6 +17,7 @@ import {
   setAuthChecked,
   clearAuth,
 } from "../auth.slice";
+import axiosInstance from "../../../utils/axios";
 
 const useAuth = () => {
   const dispatch = useDispatch();
@@ -135,6 +137,58 @@ const useAuth = () => {
     [dispatch],
   );
 
+  const handleSetOrgName = useCallback(
+    async (orgName) => {
+      try {
+        dispatch(setLoading(true));
+        dispatch(setError(null));
+        await setOrgNameApi(orgName);
+        await handleGetme(); // refresh user profile to get hasSetOrgName = true
+        return { success: true };
+      } catch (error) {
+        const message = error?.response?.data?.message || "Failed to set organization name";
+        dispatch(setError(message));
+        return { success: false, message };
+      } finally {
+        dispatch(setLoading(false));
+      }
+    },
+    [dispatch, handleGetme]
+  );
+
+  const handleGoogleLoginRedirect = useCallback(() => {
+    // Use VITE_API_URL if it exists, otherwise assume running on same domain or default to localhost:5000
+    const apiUrl = axiosInstance.defaults.baseURL;
+    window.location.href = `${apiUrl}/auth/google`;
+  }, []);
+
+  const handleGoogleCallback = useCallback(
+    async (accessToken) => {
+      try {
+        dispatch(setLoading(true));
+        dispatch(setError(null));
+
+        // 1. Set the token in Redux
+        dispatch(setToken(accessToken));
+
+        // 2. Fetch the user profile using the new token
+        const response = await getMeApi();
+        const user = response.data?.data?.user ?? response.data?.data ?? null;
+        dispatch(setUser(user));
+
+        return { success: true };
+      } catch (error) {
+        dispatch(setUser(null));
+        dispatch(setError("Google authentication failed during profile fetch"));
+        return { success: false, message: "Profile fetch failed" };
+      } finally {
+        dispatch(setAuthChecked(true));
+        dispatch(setLoading(false));
+      }
+    },
+    [dispatch],
+  );
+
   return {
     handleRegister,
     handleLogin,
@@ -142,6 +196,9 @@ const useAuth = () => {
     handleGetme,
     handleLogout,
     handleUpdateProfile,
+    handleGoogleLoginRedirect,
+    handleGoogleCallback,
+    handleSetOrgName,
   };
 };
 

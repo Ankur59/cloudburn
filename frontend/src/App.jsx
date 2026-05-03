@@ -3,7 +3,6 @@ import AppLayout from './app/Layout';
 import Loader from "./features/shared/Loader";
 import SkeletonLoader from './features/shared/SkeletonLoader';
 
-
 const App = () => {
   return (
     <AppLayout>
