@@ -1,4 +1,6 @@
 import { Routes, Route } from "react-router-dom";
+
+// Pages
 import Login from "../features/auth/pages/Login.jsx";
 import Register from "../features/auth/pages/Register.jsx";
 import VerifyEmail from "../features/auth/pages/VerifyEmail.jsx";
@@ -13,44 +15,57 @@ import AiInsights from "../features/ai-insights/pages/Aiinsights.jsx";
 import ZombieDetector from "../features/zombie-detector/pages/ZombieDetector.jsx";
 import CloudAccounts from "../features/cloud-accounts/pages/CloudAccounts.jsx";
 import AskAIPage from "../features/ask-ai/pages/AskAIPage.jsx";
+
+// Route Wrappers
 import ProtectedRoute from "../features/auth/components/Protected.jsx";
 import PublicRoute from "../features/auth/components/PublicRoute.jsx";
 
 const AppRouter = () => {
+
+  const publicRoutes = [
+    { path: "/login", element: <Login /> },
+    { path: "/signup", element: <Register /> },
+  ];
+
+  const protectedRoutes = [
+    { path: "/", element: <Dashboard /> },
+    { path: "/dashboard", element: <Dashboard /> },
+    { path: "/onboarding", element: <Onboarding /> },
+    { path: "/connect", element: <Connect /> },
+    { path: "/reports", element: <Reports /> },
+    { path: "/alerts", element: <Alerts /> },
+    { path: "/teams", element: <Team /> },
+    { path: "/budget", element: <Budget /> },
+    { path: "/ai-insights", element: <AiInsights /> },
+    { path: "/ask-ai", element: <AskAIPage /> },
+    { path: "/zombie-detector", element: <ZombieDetector /> },
+    { path: "/cloud-accounts", element: <CloudAccounts /> },
+  ];
+
   return (
     <Routes>
-      {/* Public Routes - Only accessible if NOT logged in */}
-      <Route
-        path="/login"
-        element={
-          <PublicRoute>
-            <Login />
-          </PublicRoute>
-        }
-      />
-      <Route
-        path="/signup"
-        element={
-          <PublicRoute>
-            <Register />
-          </PublicRoute>
-        }
-      />
+
+      {/* Public Routes */}
+      {publicRoutes.map(({ path, element }) => (
+        <Route
+          key={path}
+          path={path}
+          element={<PublicRoute>{element}</PublicRoute>}
+        />
+      ))}
+
+      {/* Special case (no wrapper) */}
       <Route path="/verify-email" element={<VerifyEmail />} />
 
       {/* Protected Routes */}
-      <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
-      <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-      <Route path="/connect" element={<ProtectedRoute><Connect /></ProtectedRoute>} />
-      <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
-      <Route path="/alerts" element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
-      <Route path="/teams" element={<ProtectedRoute><Team /></ProtectedRoute>} />
-      <Route path="/budget" element={<ProtectedRoute><Budget /></ProtectedRoute>} />
-      <Route path="/ai-insights" element={<ProtectedRoute><AiInsights /></ProtectedRoute>} />
-      <Route path="/ask-ai" element={<ProtectedRoute><AskAIPage /></ProtectedRoute>} />
-      <Route path="/zombie-detector" element={<ProtectedRoute><ZombieDetector /></ProtectedRoute>} />
-      <Route path="/cloud-accounts" element={<ProtectedRoute><CloudAccounts /></ProtectedRoute>} />
+      {protectedRoutes.map(({ path, element }) => (
+        <Route
+          key={path}
+          path={path}
+          element={<ProtectedRoute>{element}</ProtectedRoute>}
+        />
+      ))}
+
     </Routes>
   );
 };

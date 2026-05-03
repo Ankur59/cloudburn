@@ -1,85 +1,55 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
-import useAuth from "../hook/useAuth";
 import styles from "./VerifyEmailForm.module.css";
 
 const VerifyEmailForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { handleVerifyEmail } = useAuth();
-  const { loading, error } = useSelector((state) => state.auth);
-  const [success, setSuccess] = useState("");
 
   // email may be passed via router state from the register page
-  const emailHint = location.state?.email || "";
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    mode: "onTouched",
-    defaultValues: { token: "" },
-  });
-
-  const onSubmit = async ({ token }) => {
-    const result = await handleVerifyEmail(token.trim());
-    if (result.success) {
-      setSuccess("Email verified! Redirecting to login…");
-      setTimeout(() => navigate("/login"), 1500);
-    }
-  };
+  const emailHint = location.state?.email || "your email address";
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-      {emailHint && (
-        <p className={styles.hint}>
-          A verification token was sent to <strong>{emailHint}</strong>. Paste
-          it below.
-        </p>
-      )}
-
-      <div className={styles.formGroup}>
-        <label className={styles.label} htmlFor="token">
-          Verification Token
-        </label>
-        <input
-          id="token"
-          type="text"
-          autoComplete="one-time-code"
-          placeholder="Paste your token here"
-          className={`${styles.input} ${errors.token ? styles.error : ""}`}
-          {...register("token", { required: "Token is required." })}
-        />
-        {errors.token && (
-          <p className={styles.errorMessage}>{errors.token.message}</p>
-        )}
+    <div className={styles.form}>
+      <div style={{ display: "flex", justifyContent: "center", margin: "1rem 0" }}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="64"
+          height="64"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{ color: "var(--text-secondary)" }}
+        >
+          <path d="M21.2 8.4c.5.38.8.97.8 1.6v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V10a2 2 0 0 1 .8-1.6l8-6a2 2 0 0 1 2.4 0l8 6Z" />
+          <path d="m22 10-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 10" />
+        </svg>
       </div>
 
+      <h2 style={{ textAlign: "center", fontSize: "1.5rem", color: "var(--text-primary)", marginBottom: "0.25rem", fontWeight: "600" }}>
+        Check your email
+      </h2>
+      
+      <p className={styles.hint} style={{ marginBottom: "1.5rem" }}>
+        We have sent a verification link to <br />
+        <strong>{emailHint}</strong>.<br /><br />
+        Please check your inbox and click the link to verify your account and continue.
+      </p>
+
       <button
-        type="submit"
-        disabled={loading}
+        type="button"
+        onClick={() => navigate("/login")}
         className={styles.submitButton}
       >
-        {loading ? (
-          <span className={styles.spinnerContainer}>
-            <span className={styles.spinner} />
-            Verifying…
-          </span>
-        ) : (
-          "Verify Email"
-        )}
+        Return to Login
       </button>
 
-      {error && (
-        <p className={styles.errorMessage} style={{ textAlign: "center" }}>
-          {error}
-        </p>
-      )}
-      {success && <div className={styles.successMessage}>{success}</div>}
-    </form>
+      <p className={styles.hint} style={{ marginTop: "1rem", fontSize: "0.8rem", color: "var(--text-secondary)" }}>
+        Didn&apos;t receive the email? Please check your spam folder or try registering again.
+      </p>
+    </div>
   );
 };
 
