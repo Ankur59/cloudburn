@@ -1,10 +1,19 @@
 import axios from "axios";
 import { refreshApi } from "../features/auth/service/auth.api";
 
+const dev = true;
+let backendUrl = "";
 
+if (dev) {
+  backendUrl = "http://localhost:5000/api";
+  console.log("Running in development mode");
+} else {
+  backendUrl = "https://cloudburn.online/api";
+  console.log("Running in production mode");
+}
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5000/api",// IGONRE KARO FALTU LINK HE
+  baseURL: backendUrl,
   withCredentials: true, // keeps the httpOnly refreshToken cookie working
 });
 
@@ -18,7 +27,7 @@ axiosInstance.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 // ── Response interceptor ─────────────────────────────────────────────────────
@@ -52,7 +61,10 @@ axiosInstance.interceptors.response.use(
     // Don't refresh if the failing request IS the refresh endpoint
     if (originalRequest.url?.includes("/auth/refresh")) {
       localStorage.removeItem("accessToken");
-      if (!window.location.pathname.includes("/login") && !window.location.pathname.includes("/register")) {
+      if (
+        !window.location.pathname.includes("/login") &&
+        !window.location.pathname.includes("/register")
+      ) {
         window.location.href = "/login";
       }
       return Promise.reject(error);
@@ -79,7 +91,8 @@ axiosInstance.interceptors.response.use(
 
       if (newToken) {
         localStorage.setItem("accessToken", newToken);
-        axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+        axiosInstance.defaults.headers.common["Authorization"] =
+          `Bearer ${newToken}`;
         processQueue(null, newToken);
 
         originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
@@ -90,14 +103,17 @@ axiosInstance.interceptors.response.use(
     } catch (refreshError) {
       processQueue(refreshError, null);
       localStorage.removeItem("accessToken");
-      if (!window.location.pathname.includes("/login") && !window.location.pathname.includes("/register")) {
+      if (
+        !window.location.pathname.includes("/login") &&
+        !window.location.pathname.includes("/register")
+      ) {
         window.location.href = "/login";
       }
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;
     }
-  }
+  },
 );
 
 export default axiosInstance;
