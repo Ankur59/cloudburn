@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import Login from "../features/auth/pages/Login.jsx";
 import Register from "../features/auth/pages/Register.jsx";
 import VerifyEmail from "../features/auth/pages/VerifyEmail.jsx";
+import ForgotPassword from "../features/auth/pages/ForgotPassword.jsx";
 import Onboarding from "../features/auth/pages/Onboarding.jsx";
 import Dashboard from "../features/dashboard/pages/DashboardPage.jsx";
 import Connect from "../features/cloud-connect/pages/Connect.jsx";
@@ -22,6 +23,7 @@ const AppRouter = () => {
       {/* Public Routes - Only accessible if NOT logged in */}
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/signup" element={<PublicRoute><Register /></PublicRoute>} />
+      <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
       <Route path="/verify-email" element={<VerifyEmail />} />
 
       {/* Protected Routes */}
