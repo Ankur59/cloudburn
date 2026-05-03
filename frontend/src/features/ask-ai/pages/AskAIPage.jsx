@@ -140,6 +140,7 @@ function TypingIndicator() {
 export default function AskAIPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [mobileHistoryOpen, setMobileHistoryOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
@@ -195,20 +196,36 @@ export default function AskAIPage() {
 
         <div className={styles.chatLayout}>
           {/* ── History Panel ── */}
-          <ChatHistorySidebar
-            chats={chats}
-            activeChatId={activeChatId}
-            onSelect={selectChat}
-            onNew={startNewChat}
-            onDelete={deleteChat}
-            loading={loading}
-          />
+          <div className={`${styles.sidebarWrapper} ${mobileHistoryOpen ? styles.open : ''}`}>
+            <ChatHistorySidebar
+              chats={chats}
+              activeChatId={activeChatId}
+              onSelect={(id) => { selectChat(id); setMobileHistoryOpen(false); }}
+              onNew={() => { startNewChat(); setMobileHistoryOpen(false); }}
+              onDelete={deleteChat}
+              loading={loading}
+            />
+            {/* Overlay to close the history on mobile */}
+            {mobileHistoryOpen && (
+              <div className={styles.historyOverlay} onClick={() => setMobileHistoryOpen(false)} />
+            )}
+          </div>
 
           {/* ── Main Chat ── */}
           <div className={styles.chatArea}>
 
             {/* Header bar */}
             <div className={styles.chatHeader}>
+              <button 
+                className={styles.historyToggleBtn} 
+                onClick={() => setMobileHistoryOpen(!mobileHistoryOpen)}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+              </button>
               <div className={styles.chatHeaderIcon}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
                   <path d="M12 2v4M12 18v4M2 12h4M18 12h4M5.64 5.64l2.83 2.83M15.54 15.54l2.83 2.83M5.64 18.36l2.83-2.83M15.54 8.46l2.83-2.83" strokeLinecap="round" />

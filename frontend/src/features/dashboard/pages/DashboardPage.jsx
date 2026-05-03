@@ -40,22 +40,17 @@ export default function Dashboard() {
 
           {/* Error state */}
           {error && (
-            <div style={{
-              background: 'rgba(201,78,78,0.12)',
-              border: '1px solid var(--danger)',
-              borderRadius: '0.5rem',
-              padding: '1rem 1.25rem',
-              color: 'var(--danger)',
-              fontSize: '0.875rem',
-              marginBottom: '1.5rem',
-            }}>
+            <div className={styles.errorBanner}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: '8px', verticalAlign: 'middle'}}>
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
               {error}
             </div>
           )}
 
           {/* KPI Cards */}
           {loading && !data ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+            <div className={styles.kpiSkeletonGrid}>
               {[0, 1, 2, 3].map(i => <StatCardSkeleton key={i} />)}
             </div>
           ) : (
