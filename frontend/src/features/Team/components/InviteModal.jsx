@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import styles from './InviteModal.module.css';
+import { useState } from "react";
+import styles from "./InviteModal.module.css";
 
 /**
  * InviteModal
@@ -14,15 +14,15 @@ import styles from './InviteModal.module.css';
  *  - onSendInvite: ({ email, role }) => void
  */
 export default function InviteModal({ pendingInvites, onClose, onSendInvite }) {
-  const [email, setEmail] = useState('');
-  const [role, setRole] = useState('Developer');
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState("Developer");
 
   // Handle form submission
   const handleSend = () => {
     if (!email.trim()) return;
     onSendInvite({ email: email.trim(), role });
-    setEmail('');
-    setRole('Developer');
+    setEmail("");
+    setRole("Developer");
   };
 
   // Close modal when clicking the dark overlay (outside the box)
@@ -33,12 +33,22 @@ export default function InviteModal({ pendingInvites, onClose, onSendInvite }) {
   return (
     <div className={styles.overlay} onClick={handleOverlayClick}>
       <div className={styles.modal} id="invite-modal">
-
         {/* ── Modal Header ── */}
         <div className={styles.modalHeader}>
           <span className={styles.modalTitle}>Invite Team Member</span>
-          <button id="close-invite-modal" className={styles.closeBtn} onClick={onClose}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <button
+            id="close-invite-modal"
+            className={styles.closeBtn}
+            onClick={onClose}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
@@ -59,7 +69,7 @@ export default function InviteModal({ pendingInvites, onClose, onSendInvite }) {
               placeholder="colleague@company.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+              onKeyDown={(e) => e.key === "Enter" && handleSend()}
             />
           </div>
 
@@ -110,7 +120,6 @@ export default function InviteModal({ pendingInvites, onClose, onSendInvite }) {
             </div>
           )}
         </div>
-
       </div>
     </div>
   );
