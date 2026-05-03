@@ -2,12 +2,15 @@
   display: flex;
   min-height: 100vh;
   background-color: var(--page-base);
+  overflow-x: hidden;
 }
 
 .main {
   flex: 1;
   margin-left: 256px;
   transition: margin-left 0.3s ease;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 .main.expanded {
@@ -16,6 +19,9 @@
 
 .content {
   padding: 24px 32px 40px;
+  overflow-x: hidden;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .pageHeader {
@@ -37,18 +43,11 @@
   color: var(--text-secondary);
 }
 
-@media (max-width: 1024px) {
-  .main {
-    margin-left: 80px;
-  }
+@media (max-width: 1280px) {
+  .main     { margin-left: 0; }
+  .expanded { margin-left: 0; }
 }
 
 @media (max-width: 768px) {
-  .main {
-    margin-left: 0;
-  }
-
-  .content {
-    padding: 16px;
-  }
+  .content { padding: 16px; }
 }

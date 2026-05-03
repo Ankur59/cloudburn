@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./ReportTable.module.css";
 
 // Real data will be passed in via props
@@ -40,6 +40,13 @@ export default function ReportTable({
 }) {
   const [sortKey, setSortKey] = useState("date");
   const [sortDir, setSortDir] = useState("desc");
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const fn = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', fn);
+    return () => window.removeEventListener('resize', fn);
+  }, []);
 
   const handleSort = (key) => {
     if (sortKey === key) {
@@ -158,6 +165,38 @@ export default function ReportTable({
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile card list */}
+      <div className={styles.mobileCardList}>
+        {sortedData.map((row) => (
+          <div key={row.id} className={styles.mobileCard}>
+            <div className={styles.cardTopRow}>
+              <span className={styles.cardDate}>{row.date}</span>
+              <span className={`${styles.cloudBadge} ${styles[(row.provider || row.cloud || '').toLowerCase()]}`}>
+                {row.provider || row.cloud}
+              </span>
+            </div>
+            <div className={styles.cardService}>{row.service}</div>
+            <div className={styles.cardDivider} />
+            <div className={styles.cardMetrics}>
+              <div className={styles.cardMetricItem}>
+                <span className={styles.cardMetricLabel}>Team</span>
+                <span className={styles.teamBadge}>{row.team || 'Unallocated'}</span>
+              </div>
+              <div className={styles.cardMetricItem}>
+                <span className={styles.cardMetricLabel}>Cost</span>
+                <span className={styles.cardCost}>${(row.cost || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}</span>
+              </div>
+              <div className={styles.cardMetricItem}>
+                <span className={styles.cardMetricLabel}>VS Prev</span>
+                <span className={`${styles.delta} ${(row.delta || 0) >= 0 ? styles.up : styles.down}`}>
+                  {row.delta === null ? '—' : `${(row.delta || 0) >= 0 ? '↑' : '↓'} ${Math.abs(row.delta || 0)}%`}
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Pagination */}
