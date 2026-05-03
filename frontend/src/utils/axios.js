@@ -4,7 +4,7 @@ import { refreshApi } from "../features/auth/service/auth.api";
 
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5000/api",// IGONRE KARO FALTU LINK HE
+  baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true, // keeps the httpOnly refreshToken cookie working
 });
 
