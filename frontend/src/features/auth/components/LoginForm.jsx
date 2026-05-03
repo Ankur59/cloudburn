@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import useAuth from "../hook/useAuth";
 import styles from "./LoginForm.module.css";
 
+
 const GoogleIcon = () => (
   <svg
     width="18"
@@ -37,6 +38,8 @@ const LoginForm = () => {
   const { handleLogin, handleGoogleLoginRedirect } = useAuth();
   const { loading, error } = useSelector((state) => state.auth);
 
+  
+
   const {
     register,
     handleSubmit,
@@ -48,8 +51,13 @@ const LoginForm = () => {
 
   const onSubmit = async (data) => {
     const result = await handleLogin({ email: data.email, password: data.password });
+    
     if (result.success) {
-      navigate("/dashboard");
+      if (result.hasSetOrgName) {
+        navigate("/dashboard");
+      } else {
+        navigate("/onboarding");
+      }
     }
   };
 

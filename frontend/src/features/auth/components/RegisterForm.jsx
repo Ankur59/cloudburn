@@ -43,7 +43,6 @@ const RegisterForm = () => {
   } = useForm({
     mode: "onTouched",
     defaultValues: {
-      orgName: "",
       name: "",
       email: "",
       password: "",
@@ -53,7 +52,6 @@ const RegisterForm = () => {
   const onSubmit = async (data) => {
     // Backend takes: { orgName, name, email, password }
     const result = await handleRegister({
-      orgName: data.orgName,
       name: data.name,
       email: data.email,
       password: data.password,
@@ -81,23 +79,7 @@ const RegisterForm = () => {
         <span className={styles.dividerLine} />
       </div>
 
-      <div className={styles.formGroup}>
-        <label className={styles.label} htmlFor="orgName">
-          Organization Name
-        </label>
-        <input
-          id="orgName"
-          type="text"
-          placeholder="Acme Corporation"
-          className={`${styles.input} ${errors.orgName ? styles.error : ""}`}
-          {...register("orgName", {
-            required: "Organization name is required.",
-          })}
-        />
-        {errors.orgName && (
-          <p className={styles.errorMessage}>{errors.orgName.message}</p>
-        )}
-      </div>
+      
 
       <div className={styles.formGroup}>
         <label className={styles.label} htmlFor="name">
