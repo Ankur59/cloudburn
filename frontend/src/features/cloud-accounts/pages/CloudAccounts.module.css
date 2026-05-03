@@ -3,20 +3,24 @@
   display: flex;
   min-height: 100vh;
   background-color: var(--page-base);
+  overflow-x: hidden;
 }
 
 .main {
   flex: 1;
-  margin-left: 256px;
+  margin-left: 240px;
   transition: margin-left 0.3s ease;
+  min-width: 0;
 }
 
 .main.expanded {
-  margin-left: 80px;
+  margin-left: 64px;
 }
 
 .content {
   padding: 24px 32px 40px;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 /* Page Header */
@@ -45,6 +49,7 @@
 .connectBtn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   padding: 9px 18px;
   border-radius: 6px;
@@ -81,13 +86,21 @@
 }
 
 /* Responsive */
+@media (max-width: 1280px) {
+  .main          { margin-left: 64px; }
+  .main.expanded { margin-left: 64px; }
+}
+
 @media (max-width: 1024px) {
-  .main { margin-left: 80px; }
   .accountGrid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 768px) {
-  .main { margin-left: 0; }
-  .content { padding: 16px; }
-  .accountGrid { grid-template-columns: 1fr; }
+  .main          { margin-left: 0 !important; }
+  .main.expanded { margin-left: 0 !important; }
+  .content       { padding: 16px; }
+  .pageHeaderLeft h1 { font-size: 1.2rem; }
+  .pageHeaderLeft p  { font-size: 0.8rem; }
+  .connectBtn    { width: 100%; min-height: 44px; }
+  .accountGrid   { grid-template-columns: 1fr; }
 }

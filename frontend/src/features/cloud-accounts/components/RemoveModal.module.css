@@ -118,3 +118,15 @@
 }
 
 .removeBtn:hover { background-color: rgba(201, 78, 78, 0.2); border-color: rgba(201, 78, 78, 0.6); }
+
+@media (max-width: 768px) {
+  .overlay { align-items: flex-end; padding: 0; }
+  .modal {
+    max-width: 100%;
+    border-radius: 16px 16px 0 0;
+    margin: 0;
+    border-bottom: none;
+  }
+  .actions { flex-direction: column; }
+  .cancelBtn, .removeBtn { min-height: 44px; }
+}

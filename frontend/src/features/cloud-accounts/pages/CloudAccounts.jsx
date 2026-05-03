@@ -81,6 +81,7 @@ export default function CloudAccounts() {
   const { accounts, syncLog, loading } = useSelector((state) => state.cloudAccounts);
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [currentOrg, setCurrentOrg]             = useState('Acme Corporation');
   const [editingAccount, setEditingAccount]     = useState(null);  // account in drawer
   const [removingAccount, setRemovingAccount]   = useState(null);  // account in modal
@@ -152,6 +153,8 @@ export default function CloudAccounts() {
       <Sidebar
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        mobileOpen={mobileSidebarOpen}
+        onMobileClose={() => setMobileSidebarOpen(false)}
       />
 
       <div className={`${styles.main} ${sidebarCollapsed ? styles.expanded : ''}`}>
@@ -159,6 +162,7 @@ export default function CloudAccounts() {
           currentOrg={currentOrg}
           organizations={organizations}
           onOrgChange={setCurrentOrg}
+          onMenuClick={() => setMobileSidebarOpen(true)}
         />
 
         <div className={styles.content}>
