@@ -14,6 +14,13 @@ export const monthsAgo = (n) => {
   return d;
 };
 
+export const startOfMonth = () => {
+  const d = new Date();
+  d.setUTCDate(1);
+  d.setUTCHours(0, 0, 0, 0);
+  return d;
+};
+
 export const today = () => new Date();
 
 // AWS tag format is "tagKey$tagValue" — extract the value portion

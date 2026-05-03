@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setTeams, addPendingInvite, removeMember } from '../team.slice';
+import { setTeams, addPendingInvite, removeMember, addTeam } from '../team.slice';
 import Sidebar from '../../shared/Sidebar';
 import Header from '../../dashboard/components/Header';
 import TeamList from '../components/TeamList';
 import TeamDetail from '../components/TeamDetail';
 import InviteModal from '../components/InviteModal';
+import CreateTeamModal from '../components/CreateTeamModal';
 import styles from './Team.module.css';
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
-// In a real app this would come from an API.
-// Each team has members (active) and pending invites mixed in with status:'pending'.
 const MOCK_TEAMS = [
   {
     id: 'team-1',
@@ -18,7 +17,11 @@ const MOCK_TEAMS = [
     provider: 'AWS',
     memberCount: 5,
     totalSpend: '$24,840',
-    trend: 12,                     // % change vs last month (positive = increase)
+    currentSpend: 24840,
+    budgetLimit: 30000,
+    alertThreshold: 80,
+    teamKey: 'platform-engineering',
+    trend: 12,
     members: [
       { id: 'm-1', name: 'Alex Johnson',  role: 'Org Admin',  email: 'alex@company.com',    joined: 'Jan 12, 2025', status: 'active'  },
       { id: 'm-2', name: 'Sarah Chen',    role: 'Team Lead',  email: 'sarah@company.com',   joined: 'Feb 3, 2025',  status: 'active'  },
@@ -34,6 +37,10 @@ const MOCK_TEAMS = [
     provider: 'GCP',
     memberCount: 3,
     totalSpend: '$41,200',
+    currentSpend: 41200,
+    budgetLimit: 40000,
+    alertThreshold: 90,
+    teamKey: 'data-analytics',
     trend: 28,
     members: [
       { id: 'm-7', name: 'Lena Müller',   role: 'Team Lead',  email: 'lena@company.com',    joined: 'Jan 20, 2025', status: 'active'  },
@@ -48,6 +55,10 @@ const MOCK_TEAMS = [
     provider: 'Azure',
     memberCount: 4,
     totalSpend: '$8,560',
+    currentSpend: 8560,
+    budgetLimit: 15000,
+    alertThreshold: 75,
+    teamKey: 'frontend-products',
     trend: -5,
     members: [
       { id: 'm-11', name: 'Chloe Martin',  role: 'Team Lead',  email: 'chloe@company.com',  joined: 'Dec 5, 2024',  status: 'active'  },
@@ -55,15 +66,6 @@ const MOCK_TEAMS = [
       { id: 'm-13', name: 'Aisha Patel',   role: 'Developer',  email: 'aisha@company.com',  joined: 'Feb 22, 2025', status: 'active'  },
       { id: 'm-14', name: 'Tom Fischer',   role: 'Developer',  email: 'tom@company.com',    joined: 'Mar 11, 2025', status: 'active'  },
     ],
-  },
-  {
-    id: 'team-4',
-    name: 'Security & Compliance',
-    provider: 'AWS',
-    memberCount: 0,
-    totalSpend: '$0',
-    trend: 0,
-    members: [],                   // Empty team — will show empty state
   },
 ];
 
@@ -74,14 +76,18 @@ export default function Team() {
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [currentOrg, setCurrentOrg]   = useState('Acme Corporation');
-  const [selectedTeamId, setSelectedTeamId] = useState(MOCK_TEAMS[0].id);
+  const [selectedTeamId, setSelectedTeamId] = useState(null);
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
     if (teams.length === 0) {
       dispatch(setTeams(MOCK_TEAMS));
+      setSelectedTeamId(MOCK_TEAMS[0].id);
+    } else if (!selectedTeamId) {
+      setSelectedTeamId(teams[0].id);
     }
-  }, [dispatch, teams.length]);
+  }, [dispatch, teams, selectedTeamId]);
 
   const organizations = ['Acme Corporation', 'TechStart Inc.', 'Global Dynamics'];
 
@@ -90,14 +96,13 @@ export default function Team() {
 
   // Collect pending invites for the invite modal (members with status='pending')
   const pendingInvites = selectedTeam
-    ? selectedTeam.members
+    ? (selectedTeam.members || [])
         .filter((m) => m.status === 'pending')
         .map((m) => ({ email: m.email, role: m.role }))
     : [];
 
   // ── Handlers ──────────────────────────────────────────────────────────────
 
-  // Add a new pending invite to the selected team
   const handleSendInvite = ({ email, role }) => {
     const newMember = {
       id: `m-${Date.now()}`,
@@ -110,14 +115,14 @@ export default function Team() {
     dispatch(addPendingInvite({ teamId: selectedTeamId, member: newMember }));
   };
 
-  // Remove an active member from the selected team
   const handleRemoveMember = (memberId) => {
     dispatch(removeMember({ teamId: selectedTeamId, memberId }));
   };
 
-  // Placeholder — in a real app would open a create team form
-  const handleCreateTeam = () => {
-    alert('Create team flow — coming soon!');
+  const handleCreateTeam = (teamData) => {
+    const id = `team-${Date.now()}`;
+    dispatch(addTeam({ ...teamData, id }));
+    setSelectedTeamId(id);
   };
 
   return (
@@ -153,7 +158,7 @@ export default function Team() {
               teams={teams}
               selectedId={selectedTeamId}
               onSelect={setSelectedTeamId}
-              onCreateTeam={handleCreateTeam}
+              onCreateTeam={() => setShowCreateModal(true)}
             />
 
             {/* Right: team detail */}
@@ -174,6 +179,13 @@ export default function Team() {
           pendingInvites={pendingInvites}
           onClose={() => setShowInviteModal(false)}
           onSendInvite={handleSendInvite}
+        />
+      )}
+
+      {showCreateModal && (
+        <CreateTeamModal
+          onClose={() => setShowCreateModal(false)}
+          onCreate={handleCreateTeam}
         />
       )}
     </div>

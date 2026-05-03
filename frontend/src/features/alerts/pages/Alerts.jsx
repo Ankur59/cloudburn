@@ -15,6 +15,33 @@ import { getAlertsApi, resolveAlertApi } from '../alerts.api';
 const normalizeAlert = (alert) => {
   const isSpike = alert.alertType === 'SPIKE';
   const isZombie = alert.alertType === 'ZOMBIE';
+  const isBudget = alert.alertType === 'BUDGET';
+
+  if (isBudget) {
+    return {
+      id: alert._id || alert.id,
+      severity: 'critical',
+      type: 'Budget',
+      title: `Budget Threshold Breached`,
+      service: `AWS · Team Budget`,
+      provider: 'AWS',
+      timestamp: new Date(alert.createdAt).toLocaleString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+      }).replace(',', ' ·'),
+      costImpact: `${alert.multiplier}% limit`,
+      status: alert.isRead ? 'Resolved' : 'Active',
+      rootCause: alert.aiExplanation || 'A team budget threshold has been reached or exceeded.',
+      resources: [
+        { name: `Current Month Spend`, cost: `$${(alert.currentCost || 0).toFixed(2)}` },
+        { name: `Total Budget Limit`, cost: `$${(alert.previousCost || 0).toFixed(2)}` },
+      ],
+    };
+  }
   
   if (isZombie) {
     return {

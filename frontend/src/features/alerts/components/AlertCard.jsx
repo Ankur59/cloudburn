@@ -15,6 +15,7 @@ export default function AlertCard({ alert, onResolve }) {
 
   const isCritical = alert.severity === 'critical';
   const isZombie = alert.type === 'Zombie';
+  const isBudget = alert.type === 'Budget';
 
   return (
     <div
@@ -38,6 +39,14 @@ export default function AlertCard({ alert, onResolve }) {
                     <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                   </svg>
                 </div>
+              ) : isBudget ? (
+                <div className={`${styles.typeIcon}`} style={{ color: 'var(--success)', backgroundColor: 'rgba(77, 184, 122, 0.1)' }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                    <line x1="12" y1="8" x2="12" y2="16" />
+                    <line x1="10" y1="12" x2="14" y2="12" />
+                  </svg>
+                </div>
               ) : (
                 <div className={`${styles.typeIcon} ${styles.spike}`}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -51,7 +60,8 @@ export default function AlertCard({ alert, onResolve }) {
             <div className={styles.meta}>
               <div className={styles.titleRow}>
                 <p className={styles.title}>{alert.title}</p>
-                <span className={`${styles.typeBadge} ${isZombie ? styles.zombie : styles.spike}`}>
+                <span className={`${styles.typeBadge} ${isZombie ? styles.zombie : isBudget ? '' : styles.spike}`}
+                      style={isBudget ? { backgroundColor: 'rgba(77, 184, 122, 0.15)', color: 'var(--success)' } : {}}>
                   {alert.type}
                 </span>
               </div>
@@ -66,9 +76,9 @@ export default function AlertCard({ alert, onResolve }) {
           <div className={styles.right}>
             <div className={styles.impactContainer}>
               <span className={`${styles.cost} ${!isCritical ? styles.warning : ''}`}>
-                {isZombie ? alert.resources[0].cost : `+${alert.costImpact}`}
+                {isZombie ? alert.resources[0].cost : isBudget ? alert.costImpact : `+${alert.costImpact}`}
               </span>
-              <span className={styles.impactLabel}>{isZombie ? 'Avg Usage' : 'Impact'}</span>
+              <span className={styles.impactLabel}>{isZombie ? 'Avg Usage' : isBudget ? 'Limit' : 'Impact'}</span>
             </div>
 
             <span className={`${styles.statusBadge} ${alert.status === 'Active' ? styles.active : styles.resolved}`}>

@@ -176,9 +176,12 @@ export const getDailySpendTrend = async (accessKey, secretKey) => {
     .sort((a, b) => new Date(a.date) - new Date(b.date));
 };
 
-export const getCostByTeam = async (accessKey, secretKey) => {
+export const getCostByTeam = async (accessKey, secretKey, start, end) => {
+  const timeStart = start || daysAgo(30);
+  const timeEnd   = end || today();
+
   const response = await ceQuery(makeCEClient(accessKey, secretKey), {
-    TimePeriod: { Start: fmt(daysAgo(30)), End: fmt(today()) },
+    TimePeriod: { Start: fmt(timeStart), End: fmt(timeEnd) },
     Granularity: "MONTHLY",
     Metrics: ["AmortizedCost", "UsageQuantity"],
     Filter: {
