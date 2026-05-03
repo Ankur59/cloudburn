@@ -219,3 +219,16 @@
   color: var(--text-primary);
   background-color: var(--card-bg);
 }
+
+@media (max-width: 768px) {
+  .overlay { align-items: flex-end; padding: 0; }
+  .modal {
+    max-width: 100%;
+    border-radius: 16px 16px 0 0;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .thresholdOptions { gap: 6px; }
+  .thresholdPill    { padding: 10px 4px; min-height: 44px; }
+  .saveBtn, .cancelBtn { min-height: 44px; }
+}

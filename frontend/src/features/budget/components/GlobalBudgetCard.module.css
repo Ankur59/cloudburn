@@ -173,3 +173,12 @@
 .statusDot.healthy { background-color: var(--success); }
 .statusDot.warning { background-color: var(--warning); }
 .statusDot.danger  { background-color: var(--danger); }
+
+@media (max-width: 768px) {
+  .card          { padding: 16px; }
+  .currentSpend  { font-size: 24px; }
+  .statsRow      { gap: 16px; }
+  .stat          { min-width: calc(50% - 8px); }
+  .topRow        { flex-direction: column; gap: 10px; }
+  .statusBadge   { align-self: flex-start; }
+}
