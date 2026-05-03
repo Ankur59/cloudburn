@@ -1,19 +1,8 @@
 import axios from "axios";
 import { refreshApi } from "../features/auth/service/auth.api";
 
-const dev = true;
-let backendUrl = "";
-
-if (dev) {
-  backendUrl = "http://localhost:5000/api";
-  console.log("Running in development mode");
-} else {
-  backendUrl = "https://cloudburn.online/api";
-  console.log("Running in production mode");
-}
-
 const axiosInstance = axios.create({
-  baseURL: backendUrl,
+  baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true, // keeps the httpOnly refreshToken cookie working
 });
 
