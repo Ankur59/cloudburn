@@ -40,6 +40,7 @@ const LoginForm = () => {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm({
     mode: "onTouched",
@@ -50,6 +51,12 @@ const LoginForm = () => {
     const result = await handleLogin({ email: data.email, password: data.password });
     if (result.success) {
       navigate("/dashboard");
+    } else if (result.firstFieldError) {
+      // Show the error inline on the specific field
+      setError(result.firstFieldError.path, {
+        type: "server",
+        message: result.firstFieldError.msg,
+      });
     }
   };
 
