@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import Login from "../features/auth/pages/Login.jsx";
 import Register from "../features/auth/pages/Register.jsx";
 import VerifyEmail from "../features/auth/pages/VerifyEmail.jsx";
+import Onboarding from "../features/auth/pages/Onboarding.jsx";
 import Dashboard from "../features/dashboard/pages/DashboardPage.jsx";
 import Connect from "../features/cloud-connect/pages/Connect.jsx";
 import Reports from "../features/report/pages/Reports.jsx";
@@ -24,6 +25,7 @@ const AppRouter = () => {
       <Route path="/verify-email" element={<VerifyEmail />} />
 
       {/* Protected Routes */}
+      <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
       <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/connect" element={<ProtectedRoute><Connect /></ProtectedRoute>} />

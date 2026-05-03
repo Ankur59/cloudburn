@@ -32,14 +32,19 @@ export const logoutApi = async () => {
 
 // GET /api/auth/me  — protected
 export const getMeApi = async () => {
-  const response = await axiosInstance.get("/auth/me");
+  const response = await axiosInstance.get(`/auth/me?t=${new Date().getTime()}`);
   return response;
 };
 
-// Placeholder — no backend endpoint yet
 export const updateProfileApi = async (formData) => {
   const response = await axiosInstance.patch("/auth/profile", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
+  return response;
+};
+
+// PUT /api/auth/set-org
+export const setOrgNameApi = async (orgName) => {
+  const response = await axiosInstance.put("/auth/set-org", { orgName });
   return response;
 };

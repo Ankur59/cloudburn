@@ -1,4 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setAccounts, setSyncLog, updateAccount, removeAccount, addSyncLog } from '../cloudAccounts.slice';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../../shared/Sidebar';
 import Header from '../../dashboard/components/Header';
@@ -75,15 +77,19 @@ const INITIAL_SYNC_LOG = [
 // ─── CloudAccounts Page ────────────────────────────────────────────────────────
 export default function CloudAccounts() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { accounts, syncLog, loading } = useSelector((state) => state.cloudAccounts);
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [currentOrg, setCurrentOrg]             = useState('Acme Corporation');
-  const [accounts, setAccounts]                 = useState(MOCK_ACCOUNTS);
-  const [syncLog, setSyncLog]                   = useState(INITIAL_SYNC_LOG);
-  const [loading, setLoading]                   = useState(false);
   const [editingAccount, setEditingAccount]     = useState(null);  // account in drawer
   const [removingAccount, setRemovingAccount]   = useState(null);  // account in modal
   const [bannerDismissed, setBannerDismissed]   = useState(false);
+
+  useEffect(() => {
+    if (accounts.length === 0) dispatch(setAccounts(MOCK_ACCOUNTS));
+    if (syncLog.length === 0) dispatch(setSyncLog(INITIAL_SYNC_LOG));
+  }, [dispatch, accounts.length, syncLog.length]);
 
   const organizations = ['Acme Corporation', 'TechStart Inc.', 'Global Dynamics'];
 
@@ -98,34 +104,33 @@ export default function CloudAccounts() {
   // ── Sync Now ────────────────────────────────────────────────────────────────
   const handleSync = (id) => {
     // Set card to "Syncing"
-    setAccounts((prev) => prev.map((a) => a.id === id ? { ...a, status: 'Syncing' } : a));
+    const accToUpdate = accounts.find(a => a.id === id);
+    if (accToUpdate) dispatch(updateAccount({ ...accToUpdate, status: 'Syncing' }));
+
     // After 2.5s simulate success
     setTimeout(() => {
-      setAccounts((prev) => prev.map((a) =>
-        a.id === id ? { ...a, status: 'Active', lastSynced: 'just now' } : a
-      ));
+      const syncedAcc = { ...accToUpdate, status: 'Active', lastSynced: 'just now' };
+      dispatch(updateAccount(syncedAcc));
+      
       // Prepend to sync log
-      const acc = accounts.find((a) => a.id === id);
-      if (acc) {
-        setSyncLog((prev) => [{
-          id: `sl-new-${Date.now()}`,
-          accountName: acc.name,
-          provider: acc.provider,
-          result: 'success',
-          timestamp: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }),
-        }, ...prev.slice(0, 9)]);
-      }
+      dispatch(addSyncLog({
+        id: `sl-new-${Date.now()}`,
+        accountName: syncedAcc.name,
+        provider: syncedAcc.provider,
+        result: 'success',
+        timestamp: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }),
+      }));
     }, 2500);
   };
 
   // ── Save edit ───────────────────────────────────────────────────────────────
   const handleSave = (updated) => {
-    setAccounts((prev) => prev.map((a) => a.id === updated.id ? updated : a));
+    dispatch(updateAccount(updated));
   };
 
   // ── Remove account ──────────────────────────────────────────────────────────
   const handleRemove = (id) => {
-    setAccounts((prev) => prev.filter((a) => a.id !== id));
+    dispatch(removeAccount(id));
   };
 
   // ── Retry sync from log ─────────────────────────────────────────────────────

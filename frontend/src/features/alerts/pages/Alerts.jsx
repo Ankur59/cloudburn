@@ -1,4 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setAlerts, setLoading, resolveAlert } from '../alerts.slice';
 import Sidebar from '../../shared/Sidebar';
 import Header from '../../dashboard/components/Header';
 import AlertFilterBar from '../components/AlertFilterBar';
@@ -120,22 +122,24 @@ const DEFAULT_FILTERS = { search: '', type: '', severity: '', provider: '' };
 
 // ─── Alerts Page ─────────────────────────────────────────────────────────────
 export default function Alerts() {
+  const dispatch = useDispatch();
+  const { alerts, loading } = useSelector((state) => state.alerts);
+  
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [currentOrg, setCurrentOrg] = useState('Acme Corporation');
-  const [alerts, setAlerts] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
 
   const organizations = ['Acme Corporation', 'TechStart Inc.', 'Global Dynamics'];
 
   // Simulate an API fetch on mount
   useEffect(() => {
+    dispatch(setLoading(true));
     const timer = setTimeout(() => {
-      setAlerts(MOCK_ALERTS);
-      setLoading(false);
+      dispatch(setAlerts(MOCK_ALERTS));
+      dispatch(setLoading(false));
     }, 1200);
     return () => clearTimeout(timer);
-  }, []);
+  }, [dispatch]);
 
   // Handle individual filter field change
   const handleFilterChange = (key, value) => {
@@ -149,9 +153,7 @@ export default function Alerts() {
 
   // Mark an alert as resolved
   const handleResolve = (alertId) => {
-    setAlerts((prev) =>
-      prev.map((a) => (a.id === alertId ? { ...a, status: 'Resolved' } : a))
-    );
+    dispatch(resolveAlert(alertId));
   };
 
   // Derive filtered + sorted alerts from state

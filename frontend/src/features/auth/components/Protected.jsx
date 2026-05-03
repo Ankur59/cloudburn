@@ -12,14 +12,22 @@ const ProtectedRoute = ({ children }) => {
   const { handleGetme } = useAuth();
 
   useEffect(() => {
+    // If auth state is unknown, fetch it so we know if they should be redirected
     if (!isAuthChecked) {
       handleGetme();
     }
-  }, [isAuthChecked, handleGetme]);
+  }, [isAuthChecked]);
 
   if (!isAuthChecked) {
     return (
-      <div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
         <SkeletonLoader />
       </div>
     );
@@ -28,6 +36,22 @@ const ProtectedRoute = ({ children }) => {
   // If auth check is done and we still have no user OR no token, redirect to login
   if (!user || !accessToken) {
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Handle onboarding (organization name setup)
+  if (user.hasSetOrgName === false && location.pathname !== '/onboarding') {
+    return <Navigate to="/onboarding" replace />;
+  }
+
+  // Handle cloud connection check
+  // Note: we let them access /onboarding without cloud connected
+  if (
+    user.hasSetOrgName && 
+    !user.isCloudConnected && 
+    location.pathname !== '/connect' && 
+    location.pathname !== '/onboarding'
+  ) {
+    return <Navigate to="/connect" replace />;
   }
 
   // Auth checked, user exists, token exists -> allow access
