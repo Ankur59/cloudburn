@@ -14,6 +14,8 @@ router.use(protect()); // Apply auth protection to all dashboard routes
 
 router.get("/", getDashboardData);
 router.get("/reports", getReportsData);
+router.get("/historical", (req, res, next) => import("../controllers/dashboard.controller.js").then(m => m.getHistoricalData(req, res, next)).catch(next));
+
 
 // ── AI Insights ────────────────────────────────────────────────────────────────
 router.get("/insights",                         getInsights);     // read from cache
