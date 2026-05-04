@@ -21,21 +21,32 @@ function RoleBadge({ role }) {
   );
 }
 
+function getStatus(pct, threshold) {
+  if (pct >= 100) return 'danger';
+  if (pct >= threshold) return 'warning';
+  return 'healthy';
+}
+
+const STATUS_LABEL = {
+  healthy: 'Healthy',
+  warning: 'Approaching Limit',
+  danger: 'Over Budget',
+};
+
 /**
  * TeamDetail — Right panel
- *
- * Shows the selected team's cost summary and member table.
- *
- * Props:
- *  - team: the selected team object (see MOCK_TEAMS in Team.jsx)
- *  - onInvite: () => void — opens the invite modal
- *  - onRemoveMember: (memberId) => void
  */
 export default function TeamDetail({ team, onInvite, onRemoveMember }) {
-  // Split members into active and pending
   const activeMembers = team.members.filter((m) => m.status === 'active');
-  const pendingMembers = team.members.filter((m) => m.status === 'pending');
+  const pendingMembers = (team.members || []).filter((m) => m.status === 'pending');
   const allRows = [...activeMembers, ...pendingMembers];
+
+  const budget = team.budgetLimit || 0;
+  const spent = team.currentSpend || 0;
+  const threshold = team.alertThreshold || 80;
+  const pct = budget > 0 ? Math.round((spent / budget) * 100) : 0;
+  const barPct = Math.min(pct, 100);
+  const status = getStatus(pct, threshold);
 
   return (
     <div className={styles.panel}>
@@ -61,6 +72,64 @@ export default function TeamDetail({ team, onInvite, onRemoveMember }) {
             <span className={styles.costStatLabel}>Members</span>
             <span className={styles.costStatValue}>{team.memberCount}</span>
           </div>
+        </div>
+      </div>
+
+      {/* ── Budget Tracking Card ── */}
+      <div className={styles.budgetCard}>
+        <div className={styles.budgetHeader}>
+          <span className={styles.budgetTitle}>Monthly Budget Tracking</span>
+          <span className={`${styles.statusBadge} ${styles[status]}`}>
+            <span className={`${styles.statusDot} ${styles[status]}`} />
+            {STATUS_LABEL[status]}
+          </span>
+        </div>
+        
+        <div className={styles.budgetNumbers}>
+          <span className={styles.currentSpend}>${spent.toLocaleString()}</span>
+          <span className={styles.budgetLimit}>/ ${budget.toLocaleString()}</span>
+        </div>
+
+        <div className={styles.progressTrack}>
+          <div 
+            className={`${styles.progressFill} ${styles[status]}`} 
+            style={{ width: `${barPct}%` }}
+          />
+        </div>
+
+        <div className={styles.budgetMeta}>
+          <span>{pct}% of monthly limit used</span>
+          <span>Alert threshold set at {threshold}%</span>
+        </div>
+      </div>
+
+      {/* ── Resource Tagging Card ── */}
+      <div className={styles.tagCard}>
+        <div className={styles.tagHeader}>
+          <div className={styles.tagTitleGroup}>
+            <span className={styles.tagTitle}>Resource Tagging</span>
+            <p className={styles.tagDescription}>Use these tags in AWS to track this team's spend</p>
+          </div>
+          <div className={styles.tagBadge}>AWS Active</div>
+        </div>
+        <div className={styles.tagBox}>
+          <div className={styles.tagField}>
+            <span className={styles.tagLabel}>Tag Key</span>
+            <code className={styles.tagValue}>Team</code>
+          </div>
+          <div className={styles.tagSeparator}>:</div>
+          <div className={styles.tagField}>
+            <span className={styles.tagLabel}>Tag Value</span>
+            <code className={styles.tagValue}>{team.teamKey || 'platform-engineering'}</code>
+          </div>
+        </div>
+        <div className={styles.tagNote}>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="16" x2="12" y2="12" />
+            <line x1="12" y1="8" x2="12.01" y2="8" />
+          </svg>
+          <span>Tag your resources with this key and wait for 24hr for start sync process</span>
         </div>
       </div>
 

@@ -15,6 +15,7 @@ import ZombieDetector from "../features/zombie-detector/pages/ZombieDetector.jsx
 import CloudAccounts from "../features/cloud-accounts/pages/CloudAccounts.jsx";
 import AskAIPage from "../features/ask-ai/pages/AskAIPage.jsx";
 import SettingsPage from "../features/settings/pages/SettingsPage.jsx";
+import UsageAnalyticsPage from "../features/dashboard/pages/UsageAnalyticsPage.jsx";
 import ProtectedRoute from "../features/auth/components/Protected.jsx";
 import PublicRoute from "../features/auth/components/PublicRoute.jsx";
 
@@ -41,6 +42,7 @@ const AppRouter = () => {
       <Route path="/ask-ai" element={<ProtectedRoute><AskAIPage /></ProtectedRoute>} />
       <Route path="/zombie-detector" element={<ProtectedRoute><ZombieDetector /></ProtectedRoute>} />
       <Route path="/cloud-accounts" element={<ProtectedRoute><CloudAccounts /></ProtectedRoute>} />
+      <Route path="/usage-analytics" element={<ProtectedRoute><UsageAnalyticsPage /></ProtectedRoute>} />
     </Routes>
   );
 };

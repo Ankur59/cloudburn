@@ -13,6 +13,7 @@ import chatRoutes       from "./routes/chat.routes.js";
 import dashboardRoutes  from "./routes/dashboard.routes.js";
 import zombieRoutes     from "./routes/zombie.routes.js";
 import alertRoutes      from "./routes/alert.routes.js";
+import analyticsRoutes  from "./routes/analytics.routes.js";
 
 import { config }            from "./config/config.js";
 import { applyMiddlewares }  from "./loaders/middleware.js";
@@ -34,6 +35,7 @@ app.use("/api/chat",        chatRoutes);
 app.use("/api/dashboard",   dashboardRoutes);
 app.use("/api/zombie",      zombieRoutes);
 app.use("/api/alerts",      alertRoutes);
+app.use("/api/analytics",   analyticsRoutes);
 
 // ── Health ────────────────────────────────────────────────────────────────────
 app.get("/health", (_req, res) =>

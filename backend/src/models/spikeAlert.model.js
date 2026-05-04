@@ -21,8 +21,13 @@ const alertSchema = new mongoose.Schema(
     },
     alertType: {
       type: String,
-      enum: ['SPIKE', 'ZOMBIE'],
+      enum: ['SPIKE', 'ZOMBIE', 'BUDGET'],
       default: 'SPIKE',
+    },
+    teamId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Team',
+      required: false,
     },
     // For SPIKE: "YYYY-MM-DD"
     date: {
@@ -60,8 +65,10 @@ const alertSchema = new mongoose.Schema(
 alertSchema.index({ orgId: 1, createdAt: -1 });
 // For SPIKE uniqueness
 alertSchema.index({ orgId: 1, date: 1, service: 1, alertType: 1 }, { unique: true, partialFilterExpression: { alertType: 'SPIKE' } });
-// For ZOMBIE uniqueness (one per resource per day roughly, or just use resourceId)
+// For ZOMBIE uniqueness
 alertSchema.index({ orgId: 1, resourceId: 1, alertType: 1 }, { unique: true, partialFilterExpression: { alertType: 'ZOMBIE' } });
+// For BUDGET uniqueness
+alertSchema.index({ orgId: 1, teamId: 1, date: 1, alertType: 1 }, { unique: true, partialFilterExpression: { alertType: 'BUDGET' } });
 
 const SpikeAlert = mongoose.model('SpikeAlert', alertSchema);
 export default SpikeAlert;

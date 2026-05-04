@@ -28,6 +28,10 @@ const teamSchema = new mongoose.Schema(
       max: [100, 'Alert threshold cannot exceed 100'],
       default:80
     },
+    currentSpend: {
+      type: Number,
+      default: 0,
+    },
     notes: {
       type: String,
       trim: true,

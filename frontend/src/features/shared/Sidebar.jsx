@@ -7,6 +7,7 @@ import useAuth from "../auth/hook/useAuth";
 
 const navItems = [
   { icon: "dashboard", label: "Dashboard", href: "/dashboard" },
+  { icon: "teams", label: "Teams", href: "/teams" },
   { icon: "alerts", label: "Alerts", href: "/alerts" },
   { icon: "ai-insights", label: "AI Insights", href: "/ai-insights" },
   { icon: "ask-ai", label: "Ask AI", href: "/ask-ai" },
@@ -16,7 +17,7 @@ const navItems = [
     href: "/zombie-detector",
   },
   { icon: "cloud", label: "Cloud Accounts", href: "/cloud-accounts" },
-  { icon: "teams", label: "Teams", href: "/teams" },
+  { icon: "usage-analytics", label: "Usage Analytics", href: "/usage-analytics" },
   { icon: "budget", label: "Budget", href: "/budget" },
   { icon: "settings", label: "Settings", href: "/settings" },
 
@@ -121,6 +122,20 @@ function NavIcon({ type }) {
         strokeWidth="2"
       >
         <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
+      </svg>
+    ),
+    "usage-analytics": (
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
+        <line x1="18" y1="20" x2="18" y2="10" />
+        <line x1="12" y1="20" x2="12" y2="4" />
+        <line x1="6" y1="20" x2="6" y2="14" />
       </svg>
     ),
     teams: (
