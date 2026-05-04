@@ -16,7 +16,7 @@ const navItems = [
   { icon: "cloud", label: "Cloud Accounts", href: "/cloud-accounts" },
   { icon: "teams", label: "Teams", href: "/teams" },
   { icon: "budget", label: "Budget", href: "/budget" },
-  { icon: "reports", label: "Reports", href: "/reports" },
+  { icon: "settings", label: "Settings", href: "/settings" },
 
 ];
 
