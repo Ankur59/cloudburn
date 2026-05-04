@@ -1,0 +1,565 @@
+/* AwsGuide.module.css */
+
+.page {
+  min-height: 100vh;
+  background-color: var(--page-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  padding-bottom: 80px;
+}
+
+/* ── Top bar ─────────────────────────────────────────────────────────────── */
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 40px;
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(8px);
+}
+
+.backBtn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+.backBtn:hover {
+  background-color: var(--elevated-bg);
+  color: var(--text-primary);
+}
+
+.topBadge {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.openConsoleBtn {
+  font-size: 13px;
+  font-weight: 500;
+  color: #f59e0b;
+  text-decoration: none;
+  padding: 6px 14px;
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: 6px;
+  transition: all 0.2s;
+  background: rgba(245,158,11,0.05);
+}
+.openConsoleBtn:hover {
+  background: rgba(245,158,11,0.12);
+}
+
+/* ── Hero ────────────────────────────────────────────────────────────────── */
+.hero {
+  text-align: center;
+  padding: 72px 40px 48px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.heroIcon {
+  font-size: 52px;
+  margin-bottom: 20px;
+  display: block;
+  filter: drop-shadow(0 0 20px rgba(245,158,11,0.3));
+}
+
+.hero h1 {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero p {
+  font-size: 16px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 28px;
+}
+
+.heroStats {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.heroBadge {
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background-color: var(--elevated-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* ── Section ─────────────────────────────────────────────────────────────── */
+.section {
+  max-width: 900px;
+  margin: 0 auto 48px;
+  padding: 0 40px;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+
+.sectionDesc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+/* ── Data Grid ───────────────────────────────────────────────────────────── */
+.dataGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.dataCard {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 20px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.dataCard:hover {
+  border-color: var(--text-tertiary);
+  transform: translateY(-2px);
+}
+.dataIcon {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+.dataCard h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+}
+.dataCard p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Steps ───────────────────────────────────────────────────────────────── */
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.stepCard {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.stepCard.stepExpanded {
+  border-color: var(--text-tertiary);
+}
+
+.stepHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  text-align: left;
+  transition: background-color 0.15s;
+}
+.stepHeader:hover {
+  background-color: var(--elevated-bg);
+}
+
+.stepLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.stepNum {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--elevated-bg);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+.stepExpanded .stepNum {
+  background: rgba(245,158,11,0.12);
+  border-color: rgba(245,158,11,0.4);
+  color: #f59e0b;
+}
+
+.stepIcon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.stepTag {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.stepTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.chevron {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  transition: transform 0.25s;
+}
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+/* Step body — content comes from JSX with plain class names */
+.stepBody {
+  padding: 0 24px 24px;
+  border-top: 1px solid var(--border-color);
+  animation: fadeIn 0.2s ease;
+}
+
+.stepBody p,
+.stepBody li {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 8px;
+}
+
+.stepBody a {
+  color: #f59e0b;
+  text-decoration: none;
+}
+.stepBody a:hover {
+  text-decoration: underline;
+}
+
+.stepBody ol {
+  padding-left: 20px;
+  margin: 12px 0;
+}
+
+.stepBody ol li {
+  margin-bottom: 6px;
+}
+
+.stepBody code {
+  background-color: var(--elevated-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 13px;
+  font-family: 'Fira Code', 'Cascadia Code', monospace;
+  color: #f59e0b;
+}
+
+/* Tip / Warning banners inside step body */
+:global(.tip),
+:global(.warning) {
+  margin-top: 14px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.6;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+:global(.tip) {
+  background: rgba(59,130,246,0.08);
+  border: 1px solid rgba(59,130,246,0.2);
+  color: #93c5fd;
+}
+
+:global(.warning) {
+  background: rgba(245,158,11,0.08);
+  border: 1px solid rgba(245,158,11,0.2);
+  color: #fcd34d;
+}
+
+:global(.tip) span,
+:global(.warning) span {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Policy table inside step */
+:global(.policyTable) {
+  margin: 16px 0;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+:global(.policyHeader) {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 10px 16px;
+  background: var(--elevated-bg);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+  border-bottom: 1px solid var(--border-color);
+}
+:global(.policyRow) {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-color);
+  align-items: center;
+  font-size: 13px;
+  transition: background-color 0.15s;
+}
+:global(.policyRow):last-child {
+  border-bottom: none;
+}
+:global(.policyRow):hover {
+  background-color: var(--elevated-bg);
+}
+:global(.policyRow) code {
+  font-size: 12px;
+  background-color: var(--elevated-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 3px 7px;
+  font-family: monospace;
+  color: #f59e0b;
+}
+:global(.policyRow) span {
+  color: var(--text-secondary);
+}
+
+/* Key display box */
+:global(.keyBox) {
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+:global(.keyItem) {
+  background: var(--elevated-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+:global(.keyLabel) {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+:global(.keyExample) {
+  font-size: 13px;
+  font-family: monospace;
+  color: #f59e0b;
+  word-break: break-all;
+}
+:global(.keyDesc) {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* ── Code Block ──────────────────────────────────────────────────────────── */
+.codeBlock {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 16px;
+}
+.codeHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: var(--elevated-bg);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-family: monospace;
+}
+.copyBtn {
+  font-size: 12px;
+  padding: 5px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  background: var(--card-bg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: all 0.2s;
+}
+.copyBtn:hover {
+  background: var(--elevated-bg);
+  color: var(--text-primary);
+}
+.codeBlock pre {
+  padding: 20px;
+  margin: 0;
+  font-size: 12px;
+  font-family: 'Fira Code', 'Cascadia Code', monospace;
+  color: var(--text-secondary);
+  overflow-x: auto;
+  line-height: 1.6;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* ── Security Card ───────────────────────────────────────────────────────── */
+.securityCard {
+  background: linear-gradient(135deg, var(--card-bg) 0%, var(--elevated-bg) 100%);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 28px;
+  margin-top: 20px;
+}
+.securityTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+.securityGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.securityItem {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.securityIcon {
+  font-size: 22px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.securityItem h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+.securityItem p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── CTA ─────────────────────────────────────────────────────────────────── */
+.cta {
+  max-width: 700px;
+  margin: 48px auto 0;
+  padding: 40px;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(245,158,11,0.05) 0%, transparent 100%);
+  border: 1px solid rgba(245,158,11,0.2);
+  border-radius: 16px;
+}
+.cta h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.cta p {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+.ctaBtn {
+  padding: 12px 32px;
+  background: #f59e0b;
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: all 0.2s;
+}
+.ctaBtn:hover {
+  background: #fbbf24;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(245,158,11,0.3);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .dataGrid { grid-template-columns: 1fr 1fr; }
+  .securityGrid { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 28px; }
+  .section { padding: 0 20px; }
+  .topBar { padding: 14px 20px; }
+}
+@media (max-width: 600px) {
+  .dataGrid { grid-template-columns: 1fr; }
+  .hero { padding: 40px 20px 32px; }
+  .hero h1 { font-size: 24px; }
+  .cta { margin: 32px 20px 0; }
+  :global(.policyHeader),
+  :global(.policyRow) { grid-template-columns: 1fr; gap: 4px; }
+}
