@@ -1,5 +1,6 @@
 import asyncHandler from "../middlewares/async.middleware.js";
 import BillingSnapshot from "../models/billingSnapshot.model.js";
+import SpikeAlert from "../models/spikeAlert.model.js";
 import AppError from "../utils/AppError.js";
 import { sendSuccess } from "../utils/responseHelper.js";
 import { buildReportsData, buildDashboardData } from "../services/dashboard.service.js";
@@ -10,6 +11,10 @@ import { buildReportsData, buildDashboardData } from "../services/dashboard.serv
 // even if the snapshot was saved before those sections were added.
 export const getDashboardData = asyncHandler(async (req, res) => {
   const snapshot = await BillingSnapshot.findOne({ orgId: req.user.orgId });
+  const recentAlertsRaw = await SpikeAlert.find({ orgId: req.user.orgId })
+    .sort({ createdAt: -1 })
+    .limit(5)
+    .lean();
 
   if (!snapshot) {
     // Instead of throwing 404, we return empty data with an isSyncing flag.
@@ -50,6 +55,7 @@ export const getDashboardData = asyncHandler(async (req, res) => {
     monthlyTrend: snapshot.monthlyTrend,
     byOperation: snapshot.byOperation,
     byRecordType: snapshot.byRecordType,
+    recentAlerts: recentAlertsRaw,
   });
 
   return sendSuccess(res, 200, "Dashboard data fetched successfully", { ...dashboardData, isSyncing: false });
