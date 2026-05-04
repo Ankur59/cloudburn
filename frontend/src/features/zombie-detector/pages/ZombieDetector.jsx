@@ -213,6 +213,8 @@ export default function ZombieDetector() {
       <Sidebar
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        mobileOpen={mobileSidebarOpen}
+        onMobileClose={() => setMobileSidebarOpen(false)}
       />
 
       <div className={`${styles.main} ${sidebarCollapsed ? styles.expanded : ''}`}>
@@ -220,6 +222,7 @@ export default function ZombieDetector() {
           currentOrg={currentOrg}
           organizations={organizations}
           onOrgChange={setCurrentOrg}
+          onMenuClick={() => setMobileSidebarOpen(true)}
         />
 
         <div className={styles.content}>

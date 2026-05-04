@@ -266,4 +266,17 @@
     overflow-x: auto;
     white-space: nowrap;
   }
+  .teamsCard {
+    padding: 16px 14px;
+  }
+  .teamRow {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  .teamRight {
+    gap: 8px;
+  }
+  .miniBar {
+    width: 48px;
+  }
 }
