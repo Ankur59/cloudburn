@@ -350,7 +350,8 @@ export default function SettingsPage() {
               <label className={styles.label}>Theme</label>
               <select className={styles.input}>
                 <option value="dark">Dark</option>
-                <option value="light" disabled>Light (Coming Soon)</option>
+                <option value="light" disabled>Light(Comming soon)</option>
+                <option value="light" disabled>System(Comming Soon)</option>
               </select>
             </div>
             <div className={styles.formGroup}>
