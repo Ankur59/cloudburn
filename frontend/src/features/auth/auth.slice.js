@@ -45,7 +45,14 @@ const authSlice = createSlice({
     clearAuth: (state) => {
       state.user = null;
       state.accessToken = null;
-      localStorage.removeItem("accessToken");
+      localStorage.removeItem('accessToken');
+    },
+
+    // Merges partial profile updates (name, avatar) into the user object
+    updateUserProfile: (state, action) => {
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload };
+      }
     },
   },
 });
@@ -58,6 +65,7 @@ export const {
   setAuthChecked,
   clearError,
   clearAuth,
+  updateUserProfile,
 } = authSlice.actions;
 
 export default authSlice.reducer;

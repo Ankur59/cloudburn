@@ -64,10 +64,11 @@ export default function Header({ onMenuClick }) {
     }
   }
 
-  const currentOrg = user?.orgName || 'Select Organization'
-  const userName = user?.name || 'User'
-  const userEmail = user?.email || ''
-  const userRole = user?.role || 'Member'
+  const currentOrg  = user?.orgName || 'Select Organization'
+  const userName     = user?.name || 'User'
+  const userEmail    = user?.email || ''
+  const userRole     = user?.role || 'Member'
+  const userAvatar   = user?.avatar || null
   
   const initials = userName
     .split(' ')
@@ -156,7 +157,11 @@ export default function Header({ onMenuClick }) {
             className={styles.userButton}
             onClick={() => setUserDropdownOpen(!userDropdownOpen)}
           >
-            <div className={styles.userAvatar}>{initials}</div>
+            {userAvatar ? (
+              <img src={userAvatar} alt={userName} className={styles.userAvatarImg} />
+            ) : (
+              <div className={styles.userAvatar}>{initials}</div>
+            )}
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="6,9 12,15 18,9" />
             </svg>
@@ -186,19 +191,19 @@ export default function Header({ onMenuClick }) {
                   {profileSubMenuOpen && <ChevronLeft size={16} className={styles.chevronLeft} />}
                 </button>
 
-                {profileSubMenuOpen && (
+              {profileSubMenuOpen && (
                   <div className={styles.subMenu}>
-                    <button className={styles.subMenuItem}>
+                    <button className={styles.subMenuItem} onClick={() => { setUserDropdownOpen(false); navigate('/settings?tab=profile'); }}>
                       <span className={styles.subMenuItemIcon}><Camera size={14} /></span>
                       Change Avatar
                     </button>
-                    <button className={styles.subMenuItem}>
+                    <button className={styles.subMenuItem} onClick={() => { setUserDropdownOpen(false); navigate('/settings?tab=profile'); }}>
                       <span className={styles.subMenuItemIcon}><UserIcon size={14} /></span>
                       Edit Name
                     </button>
-                    <button className={styles.subMenuItem}>
+                    <button className={styles.subMenuItem} onClick={() => { setUserDropdownOpen(false); navigate('/settings?tab=security'); }}>
                       <span className={styles.subMenuItemIcon}><Mail size={14} /></span>
-                      Change Email
+                      Change Password
                     </button>
                     <div className={styles.subMenuItemDivider} />
                     <button className={`${styles.subMenuItem} ${styles.subMenuItemDisabled}`}>
@@ -215,7 +220,7 @@ export default function Header({ onMenuClick }) {
                 )}
               </div>
 
-              <button className={styles.dropdownItem}>
+              <button className={styles.dropdownItem} onClick={() => { setUserDropdownOpen(false); navigate('/settings'); }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="12" cy="12" r="3" />
                   <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />

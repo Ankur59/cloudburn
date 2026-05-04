@@ -215,9 +215,10 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose
       .toUpperCase();
   };
 
-  const userName = user?.name || user?.firstName || "User";
-  const userEmail = user?.email || "";
-  const initials = getInitials(userName);
+  const userName  = user?.name || user?.firstName || 'User';
+  const userEmail = user?.email || '';
+  const userAvatar = user?.avatar || null;
+  const initials  = getInitials(userName);
 
   return (
     <>
@@ -272,7 +273,11 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose
         </button>
 
         <div className={styles.userInfo}>
-          <div className={styles.avatar}>{initials}</div>
+          {userAvatar ? (
+            <img src={userAvatar} alt={userName} className={styles.avatarImg} />
+          ) : (
+            <div className={styles.avatar}>{initials}</div>
+          )}
           {!collapsed && (
             <div className={styles.userDetails}>
               <span className={styles.userName}>{userName}</span>

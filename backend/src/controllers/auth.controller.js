@@ -83,8 +83,9 @@ export const getMe = asyncHandler(async (req, res) => {
   const user = req.user.toObject();
   // Explicitly set derived fields — these drive frontend routing in ProtectedRoute
   user.isCloudConnected = !!(org && org.awsConnectedAt);
-  user.hasSetOrgName    = !!req.user.hasSetOrgName; // coerce to bool (never undefined)
+  user.hasSetOrgName    = !!req.user.hasSetOrgName;
   user.orgName          = org ? org.name : null;
+  user.avatar           = req.user.avatar || null;
   return sendSuccess(res, 200, 'User profile fetched.', { user });
 });
 

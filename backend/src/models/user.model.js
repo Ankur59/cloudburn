@@ -63,6 +63,9 @@ const userSchema = new mongoose.Schema(
     // Google OAuth users also start as false (see passport.js).
     hasSetOrgName: { type: Boolean, default: false },
 
+    // ── Profile ──────────────────────────────────────────────────────────────
+    avatar: { type: String, default: null }, // Cloudinary URL
+
     // ── Auth ─────────────────────────────────────────────────────────────────
     // Stored as SHA-256 hash — raw token lives in httpOnly cookie only
     refreshToken: { type: String, default: null, select: false },

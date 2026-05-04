@@ -119,6 +119,16 @@
   font-size: 13px;
   font-weight: 500;
   color: white;
+  flex-shrink: 0;
+}
+
+.userAvatarImg {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1.5px solid var(--border-color);
 }
 
 .dropdown {
