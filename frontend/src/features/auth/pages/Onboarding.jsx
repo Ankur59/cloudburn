@@ -6,10 +6,12 @@ import pageStyles from './Login.module.css';
 import formStyles from '../components/LoginForm.module.css';
 
 const Onboarding = () => {
-  const [orgName, setOrgName] = useState('');
   const { handleSetOrgName } = useAuth();
-  const { loading, error } = useSelector((state) => state.auth);
+  const { loading, error, user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
+
+  // Pre-fill from the org name already created at registration (returned by getMe)
+  const [orgName, setOrgName] = useState(user?.orgName || '');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,7 +19,6 @@ const Onboarding = () => {
 
     const result = await handleSetOrgName(orgName);
     if (result.success) {
-      // Once org name is set, ProtectedRoute will automatically redirect to /connect
       navigate('/connect');
     }
   };
@@ -31,7 +32,7 @@ const Onboarding = () => {
             <div className={pageStyles.brandName}>Cloudburn</div>
             <h1 className={pageStyles.pageTitle}>Welcome to Cloudburn!</h1>
             <p className={pageStyles.subtitle} style={{ textAlign: 'center', color: '#888', marginTop: '10px' }}>
-              Let's start by setting up your organization.
+              Confirm your organization name to get started.
             </p>
           </div>
 
@@ -49,6 +50,11 @@ const Onboarding = () => {
                 className={formStyles.input}
                 required
               />
+              {user?.orgName && (
+                <p style={{ fontSize: '0.78rem', color: '#888', marginTop: '4px' }}>
+                  This was set during registration — you can update it here.
+                </p>
+              )}
             </div>
 
             <button

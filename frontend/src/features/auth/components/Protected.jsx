@@ -12,11 +12,13 @@ const ProtectedRoute = ({ children }) => {
   const { handleGetme } = useAuth();
 
   useEffect(() => {
-    // If auth state is unknown, fetch it so we know if they should be redirected
-    if (!isAuthChecked) {
+    // Re-fetch user profile whenever auth state is unchecked OR a new token arrives.
+    // This ensures hasSetOrgName and isCloudConnected are always up-to-date
+    // before routing decisions are made.
+    if (!isAuthChecked || (accessToken && !user)) {
       handleGetme();
     }
-  }, [isAuthChecked]);
+  }, [isAuthChecked, accessToken]);
 
   if (!isAuthChecked) {
     return (
@@ -39,16 +41,18 @@ const ProtectedRoute = ({ children }) => {
   }
 
   // Handle onboarding (organization name setup)
-  if (user.hasSetOrgName === false && location.pathname !== '/onboarding') {
+  // Use falsy check — login response may not include hasSetOrgName (undefined),
+  // so strict `=== false` would miss new users before getme() resolves.
+  if (!user.hasSetOrgName && location.pathname !== '/onboarding') {
     return <Navigate to="/onboarding" replace />;
   }
 
   // Handle cloud connection check
   // Note: we let them access /onboarding without cloud connected
   if (
-    user.hasSetOrgName && 
-    !user.isCloudConnected && 
-    location.pathname !== '/connect' && 
+    user.hasSetOrgName &&
+    !user.isCloudConnected &&
+    location.pathname !== '/connect' &&
     location.pathname !== '/onboarding'
   ) {
     return <Navigate to="/connect" replace />;

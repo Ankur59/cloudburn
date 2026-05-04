@@ -55,7 +55,9 @@ export default function AccountCard({ account, onEdit, onRemove, onSync }) {
   };
 
   // Status badge
-  const badgeStatus = status === 'Expired' ? 'error' : status.toLowerCase();
+  const badgeStatus = status === 'Expired' 
+    ? 'error' 
+    : status.toLowerCase().replace(/\s+/g, '-');
 
   return (
     <div className={`${styles.card} ${cardMod(status)}`} id={`account-card-${id}`}>
@@ -117,7 +119,7 @@ export default function AccountCard({ account, onEdit, onRemove, onSync }) {
       {/* ── Footer ── */}
       <div className={styles.footer}>
         {isExpired ? (
-          <button id={`reconnect-${id}`} className={`${styles.footerBtn} ${styles.reconnectBtn}`} onClick={() => onEdit(account)}>
+          <button id={`reconnect-${id}`} className={`${styles.footerBtn} ${styles.reconnectBtn}`} onClick={() => onEdit(account)} disabled={status === 'Coming Soon'}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
             </svg>
@@ -128,7 +130,7 @@ export default function AccountCard({ account, onEdit, onRemove, onSync }) {
             id={`sync-${id}`}
             className={styles.footerBtn}
             onClick={() => onSync(id)}
-            disabled={isSyncing}
+            disabled={isSyncing || status === 'Coming Soon'}
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
               style={isSyncing ? { animation: 'spin 1s linear infinite' } : {}}>
@@ -138,7 +140,7 @@ export default function AccountCard({ account, onEdit, onRemove, onSync }) {
           </button>
         )}
 
-        <button id={`edit-${id}`} className={styles.footerBtn} onClick={() => onEdit(account)}>
+        <button id={`edit-${id}`} className={styles.footerBtn} onClick={() => onEdit(account)} disabled={status === 'Coming Soon'}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
@@ -146,7 +148,7 @@ export default function AccountCard({ account, onEdit, onRemove, onSync }) {
           Edit
         </button>
 
-        <button id={`remove-${id}`} className={`${styles.footerBtn} ${styles.removeBtn}`} onClick={() => onRemove(account)}>
+        <button id={`remove-${id}`} className={`${styles.footerBtn} ${styles.removeBtn}`} onClick={() => onRemove(account)} disabled={status === 'Coming Soon'}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <polyline points="3 6 5 6 21 6"/>
             <path d="M19 6l-1 14H6L5 6"/>

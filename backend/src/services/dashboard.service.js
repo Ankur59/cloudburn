@@ -30,6 +30,7 @@ export const buildDashboardData = (billingData) => {
     monthlyCostByService,
     byOperation,
     byRecordType,
+    recentAlerts: rawAlerts,
   } = billingData;
 
   // ── 1. KPI Cards ─────────────────────────────────────────────────────────────
@@ -212,27 +213,48 @@ export const buildDashboardData = (billingData) => {
     cost: +r.cost.toFixed(4),
   }));
 
-  // ── 10. Recent Alerts (static — replace with real anomaly detection later) ────
-  const recentAlerts = [
-    {
-      id: 1,
-      type: "anomaly",
-      severity: "critical",
-      title: "Cost Anomaly Detected",
-      message: "Amazon EC2 spending spiked by 45% in the last 24 hours.",
-      time: "2 hours ago",
-      actionText: "View Details",
-    },
-    {
-      id: 2,
-      type: "budget",
-      severity: "warning",
-      title: "Budget Alert",
-      message: "Frontend Apps team has consumed 90% of their monthly budget.",
-      time: "5 hours ago",
-      actionText: "Review Budget",
-    },
-  ];
+  // ── 10. Recent Alerts (Real data from SpikeAlert) ─────────────────────────
+  const formatTimeAgo = (date) => {
+    if (!date) return "Just now";
+    const diff = Math.floor((new Date() - new Date(date)) / 1000);
+    if (diff < 60) return `${diff} seconds ago`;
+    if (diff < 3600) return `${Math.floor(diff / 60)} mins ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} hrs ago`;
+    return `${Math.floor(diff / 86400)} days ago`;
+  };
+
+  const recentAlerts = (rawAlerts || []).map((alert) => {
+    let type = "anomaly";
+    let severity = "warning";
+    let title = "Alert Detected";
+    let actionText = "View Details";
+
+    if (alert.alertType === "SPIKE") {
+      type = "anomaly";
+      severity = "critical";
+      title = "Cost Anomaly Detected";
+    } else if (alert.alertType === "ZOMBIE") {
+      type = "zombie";
+      severity = "warning";
+      title = "Zombie Resource Detected";
+      actionText = "Review Resource";
+    } else if (alert.alertType === "BUDGET") {
+      type = "budget";
+      severity = "warning";
+      title = "Budget Alert";
+      actionText = "Review Budget";
+    }
+
+    return {
+      id: alert._id,
+      type,
+      severity,
+      title,
+      message: alert.message || `Unusual behavior detected in ${alert.service}.`,
+      time: formatTimeAgo(alert.createdAt),
+      actionText,
+    };
+  });
 
   return {
     kpis,

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, ExternalLink, Info } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import styles from './CredentialsForm.module.css';
 
 const CredentialsForm = ({ provider, credentials, onChange }) => {
@@ -62,10 +63,10 @@ const CredentialsForm = ({ provider, credentials, onChange }) => {
           </div>
         </div>
 
-        <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html" target="_blank" rel="noreferrer" className={styles.helpLink}>
+        <Link to="/aws-guide" className={styles.helpLink}>
           <ExternalLink size={14} />
           How to generate read-only credentials
-        </a>
+        </Link>
       </div>
     </>
   );

@@ -33,9 +33,20 @@ export const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   const { user, accessToken } = await authService.loginUser({ email, password }, res);
 
+  const org = await Organization.findById(user.orgId);
+  
   return sendSuccess(res, 200, 'Logged in successfully.', {
     accessToken,
-    user: { id: user._id, name: user.name, email: user.email, role: user.role, orgId: user.orgId },
+    user: { 
+      id: user._id, 
+      name: user.name, 
+      email: user.email, 
+      role: user.role, 
+      orgId: user.orgId,
+      hasSetOrgName: !!user.hasSetOrgName,
+      isCloudConnected: !!(org && org.awsConnectedAt),
+      orgName: org ? org.name : null
+    },
   });
 });
 
@@ -44,9 +55,19 @@ export const refresh = asyncHandler(async (req, res) => {
   const rawRefreshToken = req.cookies?.refreshToken;
   const { accessToken, user } = await authService.refreshAccessToken(rawRefreshToken, res);
 
+  const org = await Organization.findById(user.orgId);
+
   return sendSuccess(res, 200, 'Access token refreshed.', {
     accessToken,
-    user: { id: user._id, name: user.name, email: user.email, role: user.role },
+    user: { 
+      id: user._id, 
+      name: user.name, 
+      email: user.email, 
+      role: user.role,
+      hasSetOrgName: !!user.hasSetOrgName,
+      isCloudConnected: !!(org && org.awsConnectedAt),
+      orgName: org ? org.name : null
+    },
   });
 });
 
@@ -60,8 +81,11 @@ export const logout = asyncHandler(async (req, res) => {
 export const getMe = asyncHandler(async (req, res) => {
   const org = await Organization.findById(req.user.orgId);
   const user = req.user.toObject();
+  // Explicitly set derived fields — these drive frontend routing in ProtectedRoute
   user.isCloudConnected = !!(org && org.awsConnectedAt);
-  user.orgName = org ? org.name : null;
+  user.hasSetOrgName    = !!req.user.hasSetOrgName;
+  user.orgName          = org ? org.name : null;
+  user.avatar           = req.user.avatar || null;
   return sendSuccess(res, 200, 'User profile fetched.', { user });
 });
 

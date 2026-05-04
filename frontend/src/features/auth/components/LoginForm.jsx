@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import useAuth from "../hook/useAuth";
 import styles from "./LoginForm.module.css";
 
+
 const GoogleIcon = () => (
   <svg
     width="18"
@@ -37,9 +38,12 @@ const LoginForm = () => {
   const { handleLogin, handleGoogleLoginRedirect } = useAuth();
   const { loading, error } = useSelector((state) => state.auth);
 
+  
+
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm({
     mode: "onTouched",
@@ -48,8 +52,19 @@ const LoginForm = () => {
 
   const onSubmit = async (data) => {
     const result = await handleLogin({ email: data.email, password: data.password });
+    
     if (result.success) {
-      navigate("/dashboard");
+      if (result.hasSetOrgName) {
+        navigate("/dashboard");
+      } else {
+        navigate("/onboarding");
+      }
+    } else if (result.firstFieldError) {
+      // Show the error inline on the specific field
+      setError(result.firstFieldError.path, {
+        type: "server",
+        message: result.firstFieldError.msg,
+      });
     }
   };
 
@@ -131,9 +146,9 @@ const LoginForm = () => {
         )}
       </button>
 
-      <a href="#" className={styles.forgotLink}>
+      <Link to="/forgot-password" className={styles.forgotLink}>
         Forgot password?
-      </a>
+      </Link>
 
       <div className={styles.footerText}>
         Don&apos;t have an account?{" "}

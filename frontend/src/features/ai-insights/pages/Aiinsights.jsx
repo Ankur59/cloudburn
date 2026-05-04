@@ -32,6 +32,7 @@ const relativeTime = (isoDate) => {
 // ─── AI Insights Page ─────────────────────────────────────────────────────────
 export default function AiInsights() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [currentOrg, setCurrentOrg]             = useState('My Organisation');
   const [activeTab, setActiveTab]               = useState('Active Suggestions');
   const [filters, setFilters]                   = useState(DEFAULT_FILTERS);
@@ -134,13 +135,19 @@ export default function AiInsights() {
 
   return (
     <div className={styles.page}>
+      {/* Sidebar */}
       <Sidebar
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        mobileOpen={mobileSidebarOpen}
+        onMobileClose={() => setMobileSidebarOpen(false)}
       />
 
+      {/* Main Content */}
       <div className={`${styles.main} ${sidebarCollapsed ? styles.expanded : ''}`}>
-        <Header
+        {/* Top Header */}
+        <Header 
+          onMenuClick={() => setMobileSidebarOpen(true)} 
           currentOrg={currentOrg}
           organizations={['My Organisation']}
           onOrgChange={setCurrentOrg}

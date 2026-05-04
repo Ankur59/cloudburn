@@ -128,4 +128,17 @@ export const sendResourceSpikeAlert = ({ recipients, ...alertData }) => {
     )
   );
 };
+import { budgetEmailTemplate } from '../templates/budgetEmail.js';
 
+/**
+ * Sends a Team Budget Threshold Alert email.
+ */
+export const sendBudgetAlertEmail = ({ to, toName, teamName, budgetLimit, currentSpend, percentUsed, aiExplanation }) => {
+  const dashboardUrl = `${config.CLIENT_URL}/teams`;
+  return sendEmail({
+    to,
+    toName: toName || to,
+    subject: `⚠️ Budget Alert: Team ${teamName} reached ${percentUsed}% of limit`,
+    html: budgetEmailTemplate({ teamName, budgetLimit, currentSpend, percentUsed, aiExplanation, dashboardUrl }),
+  });
+};

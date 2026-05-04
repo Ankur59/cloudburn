@@ -39,8 +39,8 @@ export default function AlertFilterBar({ filters, onFilterChange, onClear }) {
       >
         <option value="">All Types</option>
         <option value="Spike">Spike</option>
-        <option value="Budget Breach">Budget Breach</option>
-        <option value="Anomaly">Anomaly</option>
+        <option value="Zombie">Zombie</option>
+        <option value="Budget">Budget</option>
       </select>
 
       {/* Severity filter */}

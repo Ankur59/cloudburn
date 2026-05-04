@@ -96,6 +96,27 @@
   border-color: #444;
 }
 
+@media (max-width: 1280px) {
+  .filterBar {
+    flex-wrap: wrap;
+  }
+
+  .searchWrapper {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+
+  .select {
+    flex: 1;
+    min-width: 130px;
+  }
+
+  .clearBtn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
 @media (max-width: 768px) {
   .filterBar {
     flex-direction: column;
@@ -104,9 +125,22 @@
 
   .searchWrapper {
     min-width: unset;
+    flex: none;
+    width: 100%;
   }
 
   .select {
     width: 100%;
+    min-height: 44px;
+  }
+
+  .searchInput {
+    min-height: 44px;
+  }
+
+  .clearBtn {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
   }
 }

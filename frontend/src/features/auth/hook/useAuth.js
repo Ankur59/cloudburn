@@ -30,9 +30,16 @@ const useAuth = () => {
         await registerApi(data);
         return { success: true };
       } catch (error) {
-        const message = error?.response?.data?.message || "Registration failed";
-        dispatch(setError(message));
-        return { success: false, message };
+        const errors = error?.response?.data?.errors;
+        const firstFieldError =
+          Array.isArray(errors) && errors.length > 0 ? errors[0] : null;
+        const message =
+          firstFieldError?.msg ??
+          error?.response?.data?.message ??
+          "Registration failed";
+        // Only push to Redux for non-field errors (e.g. 409 duplicate email)
+        if (!firstFieldError) dispatch(setError(message));
+        return { success: false, message, firstFieldError };
       } finally {
         dispatch(setLoading(false));
       }
@@ -52,9 +59,16 @@ const useAuth = () => {
         if (user) dispatch(setUser(user));
         return { success: true };
       } catch (error) {
-        const message = error?.response?.data?.message || "Login failed";
-        dispatch(setError(message));
-        return { success: false, message };
+        const errors = error?.response?.data?.errors;
+        const firstFieldError =
+          Array.isArray(errors) && errors.length > 0 ? errors[0] : null;
+        const message =
+          firstFieldError?.msg ??
+          error?.response?.data?.message ??
+          "Login failed";
+        // Only push to Redux for non-field errors (e.g. 401 wrong password)
+        if (!firstFieldError) dispatch(setError(message));
+        return { success: false, message, firstFieldError };
       } finally {
         dispatch(setLoading(false));
       }

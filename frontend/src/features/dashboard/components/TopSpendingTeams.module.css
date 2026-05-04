@@ -259,3 +259,24 @@
   font-size: 11px;
   color: var(--text-secondary);
 }
+
+@media (max-width: 768px) {
+  .detailTable {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  .teamsCard {
+    padding: 16px 14px;
+  }
+  .teamRow {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  .teamRight {
+    gap: 8px;
+  }
+  .miniBar {
+    width: 48px;
+  }
+}

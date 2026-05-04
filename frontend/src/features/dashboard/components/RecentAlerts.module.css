@@ -99,3 +99,9 @@
   color: var(--text-tertiary);
   margin-top: 2px;
 }
+
+@media (max-width: 768px) {
+  .alertsCard {
+    padding: 16px 14px;
+  }
+}

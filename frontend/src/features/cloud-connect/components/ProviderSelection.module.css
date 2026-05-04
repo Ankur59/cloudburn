@@ -144,3 +144,22 @@
   from { transform: scale(0.8); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
+
+@media (max-width: 768px) {
+  .providerGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .providerCard {
+    padding: 1.5rem 1rem;
+    gap: 1rem;
+  }
+  .providerName {
+    white-space: normal;
+    font-size: 1.1rem;
+  }
+  .providerBadge, .providerBadgeMuted {
+    font-size: 0.7rem;
+    padding: 0.35rem 0.75rem;
+  }
+}

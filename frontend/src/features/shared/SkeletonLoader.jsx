@@ -52,24 +52,81 @@ export const StatCardSkeleton = () => (
   </div>
 );
 
-/* ─── Chart / block skeleton ─────────────────────────── */
+/* ─── Chart / block skeleton ─────────── */
 export const ChartSkeleton = ({ height = "200px" }) => (
   <div className={styles.chart} style={{ height }}>
     <div className={styles.chartInner} />
   </div>
 );
 
+/* ─── Dashboard skeleton (Full Page) ─────── */
+export const DashboardSkeleton = () => (
+  <div className={styles.fullLayout}>
+    {/* Sidebar Skeleton */}
+    <div className={styles.sidebar}>
+      <div className={styles.sidebarLogo}>
+        <Bone height="2rem" width="2rem" rounded />
+        <Bone height="1.5rem" width="120px" />
+      </div>
+      <div className={styles.sidebarMenu}>
+        <Bone height="0.9rem" width="80px" />
+        <div className={styles.gap} style={{ height: "0.25rem" }} />
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className={styles.sidebarItem}>
+            <Bone height="1.25rem" width="1.25rem" rounded />
+            <Bone height="1rem" width="120px" />
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* Main Area Skeleton */}
+    <div className={styles.mainArea}>
+      {/* Topbar Skeleton */}
+      <div className={styles.topbar}>
+        <div className={styles.topbarLeft}>
+          <Bone height="1.25rem" width="1.25rem" rounded />
+          <Bone height="1.25rem" width="150px" />
+          <Bone height="1.5rem" width="60px" rounded />
+        </div>
+        <div className={styles.topbarRight}>
+          <Bone height="1.5rem" width="1.5rem" rounded />
+          <Bone height="2rem" width="2rem" rounded />
+        </div>
+      </div>
+
+      {/* Content Area Skeleton */}
+      <div className={styles.contentArea}>
+        <div className={styles.dashboardHeader}>
+          <Bone height="2rem" width="180px" />
+          <Bone height="1rem" width="280px" />
+        </div>
+        <div className={styles.statGrid}>
+          <StatCardSkeleton />
+          <StatCardSkeleton />
+          <StatCardSkeleton />
+          <StatCardSkeleton />
+        </div>
+        <ChartSkeleton height="300px" />
+        <ChartSkeleton height="180px" />
+      </div>
+    </div>
+  </div>
+);
+
 /* ─── Default export – picks the right variant ─────────── */
 /**
- * <SkeletonLoader variant="card|table|stat|chart|bone" ...props />
+ * <SkeletonLoader variant="dashboard|card|table|stat|chart|bone" ...props />
  */
-const SkeletonLoader = ({ variant = "card", ...props }) => {
+const SkeletonLoader = ({ variant = "dashboard", ...props }) => {
   switch (variant) {
     case "table": return <TableSkeleton {...props} />;
     case "stat":  return <StatCardSkeleton {...props} />;
     case "chart": return <ChartSkeleton {...props} />;
     case "bone":  return <Bone {...props} />;
-    default:      return <CardSkeleton {...props} />;
+    case "card":  return <CardSkeleton {...props} />;
+    case "dashboard":
+    default:      return <DashboardSkeleton {...props} />;
   }
 };
 

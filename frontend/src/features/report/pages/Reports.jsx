@@ -10,6 +10,7 @@ import styles from './Reports.module.css';
 
 export default function Reports() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [currentFilters, setCurrentFilters] = useState({ datePreset: '30d' });
   
   // Real data state from Redux
@@ -64,6 +65,8 @@ export default function Reports() {
       <Sidebar
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        mobileOpen={mobileSidebarOpen}
+        onMobileClose={() => setMobileSidebarOpen(false)}
       />
 
       <div className={`${styles.main} ${sidebarCollapsed ? styles.expanded : ''}`}>
@@ -71,6 +74,7 @@ export default function Reports() {
           currentOrg={currentOrg}
           organizations={organizations}
           onOrgChange={() => {}}
+          onMenuClick={() => setMobileSidebarOpen(true)}
         />
 
         <div className={styles.content}>

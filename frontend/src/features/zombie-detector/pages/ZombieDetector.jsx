@@ -1,6 +1,11 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setResources, setLastScan, setLoading, markResource, markResourcesBulk, terminateResource, removeResource } from '../zombieDetector.slice';
+import {
+  setResources, setTotal, setLastScan, setLoading, setScanLoading, setError,
+  updateResourceStatus, removeResource,
+  markResource, markResourcesBulk, terminateResource,
+} from '../zombieDetector.slice';
+import { getZombiesApi, triggerScanApi, updateZombieStatusApi } from '../zombie.api';
 import Sidebar from '../../shared/Sidebar';
 import Header from '../../dashboard/components/Header';
 import ZombieSummaryCards from '../components/ZombieSummaryCards';
@@ -11,89 +16,41 @@ import ZombieDrawer from '../components/ZombieDrawer';
 import ZombieSkeleton from '../components/ZombieSkeleton';
 import styles from './ZombieDetector.module.css';
 
-// ─── Mock Data ────────────────────────────────────────────────────────────────
-// idleDays is used for filtering and colour coding.
-// costNum is used for sorting and savings calculations.
-const MOCK_RESOURCES = [
-  {
-    id: 'z-1', resourceType: 'EC2', resourceId: 'i-0a3f8c2d91e4b7c12',
-    cloud: 'AWS', region: 'us-east-1', idleDays: 63, costNum: 420,
-    costPerMonth: '$420', status: 'Zombie', createdDate: 'Nov 12, 2024',
-    idleSince: 'Feb 28, 2025',
-    aiSummary: 'This EC2 instance has had 0% CPU utilisation and zero network I/O for 63 days. It was provisioned for a load test that was cancelled, and is now entirely idle. Safe to terminate immediately — no other resources depend on it.',
-  },
-  {
-    id: 'z-2', resourceType: 'RDS', resourceId: 'db-prod-analytics-legacy',
-    cloud: 'AWS', region: 'us-west-2', idleDays: 112, costNum: 1100,
-    costPerMonth: '$1,100', status: 'Zombie', createdDate: 'Aug 5, 2024',
-    idleSince: 'Jan 10, 2025',
-    aiSummary: 'This RDS instance was the database for the legacy analytics pipeline, which was migrated to BigQuery in January. No connections have been made since the migration date. The instance is consuming $1,100/mo with zero utilisation.',
-  },
-  {
-    id: 'z-3', resourceType: 'Elastic IP', resourceId: '54.214.33.102',
-    cloud: 'AWS', region: 'eu-west-1', idleDays: 38, costNum: 14,
-    costPerMonth: '$14', status: 'Zombie', createdDate: 'Dec 1, 2024',
-    idleSince: 'Mar 25, 2025',
-    aiSummary: 'This Elastic IP address is not attached to any running instance or network interface. Unattached Elastic IPs incur a small charge. It appears to have been detached from a terminated test instance and never released.',
-  },
-  {
-    id: 'z-4', resourceType: 'S3', resourceId: 's3://cb-loadtest-artifacts-2024',
-    cloud: 'AWS', region: 'us-east-1', idleDays: 91, costNum: 87,
-    costPerMonth: '$87', status: 'Marked', createdDate: 'Oct 22, 2024',
-    idleSince: 'Jan 31, 2025',
-    aiSummary: 'This S3 bucket contains load test artifacts from Q4 2024. There have been zero read or write operations in 91 days. The bucket holds 180 GB of test result files that are unlikely to be needed again.',
-  },
-  {
-    id: 'z-5', resourceType: 'Load Balancer', resourceId: 'k8s-elb-dev-frontend-9a2c',
-    cloud: 'AWS', region: 'us-east-2', idleDays: 44, costNum: 220,
-    costPerMonth: '$220', status: 'Zombie', createdDate: 'Dec 15, 2024',
-    idleSince: 'Mar 19, 2025',
-    aiSummary: 'This Application Load Balancer is receiving zero traffic — no target group has any healthy registered targets. It was created for a dev Kubernetes cluster that was decommissioned. The ALB is running fully idle.',
-  },
-  {
-    id: 'z-6', resourceType: 'Compute', resourceId: 'cloudburn-gcp-ml-staging-01',
-    cloud: 'GCP', region: 'us-central1', idleDays: 29, costNum: 640,
-    costPerMonth: '$640', status: 'Zombie', createdDate: 'Jan 8, 2025',
-    idleSince: 'Apr 3, 2025',
-    aiSummary: 'This Compute Engine instance was used for ML model staging. The model has since been promoted to production and this instance was not shut down. CPU has been idle for 29 days with no SSH sessions or disk writes.',
-  },
-  {
-    id: 'z-7', resourceType: 'BigQuery', resourceId: 'project/cb-data/dataset/legacy_events',
-    cloud: 'GCP', region: 'us', idleDays: 180, costNum: 310,
-    costPerMonth: '$310', status: 'Marked', createdDate: 'Jul 1, 2024',
-    idleSince: 'Nov 1, 2024',
-    aiSummary: 'This BigQuery dataset has not been queried in 180 days and contains data from a deprecated event tracking system. Storage costs continue to accrue. Recommend archiving to Cloud Storage with a lifecycle policy.',
-  },
-  {
-    id: 'z-8', resourceType: 'EC2', resourceId: 'i-0d7e2f4a88b1c3d56',
-    cloud: 'AWS', region: 'ap-southeast-1', idleDays: 8, costNum: 180,
-    costPerMonth: '$180', status: 'Zombie', createdDate: 'Apr 22, 2025',
-    idleSince: 'Apr 24, 2025',
-    aiSummary: 'This EC2 instance was recently provisioned but shows signs of being abandoned — it has never served any traffic and has had zero CPU utilisation since creation, apart from the initial boot sequence.',
-  },
-  {
-    id: 'z-9', resourceType: 'RDS', resourceId: 'db-staging-payments-v2',
-    cloud: 'Azure', region: 'eastus', idleDays: 55, costNum: 890,
-    costPerMonth: '$890', status: 'Cleaned', createdDate: 'Oct 10, 2024',
-    idleSince: 'Mar 8, 2025',
-    aiSummary: 'This Azure SQL database was used for staging the payments service v2 migration. The migration completed in March and this instance was subsequently terminated. Status: Cleaned.',
-  },
-];
-
 const DEFAULT_FILTERS = { cloud: '', resourceType: '', idleDuration: '' };
 const TABS = ['Active Zombies', 'Pending Cleanup', 'Cleaned'];
-const TAB_STATUS = { 'Active Zombies': ['Zombie'], 'Pending Cleanup': ['Marked'], 'Cleaned': ['Cleaned'] };
+const TAB_STATUS = { 'Active Zombies': ['zombie'], 'Pending Cleanup': ['marked'], 'Cleaned': ['cleaned'] };
 
-// Helper: format a number as a $ string
+// Map backend fields → UI shape expected by existing components
+const normalizeResource = (r) => ({
+  ...r,
+  id:           r._id,
+  resourceType: r.service,
+  cloud:        r.provider?.toUpperCase() ?? 'AWS',
+  costNum:      r.estimatedMonthlyCost ?? 0,
+  costPerMonth: `$${(r.estimatedMonthlyCost ?? 0).toLocaleString('en-US')}`,
+  idleDays:     r.idleDays ?? 0,
+  createdDate:  r.detectedAt ? new Date(r.detectedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—',
+  idleSince:    r.lastSeenAt ? new Date(r.lastSeenAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—',
+  // Capitalize status to match existing TAB_STATUS keys
+  status: r.status
+    ? r.status.charAt(0).toUpperCase() + r.status.slice(1)
+    : 'Zombie',
+  aiSummary:    r.aiSummary || `This ${r.service} resource (${r.resourceId}) has been idle for ${r.idleDays} day(s) with no meaningful activity detected.`,
+});
+
 const fmt = (n) => '$' + n.toLocaleString('en-US');
 
 // ─── ZombieDetector Page ──────────────────────────────────────────────────────
 export default function ZombieDetector() {
   const dispatch = useDispatch();
-  const { resources, lastScan, loading } = useSelector((state) => state.zombieDetector);
+  const { resources, lastScan, loading, scanLoading, error } = useSelector(
+    (state) => state.zombieDetector
+  );
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [currentOrg, setCurrentOrg]             = useState('Acme Corporation');
+  const organizations = ['Acme Corporation', 'Globex Inc', 'Soylent Corp'];
   const [activeTab, setActiveTab]               = useState('Active Zombies');
   const [filters, setFilters]                   = useState(DEFAULT_FILTERS);
   const [selectedIds, setSelectedIds]           = useState(new Set());
@@ -101,32 +58,56 @@ export default function ZombieDetector() {
   const [sortKey, setSortKey]                   = useState('idleDays');
   const [sortDesc, setSortDesc]                 = useState(true);
 
-  useEffect(() => {
-    if (resources.length === 0) {
-      dispatch(setResources(MOCK_RESOURCES));
-    }
-  }, [dispatch, resources.length]);
-
-  const organizations = ['Acme Corporation', 'TechStart Inc.', 'Global Dynamics'];
-
-  // ── Run Zombie Scan ──────────────────────────────────────────────────────────
-  const handleScan = () => {
+  // ── Fetch on mount ───────────────────────────────────────────────────────────
+  const fetchZombies = useCallback(async () => {
     dispatch(setLoading(true));
-    setSelectedIds(new Set());
-    setTimeout(() => {
-      dispatch(setLastScan('just now'));
+    dispatch(setError(null));
+    try {
+      const res = await getZombiesApi();
+      const data = res.data?.data;
+      dispatch(setResources((data?.resources ?? []).map(normalizeResource)));
+      dispatch(setTotal(data?.total ?? 0));
+      if (data?.scannedAt) dispatch(setLastScan(data.scannedAt));
+    } catch (err) {
+      dispatch(setError(err?.response?.data?.message ?? 'Failed to load zombie resources.'));
+    } finally {
       dispatch(setLoading(false));
-    }, 2000);
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    fetchZombies();
+  }, [fetchZombies]);
+
+  // ── Format last scan time ────────────────────────────────────────────────────
+  const lastScanLabel = useMemo(() => {
+    if (!lastScan) return 'Never';
+    const diff = Math.round((Date.now() - new Date(lastScan).getTime()) / 60000);
+    if (diff < 1) return 'just now';
+    if (diff < 60) return `${diff} min ago`;
+    return new Date(lastScan).toLocaleTimeString();
+  }, [lastScan]);
+
+  // ── Run On-Demand Scan ───────────────────────────────────────────────────────
+  const handleScan = async () => {
+    dispatch(setScanLoading(true));
+    setSelectedIds(new Set());
+    try {
+      const res = await triggerScanApi();
+      const data = res.data?.data;
+      dispatch(setResources((data?.resources ?? []).map(normalizeResource)));
+      dispatch(setTotal(data?.total ?? 0));
+      dispatch(setLastScan(data?.scannedAt ?? new Date().toISOString()));
+    } catch (err) {
+      dispatch(setError(err?.response?.data?.message ?? 'Scan failed.'));
+    } finally {
+      dispatch(setScanLoading(false));
+    }
   };
 
   // ── Sorting ──────────────────────────────────────────────────────────────────
   const handleSort = (key) => {
-    if (sortKey === key) {
-      setSortDesc((d) => !d);
-    } else {
-      setSortKey(key);
-      setSortDesc(true);
-    }
+    if (sortKey === key) { setSortDesc((d) => !d); } else { setSortKey(key); setSortDesc(true); }
   };
 
   // ── Filtering + sorting ──────────────────────────────────────────────────────
@@ -134,15 +115,14 @@ export default function ZombieDetector() {
     const allowedStatuses = TAB_STATUS[activeTab];
     return resources
       .filter((r) => {
-        if (!allowedStatuses.includes(r.status))             return false;
-        if (filters.cloud && r.cloud !== filters.cloud)      return false;
+        if (!allowedStatuses.includes(r.status?.toLowerCase())) return false;
+        if (filters.cloud && r.cloud !== filters.cloud)                return false;
         if (filters.resourceType && r.resourceType !== filters.resourceType) return false;
         if (filters.idleDuration && r.idleDays < Number(filters.idleDuration)) return false;
         return true;
       })
       .sort((a, b) => {
-        const aVal = a[sortKey];
-        const bVal = b[sortKey];
+        const aVal = a[sortKey], bVal = b[sortKey];
         if (typeof aVal === 'string') return sortDesc ? bVal.localeCompare(aVal) : aVal.localeCompare(bVal);
         return sortDesc ? bVal - aVal : aVal - bVal;
       });
@@ -150,68 +130,59 @@ export default function ZombieDetector() {
 
   // ── Selection ────────────────────────────────────────────────────────────────
   const handleToggleSelect = (id) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
+    setSelectedIds((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
   };
-
   const handleToggleSelectAll = () => {
-    if (selectedIds.size === visibleResources.length) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(visibleResources.map((r) => r.id)));
-    }
+    selectedIds.size === visibleResources.length
+      ? setSelectedIds(new Set())
+      : setSelectedIds(new Set(visibleResources.map((r) => r.id)));
   };
+  const selectedSavings = useMemo(() =>
+    resources.filter((r) => selectedIds.has(r.id)).reduce((s, r) => s + r.costNum, 0),
+    [resources, selectedIds]
+  );
 
-  // Savings for selected rows
-  const selectedSavings = useMemo(() => {
-    return resources
-      .filter((r) => selectedIds.has(r.id))
-      .reduce((sum, r) => sum + r.costNum, 0);
-  }, [resources, selectedIds]);
-
-  // ── Resource actions ─────────────────────────────────────────────────────────
-  const handleMark = (id) => {
+  // ── Resource actions (optimistic + API sync) ─────────────────────────────────
+  const handleMark = async (id) => {
     dispatch(markResource(id));
     setSelectedIds((prev) => { const n = new Set(prev); n.delete(id); return n; });
+    try { await updateZombieStatusApi(id, 'marked'); } catch { fetchZombies(); }
   };
 
-  const handleMarkAll = () => {
-    dispatch(markResourcesBulk(Array.from(selectedIds)));
+  const handleMarkAll = async () => {
+    const ids = Array.from(selectedIds);
+    dispatch(markResourcesBulk(ids));
     setSelectedIds(new Set());
+    try {
+      await Promise.all(ids.map((id) => updateZombieStatusApi(id, 'marked')));
+    } catch { fetchZombies(); }
   };
 
-  const handleTerminate = (id) => {
+  const handleTerminate = async (id) => {
     dispatch(terminateResource(id));
+    try { await updateZombieStatusApi(id, 'cleaned'); } catch { fetchZombies(); }
   };
 
-  const handleSnooze = (id) => {
-    // Snooze: remove from active list for this session
-    dispatch(removeResource(id));
-  };
+  const handleSnooze = (id) => dispatch(removeResource(id));
+  const handleIgnore = (id) => dispatch(removeResource(id));
 
-  const handleIgnore = (id) => {
-    dispatch(removeResource(id));
-  };
+  const handleExport = () => alert(`Exporting ${selectedIds.size} resource(s)…`);
 
-  const handleExport = () => {
-    // In a real app this would trigger a CSV download
-    alert(`Exporting ${selectedIds.size} resource(s)…`);
-  };
-
-  // ── Summary numbers (Active Zombies + Marked only) ───────────────────────────
-  const activeResources = resources.filter((r) => r.status === 'Zombie' || r.status === 'Marked');
+  // ── Summary numbers ──────────────────────────────────────────────────────────
+  const activeResources = resources.filter((r) => ['zombie', 'marked'].includes(r.status?.toLowerCase()));
   const totalWasted     = activeResources.reduce((s, r) => s + r.costNum, 0);
-  const zombieCount     = resources.filter((r) => r.status === 'Zombie').length;
-  const pendingCount    = resources.filter((r) => r.status === 'Marked').length;
+  const zombieCount     = resources.filter((r) => r.status?.toLowerCase() === 'zombie').length;
+  const pendingCount    = resources.filter((r) => r.status?.toLowerCase() === 'marked').length;
+
+  const isScanning = scanLoading;
 
   return (
     <div className={styles.page}>
       <Sidebar
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        mobileOpen={mobileSidebarOpen}
+        onMobileClose={() => setMobileSidebarOpen(false)}
       />
 
       <div className={`${styles.main} ${sidebarCollapsed ? styles.expanded : ''}`}>
@@ -219,6 +190,7 @@ export default function ZombieDetector() {
           currentOrg={currentOrg}
           organizations={organizations}
           onOrgChange={setCurrentOrg}
+          onMenuClick={() => setMobileSidebarOpen(true)}
         />
 
         <div className={styles.content}>
@@ -228,22 +200,28 @@ export default function ZombieDetector() {
               <h1>Zombie Resource Detector</h1>
               <p>Find and eliminate idle cloud resources wasting your budget</p>
             </div>
-
             <div className={styles.headerRight}>
-              <span className={styles.lastScan}>Last scanned: {lastScan}</span>
+              <span className={styles.lastScan}>Last scanned: {lastScanLabel}</span>
               <button
                 id="run-zombie-scan-btn"
-                className={`${styles.scanBtn} ${loading ? styles.scanning : ''}`}
+                className={`${styles.scanBtn} ${isScanning ? styles.scanning : ''}`}
                 onClick={handleScan}
-                disabled={loading}
+                disabled={isScanning || loading}
               >
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M12 2v4M12 18v4M2 12h4M18 12h4M5.64 5.64l2.83 2.83M15.54 15.54l2.83 2.83M5.64 18.36l2.83-2.83M15.54 8.46l2.83-2.83" strokeLinecap="round"/>
                 </svg>
-                {loading ? 'Scanning...' : 'Run Zombie Scan'}
+                {isScanning ? 'Scanning...' : 'Run Zombie Scan'}
               </button>
             </div>
           </div>
+
+          {/* ── Error banner ── */}
+          {error && (
+            <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 8, padding: '0.75rem 1rem', marginBottom: '1rem', color: '#ef4444', fontSize: '0.875rem' }}>
+              {error}
+            </div>
+          )}
 
           {/* ── Summary cards ── */}
           <ZombieSummaryCards
@@ -262,8 +240,8 @@ export default function ZombieDetector() {
                 onClick={() => { setActiveTab(tab); setSelectedIds(new Set()); }}
               >
                 {tab}
-                {tab === 'Active Zombies'   && ` (${zombieCount})`}
-                {tab === 'Pending Cleanup'  && ` (${pendingCount})`}
+                {tab === 'Active Zombies'  && ` (${zombieCount})`}
+                {tab === 'Pending Cleanup' && ` (${pendingCount})`}
               </button>
             ))}
           </div>
@@ -298,7 +276,7 @@ export default function ZombieDetector() {
             />
           )}
 
-          {/* ── Bulk action bar (appears when rows selected) ── */}
+          {/* ── Bulk action bar ── */}
           {selectedIds.size > 0 && (
             <ZombieBulkBar
               selectedCount={selectedIds.size}

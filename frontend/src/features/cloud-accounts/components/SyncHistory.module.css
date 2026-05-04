@@ -76,3 +76,10 @@
 }
 
 .retryBtn:hover { background-color: rgba(201, 78, 78, 0.14); }
+
+@media (max-width: 768px) {
+  .entry { flex-direction: column; align-items: flex-start; gap: 8px; padding: 14px 16px; }
+  .entryMain { width: 100%; }
+  .entryTime { align-self: flex-start; }
+  .retryBtn { width: 100%; justify-content: center; min-height: 36px; margin-top: 4px; }
+}

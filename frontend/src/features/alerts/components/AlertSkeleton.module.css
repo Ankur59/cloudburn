@@ -60,3 +60,32 @@
     background-position: -200% 0;
   }
 }
+
+@media (max-width: 768px) {
+  .skeletonCard {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    gap: 8px 12px;
+  }
+
+  .skeletonBar {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    height: auto;
+    align-self: stretch;
+  }
+
+  .skeletonBody {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .skeletonRight {
+    grid-column: 2;
+    grid-row: 2;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}

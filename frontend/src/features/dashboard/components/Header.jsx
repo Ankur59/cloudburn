@@ -3,13 +3,15 @@
 import { useState, useRef, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { Camera, User as UserIcon, Mail, CreditCard, Shield, ChevronLeft } from 'lucide-react'
 import useAuth from '../../auth/hook/useAuth'
 import styles from './Header.module.css'
 
-export default function Header() {
+export default function Header({ onMenuClick }) {
   const [orgDropdownOpen, setOrgDropdownOpen] = useState(false)
   const [notifDropdownOpen, setNotifDropdownOpen] = useState(false)
   const [userDropdownOpen, setUserDropdownOpen] = useState(false)
+  const [profileSubMenuOpen, setProfileSubMenuOpen] = useState(false)
   
   const orgRef = useRef(null)
   const notifRef = useRef(null)
@@ -35,6 +37,12 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  useEffect(() => {
+    if (!userDropdownOpen) {
+      setProfileSubMenuOpen(false)
+    }
+  }, [userDropdownOpen])
+
   const notifications = [
     {
       type: 'critical',
@@ -56,10 +64,11 @@ export default function Header() {
     }
   }
 
-  const currentOrg = user?.orgName || 'Select Organization'
-  const userName = user?.name || 'User'
-  const userEmail = user?.email || ''
-  const userRole = user?.role || 'Member'
+  const currentOrg  = user?.orgName || 'Select Organization'
+  const userName     = user?.name || 'User'
+  const userEmail    = user?.email || ''
+  const userRole     = user?.role || 'Member'
+  const userAvatar   = user?.avatar || null
   
   const initials = userName
     .split(' ')
@@ -71,6 +80,13 @@ export default function Header() {
   return (
     <header className={styles.header}>
       <div className={styles.leftSection}>
+        <button className={styles.menuButton} onClick={onMenuClick}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
         <div className={styles.orgSelector} ref={orgRef}>
           <button 
             className={styles.orgButton}
@@ -141,7 +157,11 @@ export default function Header() {
             className={styles.userButton}
             onClick={() => setUserDropdownOpen(!userDropdownOpen)}
           >
-            <div className={styles.userAvatar}>{initials}</div>
+            {userAvatar ? (
+              <img src={userAvatar} alt={userName} className={styles.userAvatarImg} />
+            ) : (
+              <div className={styles.userAvatar}>{initials}</div>
+            )}
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="6,9 12,15 18,9" />
             </svg>
@@ -154,14 +174,53 @@ export default function Header() {
                 <span className={styles.userEmail}>{userEmail}</span>
               </div>
               <div className={styles.dropdownDivider} />
-              <button className={styles.dropdownItem}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
-                Profile
-              </button>
-              <button className={styles.dropdownItem}>
+              
+              <div className={styles.subMenuContainer}>
+                <button 
+                  className={styles.dropdownItem}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setProfileSubMenuOpen(!profileSubMenuOpen);
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  Profile
+                  {profileSubMenuOpen && <ChevronLeft size={16} className={styles.chevronLeft} />}
+                </button>
+
+              {profileSubMenuOpen && (
+                  <div className={styles.subMenu}>
+                    <button className={styles.subMenuItem} onClick={() => { setUserDropdownOpen(false); navigate('/settings?tab=profile'); }}>
+                      <span className={styles.subMenuItemIcon}><Camera size={14} /></span>
+                      Change Avatar
+                    </button>
+                    <button className={styles.subMenuItem} onClick={() => { setUserDropdownOpen(false); navigate('/settings?tab=profile'); }}>
+                      <span className={styles.subMenuItemIcon}><UserIcon size={14} /></span>
+                      Edit Name
+                    </button>
+                    <button className={styles.subMenuItem} onClick={() => { setUserDropdownOpen(false); navigate('/settings?tab=security'); }}>
+                      <span className={styles.subMenuItemIcon}><Mail size={14} /></span>
+                      Change Password
+                    </button>
+                    <div className={styles.subMenuItemDivider} />
+                    <button className={`${styles.subMenuItem} ${styles.subMenuItemDisabled}`}>
+                      <span className={styles.subMenuItemIcon}><CreditCard size={14} /></span>
+                      Billing
+                      <span className={styles.comingSoonBadge}>Coming Soon</span>
+                    </button>
+                    <button className={`${styles.subMenuItem} ${styles.subMenuItemDisabled}`}>
+                      <span className={styles.subMenuItemIcon}><Shield size={14} /></span>
+                      Two-Factor Auth
+                      <span className={styles.comingSoonBadge}>Coming Soon</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <button className={styles.dropdownItem} onClick={() => { setUserDropdownOpen(false); navigate('/settings'); }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="12" cy="12" r="3" />
                   <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />

@@ -1,9 +1,13 @@
 import mongoose from 'mongoose';
 
-// Created when current metric value > previous value * 1.5 (50% spike).
-// One alert per (orgId + resourceId + metricName) spike event.
+// Created when current metric value > previous value * 1.5 (50% spike)
+// OR when cost > previous day cost * 2 (100% cost spike).
+// Handles both resource metric spikes and daily cost spikes.
+// Alert types: 
+// - SPIKE: Current cost > previous cost * 2
+// - ZOMBIE: Resource usage dropped below threshold (idle)
 
-const spikeAlertSchema = new mongoose.Schema(
+const alertSchema = new mongoose.Schema(
   {
     orgId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -15,33 +19,56 @@ const spikeAlertSchema = new mongoose.Schema(
       ref: 'Team',
       default: null,
     },
-    resourceId: {
+    alertType: {
       type: String,
-      required: true,
+      enum: ['SPIKE', 'ZOMBIE', 'BUDGET'],
+      default: 'SPIKE',
+    },
+    teamId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Team',
+      required: false,
+    },
+    // For SPIKE: "YYYY-MM-DD"
+    date: {
+      type: String,
+      required: false,
     },
     service: {
       type: String,
-      required: true, // "EC2" | "RDS" | "S3"
+      required: true, // e.g., "EC2" | "RDS" | "S3" | "Total"
+    },
+    // Resource/Metric specific fields (used for ZOMBIE and metric spikes)
+    resourceId: {
+      type: String,
+      required: false,
     },
     metricName: {
       type: String,
-      required: true, // "CPUUtilization" | "InstanceCount"
+      required: false, // "CPUUtilization" etc.
     },
-    previousValue: { type: Number, required: true },
-    currentValue:  { type: Number, required: true },
-    // currentValue / previousValue — how many times larger
-    multiplier:    { type: Number, required: true },
-    message:       { type: String, required: true },
-    alertType:     { type: String, default: 'SPIKE' },
+    // Values
+    previousValue: { type: Number, required: false },
+    currentValue:  { type: Number, required: false },
+    previousCost:  { type: Number, required: false },
+    currentCost:   { type: Number, required: false },
+    
+    multiplier:    { type: Number, required: false },
+    message:       { type: String, required: false },
+    aiExplanation: { type: String, required: false },
     isRead:        { type: Boolean, default: false },
   },
   { timestamps: true }
 );
 
 // Alert list per org, sorted by newest
-spikeAlertSchema.index({ orgId: 1, createdAt: -1 });
-// Team-scoped alert queries
-spikeAlertSchema.index({ orgId: 1, teamId: 1, createdAt: -1 });
+alertSchema.index({ orgId: 1, createdAt: -1 });
+// For SPIKE uniqueness
+alertSchema.index({ orgId: 1, date: 1, service: 1, alertType: 1 }, { unique: true, partialFilterExpression: { alertType: 'SPIKE' } });
+// For ZOMBIE uniqueness
+alertSchema.index({ orgId: 1, resourceId: 1, alertType: 1 }, { unique: true, partialFilterExpression: { alertType: 'ZOMBIE' } });
+// For BUDGET uniqueness
+alertSchema.index({ orgId: 1, teamId: 1, date: 1, alertType: 1 }, { unique: true, partialFilterExpression: { alertType: 'BUDGET' } });
 
-const SpikeAlert = mongoose.model('SpikeAlert', spikeAlertSchema);
+const SpikeAlert = mongoose.model('SpikeAlert', alertSchema);
 export default SpikeAlert;

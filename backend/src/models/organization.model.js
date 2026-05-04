@@ -21,6 +21,7 @@ const organizationSchema = new mongoose.Schema(
     awsAccessKey: { type: String, select: false, default: null },
     awsSecretKey: { type: String, select: false, default: null },
     awsRegion: { type: String, default: null },
+    awsAccountId: { type: String, default: null },
     awsConnectedAt: { type: Date, default: null },
     lastSyncedAt: { type: Date, default: null },
   },
