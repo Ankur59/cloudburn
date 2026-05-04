@@ -344,7 +344,7 @@
 }
 :global(.policyHeader) {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 2fr 1.2fr 2fr;
   padding: 10px 16px;
   background: var(--elevated-bg);
   font-size: 12px;
@@ -356,12 +356,13 @@
 }
 :global(.policyRow) {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 2fr 1.2fr 2fr;
   padding: 10px 16px;
   border-bottom: 1px solid var(--border-color);
   align-items: center;
   font-size: 13px;
   transition: background-color 0.15s;
+  gap: 8px;
 }
 :global(.policyRow):last-child {
   border-bottom: none;
@@ -370,16 +371,37 @@
   background-color: var(--elevated-bg);
 }
 :global(.policyRow) code {
-  font-size: 12px;
+  font-size: 11.5px;
   background-color: var(--elevated-bg);
   border: 1px solid var(--border-color);
   border-radius: 4px;
   padding: 3px 7px;
   font-family: monospace;
   color: #f59e0b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
 }
 :global(.policyRow) span {
   color: var(--text-secondary);
+}
+:global(.policyType) {
+  font-size: 11px !important;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+:global(.awsManaged) {
+  background: rgba(59,130,246,0.1);
+  border: 1px solid rgba(59,130,246,0.25);
+  color: #93c5fd !important;
+}
+:global(.jobFunc) {
+  background: rgba(168,85,247,0.1);
+  border: 1px solid rgba(168,85,247,0.25);
+  color: #c4b5fd !important;
 }
 
 /* Key display box */

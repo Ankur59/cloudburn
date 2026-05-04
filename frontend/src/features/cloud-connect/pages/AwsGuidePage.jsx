@@ -47,28 +47,30 @@ const steps = [
         <div className="policyTable">
           <div className="policyHeader">
             <span>Policy Name</span>
+            <span>Type</span>
             <span>Why Cloudburn Needs It</span>
           </div>
           {[
-            { policy: 'AmazonDynamoDBReadOnlyAccess',           reason: 'Read DynamoDB table metrics & usage for cost analysis' },
-            { policy: 'AmazonEC2FullAccess',                    reason: 'Full EC2 visibility — required for zombie/idle instance detection' },
-            { policy: 'AmazonEC2ReadOnlyAccess',                reason: 'Fallback read-only EC2 access (can use instead of Full)' },
-            { policy: 'AmazonRDSReadOnlyAccess',                reason: 'Detect idle RDS instances and read DB cost data' },
-            { policy: 'AmazonS3ReadOnlyAccess',                 reason: 'Read S3 bucket usage and storage costs' },
-            { policy: 'AWSBillingConductorFullAccess',          reason: 'Full billing conductor access for accurate cost allocation' },
-            { policy: 'AWSBillingConductorReadOnlyAccess',      reason: 'Read billing conductor groups and pricing plans' },
-            { policy: 'AWSBillingReadOnlyAccess',               reason: 'Read billing & invoice data, payment methods' },
-            { policy: 'AWSCostAndUsageReportAutomationPolicy',  reason: 'Access Cost & Usage Reports (CUR) for detailed spend data' },
-            { policy: 'Billing',                                reason: 'Core billing job function — required for full billing dashboard access' },
-          ].map(({ policy, reason }) => (
+            { policy: 'AmazonDynamoDBReadOnlyAccess',           type: 'AWS managed',             reason: 'Read DynamoDB table metrics & usage for cost analysis' },
+            { policy: 'AmazonEC2FullAccess',                    type: 'AWS managed',             reason: 'Full EC2 visibility — required for zombie/idle instance detection' },
+            { policy: 'AmazonEC2ReadOnlyAccess',                type: 'AWS managed',             reason: 'Fallback read-only EC2 access (use instead of EC2FullAccess if preferred)' },
+            { policy: 'AmazonRDSReadOnlyAccess',                type: 'AWS managed',             reason: 'Detect idle RDS instances and read DB cost data' },
+            { policy: 'AmazonS3ReadOnlyAccess',                 type: 'AWS managed',             reason: 'Read S3 bucket usage and storage costs' },
+            { policy: 'AWSBillingConductorFullAccess',          type: 'AWS managed',             reason: 'Full billing conductor access for accurate cost allocation' },
+            { policy: 'AWSBillingConductorReadOnlyAccess',      type: 'AWS managed',             reason: 'Read billing conductor groups and pricing plans' },
+            { policy: 'AWSBillingReadOnlyAccess',               type: 'AWS managed',             reason: 'Read billing & invoice data, payment methods' },
+            { policy: 'AWSCostAndUsageReportAutomationPolicy',  type: 'AWS managed',             reason: 'Access Cost & Usage Reports (CUR) for detailed spend data' },
+            { policy: 'Billing',                                type: 'AWS managed – job function', reason: 'Core billing job function — full billing dashboard access' },
+          ].map(({ policy, type, reason }) => (
             <div className="policyRow" key={policy}>
               <code>{policy}</code>
+              <span className={`policyType ${type.includes('job') ? 'jobFunc' : 'awsManaged'}`}>{type}</span>
               <span>{reason}</span>
             </div>
           ))}
         </div>
         <div className="warning">
-          <span>⚠️ Important</span> Cloudburn only reads data — it never writes to, modifies, or deletes any AWS resource. All policies above are strictly <strong>read-only</strong>.
+          <span>⚠️ Note</span> Attach all of the above. Cloudburn uses these for <strong>read purposes only</strong> — even EC2FullAccess is used solely to read instance metadata for idle/zombie detection.
         </div>
       </>
     ),
