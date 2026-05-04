@@ -194,7 +194,6 @@
   font-family: var(--font-sans);
 }
 
-/* Forgot password link */
 .forgotLink {
   text-align: center;
   font-size: 0.875rem;
@@ -205,4 +204,13 @@
 
 .forgotLink:hover {
   color: var(--text-primary);
+}
+
+/* Mobile overrides to prevent scrolling */
+@media (max-width: 640px) {
+  .form { gap: 1.25rem; }
+  .formGroup { gap: 0.5rem; }
+  .input, .select, .googleButton, .submitButton {
+    padding: 0.65rem 1rem;
+  }
 }

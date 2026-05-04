@@ -52,6 +52,7 @@
   align-items: center;
   gap: 8px;
   min-width: 0;
+  flex: 1;
 }
 
 .serviceRank {
@@ -68,7 +69,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 240px;
 }
 
 .serviceRight {
@@ -105,4 +105,10 @@
   background: linear-gradient(90deg, var(--accent), #7c5cbf);
   border-radius: 99px;
   transition: width 0.6s cubic-bezier(.4,0,.2,1);
+}
+
+@media (max-width: 768px) {
+  .costCard {
+    padding: 16px 14px;
+  }
 }

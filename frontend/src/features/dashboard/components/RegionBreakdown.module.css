@@ -95,6 +95,7 @@
   flex-direction: column;
   gap: 2px;
   min-width: 0;
+  flex: 1;
 }
 
 .opService {
@@ -120,4 +121,10 @@
   color: var(--accent);
   font-family: 'SF Mono', 'Fira Code', monospace;
   flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: 16px 14px;
+  }
 }

@@ -64,3 +64,39 @@
   font-weight: 600;
   color: var(--text-primary);
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+  .authContainer {
+    padding: 16px;
+    align-items: center;
+    box-sizing: border-box;
+  }
+  
+  .cardWrapper {
+    max-width: 100%;
+  }
+
+  .card {
+    padding: 1rem;
+    box-shadow: none;
+    border-color: transparent;
+    background-color: transparent;
+  }
+
+  .cardHeader {
+    margin-bottom: 1.5rem;
+  }
+  
+  .logoCircle {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  .pageTitle {
+    font-size: 1.5rem;
+    margin-top: 0.5rem;
+  }
+}

@@ -48,7 +48,9 @@ export default function ZombieDetector() {
   );
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [currentOrg, setCurrentOrg]             = useState('');
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [currentOrg, setCurrentOrg]             = useState('Acme Corporation');
+  const organizations = ['Acme Corporation', 'Globex Inc', 'Soylent Corp'];
   const [activeTab, setActiveTab]               = useState('Active Zombies');
   const [filters, setFilters]                   = useState(DEFAULT_FILTERS);
   const [selectedIds, setSelectedIds]           = useState(new Set());
@@ -176,10 +178,20 @@ export default function ZombieDetector() {
 
   return (
     <div className={styles.page}>
-      <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} />
+      <Sidebar
+        collapsed={sidebarCollapsed}
+        onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        mobileOpen={mobileSidebarOpen}
+        onMobileClose={() => setMobileSidebarOpen(false)}
+      />
 
       <div className={`${styles.main} ${sidebarCollapsed ? styles.expanded : ''}`}>
-        <Header currentOrg={currentOrg} organizations={[]} onOrgChange={setCurrentOrg} />
+        <Header
+          currentOrg={currentOrg}
+          organizations={organizations}
+          onOrgChange={setCurrentOrg}
+          onMenuClick={() => setMobileSidebarOpen(true)}
+        />
 
         <div className={styles.content}>
           {/* ── Page heading ── */}

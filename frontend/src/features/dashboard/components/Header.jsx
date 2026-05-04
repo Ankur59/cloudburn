@@ -3,13 +3,15 @@
 import { useState, useRef, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { Camera, User as UserIcon, Mail, CreditCard, Shield, ChevronLeft } from 'lucide-react'
 import useAuth from '../../auth/hook/useAuth'
 import styles from './Header.module.css'
 
-export default function Header() {
+export default function Header({ onMenuClick }) {
   const [orgDropdownOpen, setOrgDropdownOpen] = useState(false)
   const [notifDropdownOpen, setNotifDropdownOpen] = useState(false)
   const [userDropdownOpen, setUserDropdownOpen] = useState(false)
+  const [profileSubMenuOpen, setProfileSubMenuOpen] = useState(false)
   
   const orgRef = useRef(null)
   const notifRef = useRef(null)
@@ -34,6 +36,12 @@ export default function Header() {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  useEffect(() => {
+    if (!userDropdownOpen) {
+      setProfileSubMenuOpen(false)
+    }
+  }, [userDropdownOpen])
 
   const notifications = [
     {
@@ -71,6 +79,13 @@ export default function Header() {
   return (
     <header className={styles.header}>
       <div className={styles.leftSection}>
+        <button className={styles.menuButton} onClick={onMenuClick}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
         <div className={styles.orgSelector} ref={orgRef}>
           <button 
             className={styles.orgButton}
@@ -154,13 +169,52 @@ export default function Header() {
                 <span className={styles.userEmail}>{userEmail}</span>
               </div>
               <div className={styles.dropdownDivider} />
-              <button className={styles.dropdownItem}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
-                Profile
-              </button>
+              
+              <div className={styles.subMenuContainer}>
+                <button 
+                  className={styles.dropdownItem}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setProfileSubMenuOpen(!profileSubMenuOpen);
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  Profile
+                  {profileSubMenuOpen && <ChevronLeft size={16} className={styles.chevronLeft} />}
+                </button>
+
+                {profileSubMenuOpen && (
+                  <div className={styles.subMenu}>
+                    <button className={styles.subMenuItem}>
+                      <span className={styles.subMenuItemIcon}><Camera size={14} /></span>
+                      Change Avatar
+                    </button>
+                    <button className={styles.subMenuItem}>
+                      <span className={styles.subMenuItemIcon}><UserIcon size={14} /></span>
+                      Edit Name
+                    </button>
+                    <button className={styles.subMenuItem}>
+                      <span className={styles.subMenuItemIcon}><Mail size={14} /></span>
+                      Change Email
+                    </button>
+                    <div className={styles.subMenuItemDivider} />
+                    <button className={`${styles.subMenuItem} ${styles.subMenuItemDisabled}`}>
+                      <span className={styles.subMenuItemIcon}><CreditCard size={14} /></span>
+                      Billing
+                      <span className={styles.comingSoonBadge}>Coming Soon</span>
+                    </button>
+                    <button className={`${styles.subMenuItem} ${styles.subMenuItemDisabled}`}>
+                      <span className={styles.subMenuItemIcon}><Shield size={14} /></span>
+                      Two-Factor Auth
+                      <span className={styles.comingSoonBadge}>Coming Soon</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+
               <button className={styles.dropdownItem}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="12" cy="12" r="3" />

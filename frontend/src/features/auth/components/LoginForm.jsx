@@ -146,9 +146,9 @@ const LoginForm = () => {
         )}
       </button>
 
-      <a href="#" className={styles.forgotLink}>
+      <Link to="/forgot-password" className={styles.forgotLink}>
         Forgot password?
-      </a>
+      </Link>
 
       <div className={styles.footerText}>
         Don&apos;t have an account?{" "}

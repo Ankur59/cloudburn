@@ -30,9 +30,9 @@ function fmtDate(iso) {
 // ─── Components ───────────────────────────────────────────────────────────────
 
 /** Sidebar with chat history */
-function ChatHistorySidebar({ chats, activeChatId, onSelect, onNew, onDelete, loading }) {
+function ChatHistorySidebar({ chats, activeChatId, onSelect, onNew, onDelete, loading, mobileOpen }) {
   return (
-    <div className={styles.chatSidebar}>
+    <div className={`${styles.chatSidebar} ${mobileOpen ? styles.mobileOpen : ''}`}>
       <div className={styles.chatSidebarHeader}>
         <p className={styles.chatSidebarTitle}>Chat History</p>
         <button className={styles.newChatBtn} onClick={onNew} id="new-chat-btn">
@@ -139,6 +139,8 @@ function TypingIndicator() {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function AskAIPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [mobileChatHistoryOpen, setMobileChatHistoryOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
@@ -184,27 +186,51 @@ export default function AskAIPage() {
 
   return (
     <div className={styles.page}>
-      <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} />
+      <Sidebar 
+        collapsed={sidebarCollapsed} 
+        onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        mobileOpen={mobileSidebarOpen}
+        onMobileClose={() => setMobileSidebarOpen(false)}
+      />
 
       <div className={`${styles.mainContent} ${sidebarCollapsed ? styles.expanded : ''}`}>
-        <Header />
+        <Header onMenuClick={() => setMobileSidebarOpen(true)} />
 
         <div className={styles.chatLayout}>
           {/* ── History Panel ── */}
           <ChatHistorySidebar
             chats={chats}
             activeChatId={activeChatId}
-            onSelect={selectChat}
-            onNew={startNewChat}
+            onSelect={(id) => { selectChat(id); setMobileChatHistoryOpen(false); }}
+            onNew={() => { startNewChat(); setMobileChatHistoryOpen(false); }}
             onDelete={deleteChat}
             loading={loading}
+            mobileOpen={mobileChatHistoryOpen}
           />
+          
+          {mobileChatHistoryOpen && (
+            <div 
+              className={styles.historyBackdrop}
+              onClick={() => setMobileChatHistoryOpen(false)}
+            />
+          )}
 
           {/* ── Main Chat ── */}
           <div className={styles.chatArea}>
 
             {/* Header bar */}
             <div className={styles.chatHeader}>
+              <button 
+                className={styles.mobileHistoryBtn}
+                onClick={() => setMobileChatHistoryOpen(true)}
+                title="Chat History"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+              </button>
               <div className={styles.chatHeaderIcon}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
                   <path d="M12 2v4M12 18v4M2 12h4M18 12h4M5.64 5.64l2.83 2.83M15.54 15.54l2.83 2.83M5.64 18.36l2.83-2.83M15.54 8.46l2.83-2.83" strokeLinecap="round" />

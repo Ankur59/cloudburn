@@ -1,23 +1,137 @@
-import styles from "./Loader.module.css";
+import React from 'react';
+import styled from 'styled-components';
 
-/**
- * Normal spinner Loader
- * Props:
- *   size    — 'sm' | 'md' | 'lg'   (default: 'md')
- *   label   — optional text beneath the spinner
- *   fullPage — centres the loader in the whole viewport (default: false)
- */
-const Loader = ({ size = "md", label, fullPage = false }) => {
+const Loader = () => {
   return (
-    <div
-      className={`${styles.wrapper} ${fullPage ? styles.fullPage : ""}`}
-      role="status"
-      aria-label={label || "Loading…"}
-    >
-      <span className={`${styles.spinner} ${styles[size]}`} />
-      {label && <p className={styles.label}>{label}</p>}
-    </div>
+    <StyledWrapper>
+      <div className="loader">
+        <div className="bar1" />
+        <div className="bar2" />
+        <div className="bar3" />
+        <div className="bar4" />
+        <div className="bar5" />
+        <div className="bar6" />
+        <div className="bar7" />
+        <div className="bar8" />
+        <div className="bar9" />
+        <div className="bar10" />
+        <div className="bar11" />
+        <div className="bar12" />
+      </div>
+      <div className="loading-text">Authenticating</div>
+    </StyledWrapper>
   );
-};
+}
+
+const StyledWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  gap: 10px;
+
+  .loading-text {
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: #a1a1aa; /* Professional muted gray */
+    letter-spacing: 0.5px;
+  }
+
+  .loader {
+    position: relative;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+  }
+
+  .loader div {
+    width: 8%;
+    height: 24%;
+    background: rgb(128, 128, 128);
+    position: absolute;
+    left: 50%;
+    top: 30%;
+    opacity: 0;
+    border-radius: 50px;
+    box-shadow: 0 0 3px rgba(0,0,0,0.2);
+    animation: fade458 1s linear infinite;
+  }
+
+  @keyframes fade458 {
+    from {
+      opacity: 1;
+    }
+
+    to {
+      opacity: 0.25;
+    }
+  }
+
+  .loader .bar1 {
+    transform: rotate(0deg) translate(0, -130%);
+    animation-delay: 0s;
+  }
+
+  .loader .bar2 {
+    transform: rotate(30deg) translate(0, -130%);
+    animation-delay: -1.1s;
+  }
+
+  .loader .bar3 {
+    transform: rotate(60deg) translate(0, -130%);
+    animation-delay: -1s;
+  }
+
+  .loader .bar4 {
+    transform: rotate(90deg) translate(0, -130%);
+    animation-delay: -0.9s;
+  }
+
+  .loader .bar5 {
+    transform: rotate(120deg) translate(0, -130%);
+    animation-delay: -0.8s;
+  }
+
+  .loader .bar6 {
+    transform: rotate(150deg) translate(0, -130%);
+    animation-delay: -0.7s;
+  }
+
+  .loader .bar7 {
+    transform: rotate(180deg) translate(0, -130%);
+    animation-delay: -0.6s;
+  }
+
+  .loader .bar8 {
+    transform: rotate(210deg) translate(0, -130%);
+    animation-delay: -0.5s;
+  }
+
+  .loader .bar9 {
+    transform: rotate(240deg) translate(0, -130%);
+    animation-delay: -0.4s;
+  }
+
+  .loader .bar10 {
+    transform: rotate(270deg) translate(0, -130%);
+    animation-delay: -0.3s;
+  }
+
+  .loader .bar11 {
+    transform: rotate(300deg) translate(0, -130%);
+    animation-delay: -0.2s;
+  }
+
+  .loader .bar12 {
+    transform: rotate(330deg) translate(0, -130%);
+    animation-delay: -0.1s;
+  }`;
 
 export default Loader;

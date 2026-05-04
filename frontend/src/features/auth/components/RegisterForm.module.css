@@ -183,7 +183,6 @@
   color: white;
 }
 
-/* Success message */
 .successMessage {
   border-radius: 0.75rem;
   border: 1px solid rgba(77, 184, 122, 0.4);
@@ -192,4 +191,13 @@
   font-size: 0.875rem;
   color: rgba(217, 241, 217, 1);
   font-family: var(--font-sans);
+}
+
+/* Mobile overrides to prevent scrolling */
+@media (max-width: 640px) {
+  .form { gap: 1.25rem; }
+  .formGroup { gap: 0.5rem; }
+  .input, .select, .googleButton, .submitButton {
+    padding: 0.65rem 1rem;
+  }
 }

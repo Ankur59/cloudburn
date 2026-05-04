@@ -5,6 +5,7 @@
   overflow: hidden;
 }
 
+/* ── Row count bar ─────────────────────────────────────────── */
 .rowCount {
   padding: 12px 20px;
   font-size: 13px;
@@ -17,14 +18,17 @@
   font-weight: 500;
 }
 
+/* ── Desktop + Tablet: scrollable table ────────────────────── */
 .scrollArea {
   overflow-x: auto;
+  width: 100%;
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
+  min-width: 650px;
 }
 
 .th {
@@ -38,36 +42,23 @@
   user-select: none;
   white-space: nowrap;
   transition: color 0.15s ease;
-  display: table-cell;
 }
 
-/* Override display for th since it's a table cell */
-th.th {
-  display: table-cell;
-}
-
-table thead tr th {
-  display: table-cell;
-  padding: 12px 16px;
-  text-align: left;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  border-bottom: 1px solid var(--border-color);
-  cursor: pointer;
-  user-select: none;
-  white-space: nowrap;
-  transition: color 0.15s ease;
-}
-
-table thead tr th:hover,
-table thead tr th.thActive {
+.th:hover,
+.thActive {
   color: var(--text-primary);
 }
 
-table thead tr th svg {
+.th svg {
   margin-left: 6px;
   vertical-align: middle;
+}
+
+.serviceCell {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .row {
@@ -75,13 +66,8 @@ table thead tr th svg {
   transition: background-color 0.1s ease;
 }
 
-.row:last-child {
-  border-bottom: none;
-}
-
-.row:hover {
-  background-color: var(--elevated-bg);
-}
+.row:last-child { border-bottom: none; }
+.row:hover      { background-color: var(--elevated-bg); }
 
 .td {
   padding: 12px 16px;
@@ -94,7 +80,9 @@ table thead tr th svg {
   font-size: 13px;
 }
 
+/* ── Shared badges ─────────────────────────────────────────── */
 .teamBadge {
+  display: inline-block;
   padding: 3px 8px;
   background-color: rgba(91, 127, 212, 0.12);
   color: var(--info);
@@ -104,26 +92,17 @@ table thead tr th svg {
 }
 
 .cloudBadge {
+  display: inline-block;
   padding: 3px 8px;
   border-radius: 4px;
   font-size: 12px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
-.cloudBadge.aws {
-  background-color: rgba(249, 153, 29, 0.12);
-  color: #F8991D;
-}
-
-.cloudBadge.gcp {
-  background-color: rgba(66, 133, 244, 0.12);
-  color: #4285F4;
-}
-
-.cloudBadge.azure {
-  background-color: rgba(0, 120, 212, 0.12);
-  color: #0078D4;
-}
+.cloudBadge.aws   { background-color: rgba(249, 153, 29, 0.12); color: #F8991D; }
+.cloudBadge.gcp   { background-color: rgba(66, 133, 244, 0.12); color: #4285F4; }
+.cloudBadge.azure { background-color: rgba(0, 120, 212, 0.12);  color: #0078D4; }
 
 .delta {
   font-family: var(--font-mono);
@@ -131,19 +110,15 @@ table thead tr th svg {
   font-weight: 500;
 }
 
-.delta.up {
-  color: var(--danger);
-}
+.delta.up   { color: #C94E4E; }
+.delta.down { color: #4DB87A; }
 
-.delta.down {
-  color: var(--success);
-}
-
-/* Pagination */
+/* ── Pagination ────────────────────────────────────────────── */
 .pagination {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: 12px;
   padding: 12px 20px;
   border-top: 1px solid var(--border-color);
@@ -159,6 +134,7 @@ table thead tr th svg {
   font-family: var(--font-sans);
   cursor: pointer;
   transition: all 0.15s ease;
+  min-height: 36px;
 }
 
 .pageBtn:hover:not(:disabled) {
@@ -178,7 +154,99 @@ table thead tr th svg {
   text-align: center;
 }
 
-/* Skeleton */
+/* ── Mobile card list — hidden on desktop/tablet ───────────── */
+.mobileCardList {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+}
+
+.mobileCard {
+  background: #111111;
+  border: 1px solid #222222;
+  border-radius: 8px;
+  padding: 0.875rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Top row: date (left) + cloud badge (right) */
+.cardTopRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.cardDate {
+  font-size: 0.75rem;
+  color: #A1A1A1;
+  flex-shrink: 0;
+}
+
+/* Cloud badge in top-row: must not grow or cause overflow */
+.cardTopRow .cloudBadge {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.cardService {
+  font-size: 0.875rem;
+  color: #EDEDED;
+  font-weight: 500;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  max-width: 100%;
+  margin-bottom: 10px;
+}
+
+.cardDivider {
+  height: 1px;
+  background-color: #222222;
+  margin: 0 -0.875rem 10px;
+}
+
+.cardMetrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  align-items: flex-start;
+}
+
+.cardMetricItem {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.cardMetricLabel {
+  font-size: 0.7rem;
+  color: #A1A1A1;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cardCost {
+  font-size: 0.875rem;
+  color: #EDEDED;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+/* ── Skeleton loading ──────────────────────────────────────── */
+/* Desktop/Tablet skeletons — hidden on mobile */
+.desktopSkeleton {
+  display: block;
+}
+
 .skeletonHeader {
   height: 44px;
   background: linear-gradient(90deg, var(--elevated-bg) 25%, var(--border-color) 50%, var(--elevated-bg) 75%);
@@ -194,13 +262,86 @@ table thead tr th svg {
   animation: shimmer 1.4s infinite;
 }
 
+/* Mobile skeletons — hidden on desktop/tablet */
+.mobileSkeleton {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+}
+
+.mobileSkeletonCard {
+  background: #111111;
+  border: 1px solid #222222;
+  border-radius: 8px;
+  padding: 0.875rem;
+}
+
+.skeletonTopRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.skeletonLine {
+  height: 12px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--elevated-bg) 25%, #222 50%, var(--elevated-bg) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+.skeletonDivider {
+  height: 1px;
+  background-color: #222222;
+  margin: 10px -0.875rem;
+}
+
 @keyframes shimmer {
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
 
+/* ── Responsive breakpoints ────────────────────────────────── */
 @media (max-width: 768px) {
-  .td, thead tr th {
-    padding: 10px 12px;
+  /* Hide table, show cards */
+  .scrollArea      { display: none; }
+  .desktopSkeleton { display: none; }
+
+  .mobileCardList { display: flex; }
+  .mobileSkeleton { display: flex; }
+
+  /* Pagination */
+  .pageBtn  { min-height: 44px; min-width: 80px; }
+  .pageInfo { font-size: 0.85rem; }
+
+  /* Prevent horizontal scroll */
+  .tableWrapper {
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+
+  .mobileCardList {
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+
+  .mobileCard {
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .cardTopRow {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .cardTopRow .cloudBadge {
+    max-width: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 }
