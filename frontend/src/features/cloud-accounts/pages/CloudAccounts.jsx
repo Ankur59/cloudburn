@@ -13,55 +13,9 @@ import AccountEditDrawer from '../components/AccountEditDrawer';
 import RemoveModal from '../components/RemoveModal';
 import AccountSkeleton from '../components/AccountSkeleton';
 import styles from './CloudAccounts.module.css';
+import { getCloudAccountsApi } from '../cloudAccounts.api.js';
 
-// ─── Mock Data ─────────────────────────────────────────────────────────────────
-// credHealth: { status: 'healthy'|'expiring'|'expired', label, pct }
-const MOCK_ACCOUNTS = [
-  {
-    id: 'acc-1',
-    name: 'Production AWS',
-    provider: 'AWS',
-    accountId: '123456789012',
-    regions: ['us-east-1', 'us-west-2'],
-    mtdSpend: '$24,840',
-    lastSynced: '2 min ago',
-    status: 'Active',
-    credHealth: { status: 'healthy', label: 'Healthy', pct: 100 },
-  },
-  {
-    id: 'acc-2',
-    name: 'Analytics GCP',
-    provider: 'GCP',
-    accountId: 'cb-analytics-prod-9812',
-    regions: ['us-central1', 'europe-west1'],
-    mtdSpend: '$18,430',
-    lastSynced: '8 min ago',
-    status: 'Active',
-    credHealth: { status: 'healthy', label: 'Healthy', pct: 100 },
-  },
-  {
-    id: 'acc-3',
-    name: 'Staging Azure',
-    provider: 'Azure',
-    accountId: 'sub-4f7a-8b2c-1d9e',
-    regions: ['eastus', 'westeurope'],
-    mtdSpend: '$8,560',
-    lastSynced: '3 hours ago',
-    status: 'Expiring Soon',
-    credHealth: { status: 'expiring', label: 'Expiring in 3 days', pct: 15 },
-  },
-  {
-    id: 'acc-4',
-    name: 'Dev AWS East',
-    provider: 'AWS',
-    accountId: '987654321098',
-    regions: ['eu-west-1'],
-    mtdSpend: '$3,210',
-    lastSynced: '3 hours ago',
-    status: 'Error',
-    credHealth: { status: 'expired', label: 'Credentials expired', pct: 0 },
-  },
-];
+// MOCK_ACCOUNTS removed as we will fetch from backend
 
 // Sync history log (newest first)
 const INITIAL_SYNC_LOG = [
@@ -88,18 +42,29 @@ export default function CloudAccounts() {
   const [bannerDismissed, setBannerDismissed]   = useState(false);
 
   useEffect(() => {
-    if (accounts.length === 0) dispatch(setAccounts(MOCK_ACCOUNTS));
+    const fetchAccounts = async () => {
+      try {
+        const res = await getCloudAccountsApi();
+        const data = res.data?.data?.accounts || [];
+        dispatch(setAccounts(data));
+      } catch (err) {
+        console.error("Failed to fetch cloud accounts:", err);
+      }
+    };
+    fetchAccounts();
+
     if (syncLog.length === 0) dispatch(setSyncLog(INITIAL_SYNC_LOG));
-  }, [dispatch, accounts.length, syncLog.length]);
+  }, [dispatch, syncLog.length]);
 
   const organizations = ['Acme Corporation', 'TechStart Inc.', 'Global Dynamics'];
 
   // ── Stats ──────────────────────────────────────────────────────────────────
-  const totalSpend     = accounts.reduce((s, a) => s + parseInt(a.mtdSpend.replace(/[$,]/g, ''), 10), 0);
-  const needsAttention = accounts.filter((a) => a.status === 'Error' || a.status === 'Expiring Soon' || a.status === 'Expired').length;
+  const activeAccounts = accounts.filter(a => a.status !== 'Coming Soon');
+  const totalSpend     = activeAccounts.reduce((s, a) => s + parseInt(String(a.mtdSpend).replace(/[$,]/g, '') || 0, 10), 0);
+  const needsAttention = activeAccounts.filter((a) => a.status === 'Error' || a.status === 'Expiring Soon' || a.status === 'Expired').length;
 
   // Show expiry banner if any account is expiring/expired and not dismissed
-  const expiringAccount = useMemo(() => accounts.find((a) => a.status === 'Expiring Soon'), [accounts]);
+  const expiringAccount = useMemo(() => activeAccounts.find((a) => a.status === 'Expiring Soon'), [activeAccounts]);
   const showBanner = !bannerDismissed && !!expiringAccount;
 
   // ── Sync Now ────────────────────────────────────────────────────────────────
@@ -170,7 +135,7 @@ export default function CloudAccounts() {
           {/* ── Page heading ── */}
           <div className={styles.pageHeader}>
             <div className={styles.pageHeaderLeft}>
-              <h1>Cloud Accounts</h1>
+               <h1>Cloud Accounts</h1>
               <p>Manage your connected cloud providers</p>
             </div>
             <button id="connect-new-btn" className={styles.connectBtn} onClick={handleConnectNew}>
@@ -192,7 +157,7 @@ export default function CloudAccounts() {
 
           {/* ── Top stats ── */}
           <AccountStatsBar
-            totalAccounts={accounts.length}
+            totalAccounts={activeAccounts.length}
             totalSpend={fmt(totalSpend)}
             needsAttention={needsAttention}
           />
