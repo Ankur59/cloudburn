@@ -9,6 +9,7 @@ import { initCronJobs } from './src/jobs/costSync.job.js';
 import { initResourceSyncJob } from './src/jobs/resourceSync.job.js';
 import { initInsightRefreshJob } from './src/jobs/insightRefresh.job.js';
 import { initZombieJob } from './src/jobs/zombie.job.js';
+import { initBillingSnapshotJob } from './src/jobs/billingSnapshot.job.js';
 
 // ── HTTP server (wraps express — required for socket.io) ──────────────────────
 const httpServer = createServer(app);
@@ -43,6 +44,7 @@ const startServer = async () => {
   initResourceSyncJob();        // resource monitor (every 5 min)
   initInsightRefreshJob();      // AI insights refresh (daily at midnight)
   initZombieJob(io);            // zombie detection  (every 12h)
+  initBillingSnapshotJob();     // billing snapshot (daily at 8:00 PM IST)
   
   // 4) Begin accepting HTTP + WebSocket connections
   httpServer.listen(config.PORT, () => {
