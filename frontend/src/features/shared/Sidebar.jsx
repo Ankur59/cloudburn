@@ -2,6 +2,8 @@
 
 import styles from "./Sidebar.module.css";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import useAuth from "../auth/hook/useAuth";
 
 const navItems = [
   { icon: "dashboard", label: "Dashboard", href: "/dashboard" },
@@ -185,6 +187,22 @@ function NavIcon({ type }) {
 
 export default function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }) {
   const currentPath = window.location.pathname;
+  const { user } = useSelector((state) => state.auth);
+  const { handleLogout } = useAuth();
+
+  const getInitials = (name) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .substring(0, 2)
+      .toUpperCase();
+  };
+
+  const userName = user?.name || user?.firstName || "User";
+  const userEmail = user?.email || "";
+  const initials = getInitials(userName);
 
   return (
     <>
@@ -239,15 +257,15 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose
         </button>
 
         <div className={styles.userInfo}>
-          <div className={styles.avatar}>AJ</div>
+          <div className={styles.avatar}>{initials}</div>
           {!collapsed && (
             <div className={styles.userDetails}>
-              <span className={styles.userName}>Alex Johnson</span>
-              <span className={styles.userEmail}>alex@company.com</span>
+              <span className={styles.userName}>{userName}</span>
+              <span className={styles.userEmail}>{userEmail}</span>
             </div>
           )}
           {!collapsed && (
-            <button className={styles.logoutBtn}>
+            <button className={styles.logoutBtn} onClick={handleLogout} title="Logout">
               <svg
                 width="18"
                 height="18"
